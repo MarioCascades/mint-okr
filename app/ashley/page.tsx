@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '../../lib/supabase'
 
 
 export default function Page() {
