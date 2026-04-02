@@ -10,7 +10,7 @@ export default function Header() {
   )
 }
 
-const container = {
+const container : React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -19,14 +19,14 @@ const container = {
   backgroundColor: '#000000'
 }
 
-const logo = {
+const logo : React.CSSProperties = {
   height: 40
 }
 
-const title = {
+const title : React.CSSProperties = {
   fontSize: 18,
   fontWeight: 600,
   flex: 1,
-  textAlign: 'center' as const,
+  textAlign: 'center',
   color: '#FFFFFF'
 }
