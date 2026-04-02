@@ -224,6 +224,24 @@ const KeyResult = ({ label, selectedMonth, isEditing, isPercent = false }: any) 
   const [target, setTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
+
+  const handleSave = async () => {
+
+  if (!keyResultId) return
+
+  const y = selectedMonth.getFullYear()
+  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+  const reportingDate = `${y}-${m}-01`
+
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      value: Number(value),
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
+}
 useEffect(() => {
 
   const fetchData = async () => {
@@ -262,6 +280,22 @@ useEffect(() => {
     if (!base) return
 
     setKeyResultId(base.key_result_id)
+
+    const prev = new Date(selectedMonth)
+prev.setMonth(prev.getMonth() - 1)
+
+const formatDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+
+const { data: prevData } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', formatDate(prev))
+  .maybeSingle()
+
+const prevVal = Number(prevData?.value ?? 0)
+setLastMonth(prevVal.toString())
 
     let t = Number(base.target_value ?? 0)
 
@@ -307,11 +341,12 @@ useEffect(() => {
         <input style={cell} value={target} readOnly />
 
         <input
-          style={cell}
-          value={value}
-          readOnly={!isEditing}
-          onChange={(e) => setValue(e.target.value)}
-        />
+            style={cell}
+            value={value}
+            readOnly={!isEditing}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={handleSave}
+/>
 
         <input style={cell} value={score} readOnly />
 
