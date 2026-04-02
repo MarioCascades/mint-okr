@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
-import { supabase } from '../../lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 const labelMap: Record<string, string> = {
   "Missed Slack Orders": "Missed Slack Orders",

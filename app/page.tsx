@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import KPI from '../components/KPI'
-import { supabase } from '../lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 // ================= LABEL MAP =================
 
