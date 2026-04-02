@@ -1,5 +1,5 @@
 'use client'
-export const dynamic = 'force-dynamic'
+
 
 import { useRouter, usePathname } from 'next/navigation'
 
