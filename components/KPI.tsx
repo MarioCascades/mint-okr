@@ -245,31 +245,31 @@ export default function KPI({ label, user, value, prev, target, isCurrency, isPe
 // ================= STYLES =================
 //
 
-const kpiCard = {
+const kpiCard : React.CSSProperties = {
   backgroundColor: '#1a1a1a',
   padding: 10,
   borderRadius: 6
 }
 
-const kpiLabel = {
+const kpiLabel : React.CSSProperties = {
   textAlign: 'center' as const,
   marginBottom: 10,
   fontWeight: 600
 }
 
-const kpiHeader = {
+const kpiHeader : React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   fontSize: 12,
   marginBottom: 5
 }
 
-const kpiRow = {
+const kpiRow : React.CSSProperties = {
   display: 'flex',
   gap: 5
 }
 
-const cell = {
+const cell : React.CSSProperties = {
   width: '100%',
   padding: 4,
   backgroundColor: '#111',
@@ -277,11 +277,11 @@ const cell = {
   border: '1px solid #333'
 }
 
-const cellWide = {
+const cellWide : React.CSSProperties = {
   ...cell
 }
 
-const button = {
+const button : React.CSSProperties = {
   marginTop: 10,
   width: '100%',
   backgroundColor: '#00AEEF',
@@ -293,7 +293,7 @@ const button = {
   fontSize: 12
 }
 
-const initRow = {
+const initRow : React.CSSProperties = {
   display: 'flex',
   gap: 5,
   marginTop: 10
