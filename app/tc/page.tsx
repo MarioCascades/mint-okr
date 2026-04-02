@@ -449,33 +449,33 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) => (
 // STYLES
 // =========================
 
-const container = { background: '#000', minHeight: '100vh', color: '#fff' }
-const headerBar = { 
+const container : React.CSSProperties = { background: '#000', minHeight: '100vh', color: '#fff' }
+const headerBar : React.CSSProperties = { 
   background: '#E4572E', 
   padding: 20,
   position: 'sticky',
   top: 60, // BELOW TopNav
   zIndex: 50 // LOWER than TopNav
 }
-const headerTop = { display: 'flex', justifyContent: 'space-between', alignItems: 'center' }
-const headerTitle = { fontSize: 28, fontWeight: 700 }
-const backButton = { background: '#000', color: '#fff', border: 'none', padding: '6px 10px' }
+const headerTop : React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center' }
+const headerTitle : React.CSSProperties = { fontSize: 28, fontWeight: 700 }
+const backButton : React.CSSProperties = { background: '#000', color: '#fff', border: 'none', padding: '6px 10px' }
 
-const headerMeta = { display: 'flex', gap: 20, marginTop: 15 }
-const metaBlock = { display: 'flex', flexDirection: 'column' }
-const metaInput = { background: '#000', color: '#fff', border: '1px solid #1F2937', padding: 6 }
+const headerMeta : React.CSSProperties = { display: 'flex', gap: 20, marginTop: 15 }
+const metaBlock : React.CSSProperties = { display: 'flex', flexDirection: 'column' }
+const metaInput : React.CSSProperties = { background: '#000', color: '#fff', border: '1px solid #1F2937', padding: 6 }
 
-const monthSelector = { display: 'flex', gap: 10 }
+const monthSelector : React.CSSProperties = { display: 'flex', gap: 10 }
 
-const grid = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, padding: 20 }
+const grid : React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, padding: 20 }
 
-const card = { background: '#0A0A0A', border: '1px solid #1F2937', borderRadius: 12, padding: 20 }
-const cardTitle = { fontSize: 16, marginBottom: 10 }
-const cardValue = { fontSize: 40, fontWeight: 800, marginBottom: 20 }
+const card : React.CSSProperties = { background: '#0A0A0A', border: '1px solid #1F2937', borderRadius: 12, padding: 20 }
+const cardTitle : React.CSSProperties = { fontSize: 16, marginBottom: 10 }
+const cardValue : React.CSSProperties = { fontSize: 40, fontWeight: 800, marginBottom: 20 }
 
-const bottomRow = { display: 'flex', gap: 20 }
-const smallLabel = { fontSize: 10, color: '#9CA3AF' }
-const smallBox = { border: '1px solid #1F2937', padding: 6, marginTop: 4 }
+const bottomRow : React.CSSProperties = { display: 'flex', gap: 20 }
+const smallLabel : React.CSSProperties = { fontSize: 10, color: '#9CA3AF' }
+const smallBox : React.CSSProperties = { border: '1px solid #1F2937', padding: 6, marginTop: 4 }
 
-const notesSection = { padding: 20 }
-const notesInput = { width: '100%', height: 100, background: '#0A0A0A', border: '1px solid #1F2937', color: '#fff' }
+const notesSection : React.CSSProperties = { padding: 20 }
+const notesInput : React.CSSProperties = { width: '100%', height: 100, background: '#0A0A0A', border: '1px solid #1F2937', color: '#fff' }

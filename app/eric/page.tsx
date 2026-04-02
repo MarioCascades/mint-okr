@@ -364,13 +364,13 @@ if (!base) {
 // STYLES
 // =========================
 
-const container = {
+const container : React.CSSProperties = {
   backgroundColor: '#000',
   minHeight: '100vh',
   color: '#fff'
 }
 
-const stickyHeader = {
+const stickyHeader : React.CSSProperties = {
   position: 'sticky',
   top: 60,
   zIndex: 10,
@@ -379,51 +379,51 @@ const stickyHeader = {
   borderBottom: '1px solid #1F2937'
 }
 
-const content = {
+const content : React.CSSProperties = {
   padding: 20
 }
 
-const title = {
+const title : React.CSSProperties = {
   fontSize: 24,
   fontWeight: 700
 }
 
-const description = {
+const description : React.CSSProperties = {
   fontSize: 13,
   color: '#9CA3AF',
   marginTop: 6,
   maxWidth: 700
 }
 
-const topSection = {
+const topSection : React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   gap: 20
 }
 
-const leftMeta = {
+const leftMeta : React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 10
 }
 
-const rightMeta = {
+const rightMeta : React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 10
 }
 
-const metaItem = {
+const metaItem : React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column'
 }
 
-const label = {
+const label : React.CSSProperties = {
   fontSize: 12,
   color: '#9CA3AF'
 }
 
-const inputSmall = {
+const inputSmall : React.CSSProperties = {
   height: 36,
   padding: '6px 10px',
   borderRadius: 6,
@@ -432,13 +432,13 @@ const inputSmall = {
   color: '#fff'
 }
 
-const monthSelector = {
+const monthSelector : React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 10
 }
 
-const editButton = {
+const editButton : React.CSSProperties = {
   backgroundColor: '#00AEEF',
   border: 'none',
   padding: '6px 12px',
@@ -448,7 +448,7 @@ const editButton = {
   cursor: 'pointer'
 }
 
-const backButton = {
+const backButton : React.CSSProperties = {
   backgroundColor: '#1F2937',
   border: 'none',
   padding: '6px 12px',
@@ -458,15 +458,15 @@ const backButton = {
   fontSize: 12
 }
 
-const objective = {
+const objective : React.CSSProperties = {
   marginBottom: 40
 }
 
-const objectiveTitle = {
+const objectiveTitle : React.CSSProperties = {
   color: '#00AEEF'
 }
 
-const headerRow = {
+const headerRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
   gap: 8,
@@ -475,20 +475,20 @@ const headerRow = {
   color: '#9CA3AF'
 }
 
-const row = {
+const row : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
   gap: 8,
   marginBottom: 6
 }
 
-const cell = {
+const cell : React.CSSProperties = {
   background: '#0A0A0A',
   border: '1px solid #1F2937',
   borderRadius: 6,
   color: '#fff'
 }
-const button = {
+const button : React.CSSProperties  = {
   backgroundColor: '#00AEEF',
   border: 'none',
   borderRadius: 6,
@@ -498,7 +498,7 @@ const button = {
   fontSize: 12
 }
 
-const initiativeRow = {
+const initiativeRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr 1fr',
   gap: 8

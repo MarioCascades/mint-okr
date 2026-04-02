@@ -52,7 +52,7 @@ export default function TopNav() {
   )
 }
 
-const navContainer = {
+const navContainer : React.CSSProperties = {
   position: 'sticky',
   top: 0,
   zIndex: 100,
@@ -64,13 +64,13 @@ const navContainer = {
   borderBottom: '1px solid #1F2937'
 }
 
-const left = {
+const left : React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 10
 }
 
-const logo = {
+const logo : React.CSSProperties = {
   width: 32,
   height: 32,
   borderRadius: '50%',
@@ -82,18 +82,18 @@ const logo = {
   color: '#000'
 }
 
-const title = {
+const title : React.CSSProperties = {
   fontWeight: 600,
   color: '#fff'
 }
 
-const right = {
+const right : React.CSSProperties = {
   display: 'flex',
   gap: 8,
   flexWrap: 'wrap'
 }
 
-const button = {
+const button : React.CSSProperties = {
   padding: '6px 10px',
   borderRadius: 6,
   border: '1px solid #1F2937',
@@ -101,11 +101,11 @@ const button = {
   cursor: 'pointer'
 }
 
-const logoImg = {
+const logoImg : React.CSSProperties = {
   height: 40
 }
 
-const selectorRow = {
+const selectorRow : React.CSSProperties = {
   display: 'flex',
   gap: 8,
   flexWrap: 'wrap'
