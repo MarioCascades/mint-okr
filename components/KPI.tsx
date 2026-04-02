@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
@@ -252,7 +253,7 @@ const kpiCard : React.CSSProperties = {
 }
 
 const kpiLabel : React.CSSProperties = {
-  textAlign: 'center' as const,
+  textAlign: 'center',
   marginBottom: 10,
   fontWeight: 600
 }
