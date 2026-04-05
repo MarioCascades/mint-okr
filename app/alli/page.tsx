@@ -390,7 +390,7 @@ const headerRow : React.CSSProperties = {
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
   gap: 8,
   marginBottom: 10
-  minWidth: 700,
+  minWidth: 700
 }
 
 const row : React.CSSProperties = {
@@ -398,7 +398,7 @@ const row : React.CSSProperties = {
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
   gap: 8,
   marginBottom: 6
-  minWidth: 700,
+  minWidth: 700
 }
 
 const cell : React.CSSProperties = {
