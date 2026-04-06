@@ -60,6 +60,7 @@ export default function Page() {
   //  MASTER TARGETS (UI CONTROLLED)
   const [masterStartsTarget, setMasterStartsTarget] = useState('0')
   const [masterProductionTarget, setMasterProductionTarget] = useState('0')
+  const [masterWhiteningTarget, setMasterWhiteningTarget] = useState('0')
 
 
   useEffect(() => {
@@ -231,7 +232,8 @@ export default function Page() {
   label="Total Whitening Kits" 
   selectedMonth={selectedMonth} 
   isEditing={false}
- 
+  target={masterWhiteningTarget}
+  setTarget={setMasterWhiteningTarget}
 />
         </Objective>
 
@@ -642,7 +644,7 @@ setLastMonth(prevTotal.toString())
       : value
   )
 }
-          disabled={!isEditing || isComputed}
+          disabled={!isEditing || (isComputed && label !== "Total Whitening Kits")}
           onChange={(e) => {
               const raw = e.target.value.replace(/[^0-9.]/g, '')
               const parts = raw.split('.')
