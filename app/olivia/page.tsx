@@ -629,19 +629,18 @@ const finalTarget =
   onChange={(e) => {
     let val = ''
 
-    if (isCurrency) {
-      const raw = e.target.value.replace(/[^0-9.]/g, '')
-      const parts = raw.split('.')
+    if (isCurrency || isPercentage) {
+  const raw = e.target.value.replace(/[^0-9.]/g, '')
+  const parts = raw.split('.')
 
-      val = parts[0]
+  val = parts[0]
 
-      if (parts.length > 1) {
-        val += '.' + parts[1].slice(0, 2)
-      }
-    } else {
-      val = e.target.value.replace(/[^0-9]/g, '')
-    }
-
+  if (parts.length > 1) {
+    val += '.' + parts[1].slice(0, 2)
+  }
+} else {
+  val = e.target.value.replace(/[^0-9]/g, '')
+}
     setValue(val)
     setIsDirty(true)
 
