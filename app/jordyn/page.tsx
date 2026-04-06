@@ -279,7 +279,9 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   const [isDirty, setIsDirty] = useState(false)
 
   const isPercentage = metricType === 'percentage'
-  const isCurrency = metricType === 'currency'
+  const isCurrency =
+  metricType === 'currency' ||
+  label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
 
   const handleEnter = (e: any) => {
@@ -619,7 +621,16 @@ setLastMonth(prevTotal.toString())
 }
           disabled={!isEditing || isComputed}
           onChange={(e) => {
-              const val = e.target.value.replace(/[^0-9]/g, '')
+              const raw = e.target.value.replace(/[^0-9.]/g, '')
+              const parts = raw.split('.')
+
+              let val = parts[0]
+
+              if (parts.length > 1) {
+          val += '.' + parts[1].slice(0, 2)
+          }
+
+setValue(val)
   setValue(val)
 
   if (setParentValue) {
