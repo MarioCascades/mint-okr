@@ -613,11 +613,15 @@ setLastMonth(prevTotal.toString())
     ? (label === "Total Production"
         ? '$' + Number(forcedValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
         : forcedValue)
-    : (isCurrency && value
-        ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        : isPercentage && value
-        ? value + '%'
-        : value)
+    : (
+    isEditing
+      ? value
+      : isCurrency && value
+      ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : isPercentage && value
+      ? value + '%'
+      : value
+  )
 }
           disabled={!isEditing || isComputed}
           onChange={(e) => {
