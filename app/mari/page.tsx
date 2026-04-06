@@ -283,11 +283,13 @@ setScore(percent + '%')
     )
   }
 const isLowerBetter = (label: string) => {
+  const l = label.toLowerCase()
+
   return (
-    label.includes('Waited') ||
-    label.includes('Missed') ||
-    label.includes('Call Outs') ||
-    label.includes('Rescheduled')
+    l.includes('wait') ||
+    l.includes('miss') ||
+    l.includes('call out') ||
+    l.includes('reschedule')
   )
 }
   const getScoreColor = () => {
