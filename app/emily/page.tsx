@@ -291,7 +291,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
  const getScoreColor = () => {
   const num = Number(score.replace('%', ''))
 
-  if (!num) return '#fff'
+  if (!num) return '#ff0000'
 
   if (isLowerBetter(label)) {
     return num <= 100 ? '#22c55e' : '#c2410c'
