@@ -653,7 +653,7 @@ setLastMonth(prevTotal.toString())
           val += '.' + parts[1].slice(0, 2)
           }
 
-ssetValue(val)
+setValue(val)
 setIsDirty(true)
 
   if (setParentValue) {
