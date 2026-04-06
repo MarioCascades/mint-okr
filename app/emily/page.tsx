@@ -279,11 +279,26 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
       { onConflict: 'key_result_id,reporting_month' }
     )
   }
+  const isLowerBetter = (label: string) => {
+  const l = label.toLowerCase()
 
-  const getScoreColor = () => {
-    const num = Number(score.replace('%', ''))
+  return (
+    l.includes('late arrivals') ||
+    l.includes('call outs')
+  )
+}
+
+ const getScoreColor = () => {
+  const num = Number(score.replace('%', ''))
+
+  if (!num) return '#fff'
+
+  if (isLowerBetter(label)) {
+    return num <= 100 ? '#22c55e' : '#c2410c'
+  } else {
     return num >= 100 ? '#22c55e' : '#c2410c'
   }
+}
 
   return (
     <div style={{ marginBottom: 10 }}>
