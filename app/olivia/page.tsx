@@ -590,9 +590,11 @@ setLastMonth(prevTotal.toString())
   }
 
 const finalTarget =
-  (derivedTarget && Number(derivedTarget) > 0)
-    ? derivedTarget
-    : (Number(target) > 0 ? target : dbTarget)
+  label === "Total Whitening Kits"
+    ? target
+    : (derivedTarget && Number(derivedTarget) > 0)
+      ? derivedTarget
+      : (Number(target) > 0 ? target : dbTarget)
 
   return (
     <div style={{ marginBottom: 10 }}>
@@ -614,11 +616,11 @@ const finalTarget =
         <input
           style={cell}
           value={
-          isCurrency && finalTarget
-          ? '$' + Number(finalTarget).toLocaleString()
-            : isPercentage && lastMonth
-  ? Number(lastMonth) + '%'
-          : finalTarget
+  isCurrency && finalTarget
+    ? '$' + Number(finalTarget).toLocaleString()
+    : isPercentage && finalTarget
+    ? Number(finalTarget) + '%'
+    : finalTarget
 }
           disabled={!isEditing || derivedTarget !== undefined}
          onChange={(e) => {
