@@ -290,7 +290,7 @@ const isLowerBetter = (label: string) => {
     label.includes('Rescheduled')
   )
 }
-  cconst getScoreColor = () => {
+  const getScoreColor = () => {
   const num = Number(score.replace('%', ''))
 
   if (!num) return '#fff'
