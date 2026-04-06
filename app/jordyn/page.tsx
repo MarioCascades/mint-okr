@@ -278,7 +278,9 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   const [loadedMonth, setLoadedMonth] = useState('')
   const [isDirty, setIsDirty] = useState(false)
 
-  const isPercentage = metricType === 'percentage'
+  const isPercentage =
+  metricType === 'percentage' ||
+  label === 'Conversion Rate'
   const isCurrency =
   metricType === 'currency' ||
   label === 'Collections from Starts'
@@ -586,7 +588,7 @@ setLastMonth(prevTotal.toString())
   isCurrency && lastMonth
     ? '$' + Number(lastMonth).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : isPercentage && lastMonth
-    ? lastMonth + '%'
+  ? Number(lastMonth) + '%'
     : lastMonth
 }
           readOnly
@@ -598,11 +600,28 @@ setLastMonth(prevTotal.toString())
           isCurrency && finalTarget
           ? '$' + Number(finalTarget).toLocaleString()
             : isPercentage && finalTarget
-          ? finalTarget + '%'
+  ? Number(finalTarget) + '%'
           : finalTarget
 }
           disabled={!isEditing || derivedTarget !== undefined}
-          onChange={(e) => setTarget?.(e.target.value.replace(/[^0-9]/g, ''))}
+          onChange={(e) => {
+  let val = ''
+
+  if (isCurrency || isPercentage) {
+    const raw = e.target.value.replace(/[^0-9.]/g, '')
+    const parts = raw.split('.')
+
+    val = parts[0]
+
+    if (parts.length > 1) {
+      val += '.' + parts[1].slice(0, 2)
+    }
+  } else {
+    val = e.target.value.replace(/[^0-9]/g, '')
+  }
+
+  setTarget?.(val)
+}}
           onKeyDown={handleEnter}
         />
 
@@ -634,8 +653,8 @@ setLastMonth(prevTotal.toString())
           val += '.' + parts[1].slice(0, 2)
           }
 
-setValue(val)
-  setValue(val)
+ssetValue(val)
+setIsDirty(true)
 
   if (setParentValue) {
     setParentValue(Number(val))
