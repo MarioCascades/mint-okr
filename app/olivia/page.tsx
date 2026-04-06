@@ -299,6 +299,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   useEffect(() => {
 
     const fetchData = async () => {
+      setIsDirty(false)
 
       const dbLabel = labelMap[label]
 
@@ -642,6 +643,7 @@ const finalTarget =
     }
 
     setValue(val)
+    setIsDirty(true)
 
     if (setParentValue) {
       setParentValue(Number(val))
