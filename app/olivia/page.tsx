@@ -608,53 +608,48 @@ const finalTarget =
         />
 
         <input
-          style={cell}
-          value={
-  forcedValue !== undefined
-    ? (label === "Total Production"
-        ? '$' + Number(forcedValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        : forcedValue)
-    : (
-    isEditing
-      ? value
-      : isCurrency && value
-      ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-      : isPercentage && value
-      ? value + '%'
-      : value
-  )
-          disabled={!isEditing || isComputed}
-         onChange={(e) => {
-  let val = ''
+  style={cell}
+  value={
+    forcedValue !== undefined
+      ? (label === "Total Production"
+          ? '$' + Number(forcedValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : forcedValue)
+      : (
+          isEditing
+            ? value
+            : isCurrency && value
+            ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : isPercentage && value
+            ? value + '%'
+            : value
+        )
+  }
+  disabled={!isEditing || isComputed}
+  onChange={(e) => {
+    let val = ''
 
-  if (isCurrency) {
-    const raw = e.target.value.replace(/[^0-9.]/g, '')
-    const parts = raw.split('.')
+    if (isCurrency) {
+      const raw = e.target.value.replace(/[^0-9.]/g, '')
+      const parts = raw.split('.')
 
-    val = parts[0]
+      val = parts[0]
 
-    if (parts.length > 1) {
-      val += '.' + parts[1].slice(0, 2)
+      if (parts.length > 1) {
+        val += '.' + parts[1].slice(0, 2)
+      }
+    } else {
+      val = e.target.value.replace(/[^0-9]/g, '')
     }
-  } else {
-    val = e.target.value.replace(/[^0-9]/g, '')
-  }
 
-  setValue(val)
+    setValue(val)
 
-  if (setParentValue) {
-    setParentValue(Number(val))
-  }
-}}
-  setValue(val)
-
-  if (setParentValue) {
-    setParentValue(Number(val))
-  }
-}}
-          onBlur={handleSave}
-          onKeyDown={handleEnter}
-        />
+    if (setParentValue) {
+      setParentValue(Number(val))
+    }
+  }}
+  onBlur={handleSave}
+  onKeyDown={handleEnter}
+/>
 
         <input style={{ ...cell, color: getScoreColor() }} value={score} readOnly />
 
