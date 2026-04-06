@@ -247,13 +247,16 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
       setLastMonth(prevData?.value ?? '')
 
-      const c = Number(currentValue)
-      const t = Number(kr?.target_value)
+     const c = Number(currentValue || 0)
+const t = Number(target || 0)
 
-      if (t > 0) {
-        const percent = Math.round((c / t) * 100)
-        setScore(percent + '%')
-      }
+if (!t || t <= 0) {
+  setScore('')
+  return
+}
+
+const percent = Math.round((c / t) * 100)
+setScore(percent + '%')
     }
 
     fetchData()
@@ -279,12 +282,25 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
       { onConflict: 'key_result_id,reporting_month' }
     )
   }
+const isLowerBetter = (label: string) => {
+  return (
+    label.includes('Waited') ||
+    label.includes('Missed') ||
+    label.includes('Call Outs') ||
+    label.includes('Rescheduled')
+  )
+}
+  cconst getScoreColor = () => {
+  const num = Number(score.replace('%', ''))
 
-  const getScoreColor = () => {
-    const num = Number(score.replace('%', ''))
+  if (!num) return '#fff'
+
+  if (isLowerBetter(label)) {
+    return num <= 100 ? '#22c55e' : '#c2410c'
+  } else {
     return num >= 100 ? '#22c55e' : '#c2410c'
   }
-
+}
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
