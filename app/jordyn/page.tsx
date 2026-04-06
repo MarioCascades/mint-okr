@@ -327,9 +327,21 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
         console.log("BASE:", base)
         console.log("KR:", kr)
+setDbTarget(kr?.target_value ?? '')
+setMetricType(kr?.metric_type ?? '')
 
-      setDbTarget(kr?.target_value ?? '')
-      setMetricType(kr?.metric_type ?? '')
+if (label === "Total Whitening Kits") {
+  const { data: shared } = await supabase
+    .from('key_results')
+    .select('target_value')
+    .eq('id', 'f4406ada-8fe2-42aa-9e84-c8c373e6dfe1')
+    .maybeSingle()
+
+    if (shared && shared.target_value !== null) {
+  setTarget(shared.target_value.toString())
+}
+}
+      
 
       const formatDate = (d: Date) =>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
@@ -349,7 +361,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
       const currentValue = current?.value ?? base.current_value ?? ''
       const currentMonthKey = selectedMonth.toISOString()      
       // =========================
-// ✅ GLOBAL TOTALS (JORDYN + OLIVIA)
+//  GLOBAL TOTALS (JORDYN + OLIVIA)
 // =========================
 
 if (
