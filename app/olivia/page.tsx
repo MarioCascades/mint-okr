@@ -595,9 +595,11 @@ setLastMonth(prevTotal.toString())
   }
 
 const finalTarget =
-  (derivedTarget && Number(derivedTarget) > 0)
-    ? derivedTarget
-    : (Number(target) > 0 ? target : dbTarget)
+  label === "Total Whitening Kits"
+    ? dbTarget
+    : (derivedTarget && Number(derivedTarget) > 0)
+      ? derivedTarget
+      : (Number(target) > 0 ? target : dbTarget)
     
   return (
     <div style={{ marginBottom: 10 }}>
