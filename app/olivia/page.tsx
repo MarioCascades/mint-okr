@@ -331,7 +331,11 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
         console.log("BASE:", base)
         console.log("KR:", kr)
 
-      setDbTarget(kr?.target_value ?? '')
+      setDbTarget(
+  kr?.target_value !== null && kr?.target_value !== undefined
+    ? kr.target_value.toString()
+    : ''
+)
       setMetricType(kr?.metric_type ?? '')
 
 if (label === "Total Whitening Kits") {
@@ -344,7 +348,7 @@ if (label === "Total Whitening Kits") {
   console.log("SHARED TARGET:", shared)
 
   if (shared && shared.target_value !== null) {
-    setDbTarget(shared.target_value.toString())
+    setDbTarget(String(shared.target_value))
   }
 }
 
@@ -596,7 +600,7 @@ setLastMonth(prevTotal.toString())
 
 const finalTarget =
   label === "Total Whitening Kits"
-    ? dbTarget
+    ? (dbTarget || '')
     : (derivedTarget && Number(derivedTarget) > 0)
       ? derivedTarget
       : (Number(target) > 0 ? target : dbTarget)
