@@ -334,17 +334,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
       setDbTarget(kr?.target_value ?? '')
       setMetricType(kr?.metric_type ?? '')
 
-if (label === "Total Whitening Kits") {
-  const { data: shared } = await supabase
-    .from('key_results')
-    .select('target_value')
-    .eq('id', 'f4406ada-8fe2-42aa-9e84-c8c373e6dfe1')
-    .maybeSingle()
 
-  if (shared && shared.target_value !== null) {
-    setDbTarget(shared.target_value.toString())
-  }
-}
 
       const formatDate = (d: Date) =>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
@@ -476,12 +466,23 @@ if (label === "Total Whitening Kits") {
 const prevTotal = prevJordyn + prevOlivia
 
 setLastMonth(prevTotal.toString())
+if (label === "Total Whitening Kits") {
+  const { data: shared } = await supabase
+    .from('key_results')
+    .select('target_value')
+    .eq('id', 'f4406ada-8fe2-42aa-9e84-c8c373e6dfe1')
+    .maybeSingle()
 
-// ✅ NOW EXIT
+  if (shared && shared.target_value !== null) {
+    setDbTarget(shared.target_value.toString())
+  }
+}
+
+//  NOW EXIT
 return
 }
 // =========================
-// ✅ PREVIOUS MONTH FOR TOTALS
+//  PREVIOUS MONTH FOR TOTALS
 // =========================
 
 const prevDateObj = new Date(selectedMonth)
