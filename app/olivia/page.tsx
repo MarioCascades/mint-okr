@@ -564,7 +564,7 @@ setLastMonth(prevTotal.toString())
       const c = Number(currentValue)
       const t = Number(
   label === "Total Whitening Kits"
-    ? dbTarget
+    ? target
     : derivedTarget ?? target ?? dbTarget
 )
 
@@ -601,9 +601,11 @@ setLastMonth(prevTotal.toString())
   }
 
 const finalTarget =
-  (derivedTarget && Number(derivedTarget) > 0)
-    ? derivedTarget
-    : (Number(target) > 0 ? target : dbTarget)
+  label === "Total Whitening Kits"
+    ? target
+    : (derivedTarget && Number(derivedTarget) > 0)
+      ? derivedTarget
+      : (Number(target) > 0 ? target : dbTarget)
     
   return (
     <div style={{ marginBottom: 10 }}>
