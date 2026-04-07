@@ -344,7 +344,7 @@ if (label === "Total Whitening Kits") {
   console.log("SHARED TARGET:", shared)
 
   if (shared && shared.target_value !== null) {
-    setTarget?.(shared.target_value.toString())
+    setDbTarget(shared.target_value.toString())
   }
 }
 
