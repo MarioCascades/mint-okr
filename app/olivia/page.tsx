@@ -591,7 +591,7 @@ setLastMonth(prevTotal.toString())
 
 const finalTarget =
   label === "Total Whitening Kits"
-    ? target
+    ? dbTarget
     : (derivedTarget && Number(derivedTarget) > 0)
       ? derivedTarget
       : (Number(target) > 0 ? target : dbTarget)
