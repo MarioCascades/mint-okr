@@ -605,7 +605,7 @@ const finalTarget =
     ? (dbTarget || '')
     : (derivedTarget && Number(derivedTarget) > 0)
       ? derivedTarget
-      : (Number(target) > 0 ? target : dbTarget)
+      : (dbTarget || target)
     
   return (
     <div style={{ marginBottom: 10 }}>
@@ -633,7 +633,9 @@ const finalTarget =
     ? Number(finalTarget) + '%'
     : finalTarget
 }
-          disabled={!isEditing || derivedTarget !== undefined}
+          disabled={
+  !isEditing && label !== "Total Whitening Kits"
+}
          onChange={(e) => {
   let val = ''
 
