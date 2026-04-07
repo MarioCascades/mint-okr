@@ -432,7 +432,14 @@ const total = jordyn + olivia
 // =========================
 setValue(total.toString())
 setLoadedMonth(currentMonthKey)
+// =========================
+// SCORE CALCULATION 
+// =========================
+const t = Number(kr?.target_value ?? 0)
 
+if (t > 0) {
+  setScore(Math.round((total / t) * 100) + '%')
+}
 
 // =========================
 // PREVIOUS MONTH CALCULATION
