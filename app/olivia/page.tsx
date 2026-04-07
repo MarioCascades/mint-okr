@@ -61,7 +61,6 @@ export default function Page() {
   // 🔥 MASTER TARGETS (UI CONTROLLED)
   const [masterStartsTarget, setMasterStartsTarget] = useState('0')
   const [masterProductionTarget, setMasterProductionTarget] = useState('0')
-  const [masterWhiteningTarget, setMasterWhiteningTarget] = useState('0')
 
 
   useEffect(() => {
@@ -233,8 +232,6 @@ export default function Page() {
   label="Total Whitening Kits" 
   selectedMonth={selectedMonth} 
   isEditing={false}
-  target={masterWhiteningTarget}
-  setTarget={setMasterWhiteningTarget}
 />
   
         </Objective>
@@ -471,19 +468,7 @@ const prevTotal = prevJordyn + prevOlivia
 
 setLastMonth(prevTotal.toString())
 
-if (label === "Total Whitening Kits") {
-  const { data: shared } = await supabase
-    .from('key_results')
-    .select('target_value')
-    .eq('id', 'f4406ada-8fe2-42aa-9e84-c8c373e6dfe1')
-    .maybeSingle()
 
-  console.log("FINAL SHARED TARGET:", shared)
-
-  if (shared && shared.target_value !== null) {
-    setTarget?.(shared.target_value.toString())
-  }
-}
 
 return
 }
@@ -562,11 +547,7 @@ setLastMonth(prevTotal.toString())
 }
 
       const c = Number(currentValue)
-      const t = Number(
-  label === "Total Whitening Kits"
-    ? target
-    : derivedTarget ?? target ?? dbTarget
-)
+      const t = Number(finalTarget)
 
       if (t > 0) {
         setScore(Math.round((c / t) * 100) + '%')
@@ -600,13 +581,16 @@ setLastMonth(prevTotal.toString())
     return num >= 100 ? '#22c55e' : '#c2410c'
   }
 
-const finalTarget =
-  label === "Total Whitening Kits"
-    ? target
-    : (derivedTarget && Number(derivedTarget) > 0)
+let finalTarget = dbTarget
+
+if (label !== "Total Whitening Kits") {
+  finalTarget =
+    (derivedTarget && Number(derivedTarget) > 0)
       ? derivedTarget
-      : (Number(target) > 0 ? target : dbTarget)
-    
+      : (Number(target) > 0
+          ? target
+          : dbTarget)
+}
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
