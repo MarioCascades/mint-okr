@@ -342,8 +342,8 @@ if (label === "Total Whitening Kits") {
     .maybeSingle()
 
   if (shared && shared.target_value !== null) {
-  setTarget(shared.target_value.toString())
-}
+    setDbTarget(shared.target_value.toString())
+  }
 }
 
       const formatDate = (d: Date) =>
