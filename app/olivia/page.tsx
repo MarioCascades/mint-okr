@@ -304,13 +304,31 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
       setIsDirty(false)
 
       const dbLabel = labelMap[label]
+      console.log("LABEL:", label)
+      console.log("DB LABEL:", dbLabel)
 
-      const { data: base } = await supabase
-        .from('dashboard_okr_data')
-        .select('*')
-        .eq('user_name', 'Olivia')
-        .eq('key_result_title', dbLabel)
-        .maybeSingle()
+      let base
+
+if (label === "Total Whitening Kits") {
+  const { data } = await supabase
+    .from('key_results')
+    .select('id')
+    .eq('id', 'f4406ada-8fe2-42aa-9e84-c8c373e6dfe1')
+    .maybeSingle()
+
+  base = {
+    key_result_id: data?.id
+  }
+} else {
+  const { data } = await supabase
+    .from('dashboard_okr_data')
+    .select('*')
+    .eq('user_name', 'Olivia')
+    .eq('key_result_title', dbLabel)
+    .maybeSingle()
+
+  base = data
+}
 
       if (!base) return
 
