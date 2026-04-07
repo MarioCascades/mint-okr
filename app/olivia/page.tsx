@@ -344,7 +344,7 @@ if (label === "Total Whitening Kits") {
   console.log("SHARED TARGET:", shared)
 
   if (shared && shared.target_value !== null) {
-    setDbTarget(shared.target_value.toString())
+    setTarget?.(shared.target_value.toString())
   }
 }
 
@@ -595,12 +595,10 @@ setLastMonth(prevTotal.toString())
   }
 
 const finalTarget =
-  label === "Total Whitening Kits"
-    ? dbTarget
-    : (derivedTarget && Number(derivedTarget) > 0)
-      ? derivedTarget
-      : (Number(target) > 0 ? target : dbTarget)
-
+  (derivedTarget && Number(derivedTarget) > 0)
+    ? derivedTarget
+    : (Number(target) > 0 ? target : dbTarget)
+    
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
