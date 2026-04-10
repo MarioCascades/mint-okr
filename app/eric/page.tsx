@@ -360,10 +360,12 @@ if (!base) {
 <input
   style={cell}
   value={
-    isPercentage && value
-      ? value + '%'
-      : isCurrency && value
-      ? '$' + Number(value).toLocaleString()
+    !isEditing
+      ? isPercentage && value
+        ? value + '%'
+        : isCurrency && value
+        ? '$' + Number(value).toLocaleString()
+        : value
       : value
   }
   disabled={!isEditing}
