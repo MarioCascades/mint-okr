@@ -135,16 +135,17 @@ export default function Page() {
 
             <button
   style={editButton}
-  onClick={async () => {
+ onClick={async () => {
 
-    if (isEditing) {
-      // trigger save for ALL rows
+  if (isEditing) {
+    setTimeout(() => {
       const event = new Event('save-all')
       window.dispatchEvent(event)
-    }
+    }, 50)
+  }
 
-    setIsEditing(!isEditing)
-  }}
+  setIsEditing(!isEditing)
+}}
 >
   {isEditing ? 'Save' : 'Edit'}
 </button>
@@ -527,6 +528,11 @@ if (direction === 'none') {
 
   useEffect(() => {
   const handleGlobalSave = () => {
+    if (!keyResultId) {
+      console.log('❌ skipping save — no keyResultId yet')
+      return
+    }
+
     handleSave()
   }
 
@@ -539,7 +545,10 @@ if (direction === 'none') {
 
  const handleSave = async () => {
 
-  if (!keyResultId) return
+  if (!keyResultId) {
+  console.log('❌ keyResultId missing, skipping save')
+  return
+}
 
   const y = selectedMonth.getFullYear()
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
