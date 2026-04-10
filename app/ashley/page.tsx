@@ -556,6 +556,12 @@ if (direction === 'none') {
 
  const handleSave = async () => {
 
+  console.log('SAVE ATTEMPT:', {
+  keyResultId,
+  value,
+  target
+})
+
   if (!keyResultId) {
   console.log('❌ keyResultId missing, skipping save')
   return
