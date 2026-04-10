@@ -137,12 +137,12 @@ export default function Page() {
   style={editButton}
  onClick={async () => {
 
-  if (isEditing) {
-    setTimeout(() => {
-      const event = new Event('save-all')
-      window.dispatchEvent(event)
-    }, 50)
-  }
+ if (isEditing) {
+  await new Promise((r) => setTimeout(r, 0))
+
+  const event = new Event('save-all')
+  window.dispatchEvent(event)
+}
 
   setIsEditing(!isEditing)
 }}
@@ -494,7 +494,7 @@ const t = data.target
 
       const { data: prevData } = await supabase
         .from('key_result_updates')
-        .select('value')
+        .select('value, target_value')
         .eq('key_result_id', base.key_result_id)
         .eq('reporting_month', formatDate(prev))
         .maybeSingle()
@@ -580,7 +580,7 @@ if (direction === 'none') {
   value={target}
   disabled={!isEditing}
   onChange={(e) => setTarget(e.target.value)}
- onBlur={handleSave}
+
 />
 
 
@@ -589,7 +589,7 @@ if (direction === 'none') {
           value={value}
           disabled={!isEditing}
           onChange={(e) => setValue(e.target.value)}
-        onBlur={handleSave}
+       
         />
 
         <input 
