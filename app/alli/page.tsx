@@ -76,10 +76,10 @@ export default function Page() {
         <TopNav />
 
       <div style={stickyHeader}>
-        <h1 style={title}>Alli - Front Desk Coordinator</h1>
+        <h1 style={title}>Alli - Patient Retention and Fincial Coordinator - </h1>
 
         <p style={description}>
-          Responsible for managing front desk operations, ensuring accurate patient scheduling, timely collections, and maintaining strong patient engagement.
+          Ensure timely patient collections, maintaining strong engagement with observation patients, and supporting overall practice efficiency through task management and follow-up systems. This role directly impacts cash flow, patient experience, and case conversion.
         </p>
 
         <div style={topSection}>
