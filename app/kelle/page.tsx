@@ -224,6 +224,11 @@ const KeyResult = ({ label, selectedMonth, isEditing, isPercent = false }: any) 
   const [target, setTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
+  const format = (v: number) => {
+      if (isPercent) return formatPercent(v)
+      return v.toString()
+    }
+
   const getScoreColor = () => {
   const num = Number(score.replace('%', ''))
   if (isNaN(num)) return '#fff'
@@ -300,7 +305,7 @@ const { data: prevData } = await supabase
   .maybeSingle()
 
 const prevVal = Number(prevData?.value ?? 0)
-setLastMonth(prevVal.toString())
+setLastMonth(format(prevVal))
 
     let t = Number(base.target_value ?? 0)
 
@@ -330,13 +335,10 @@ const { data: currentData } = await supabase
 
 const c = Number(currentData?.value ?? 0)
 
-    const format = (v: number) => {
-      if (isPercent) return formatPercent(v)
-      return v.toString()
-    }
+    
 
     setTarget(format(t))
-    setValue(c.toString())
+    setValue(format(c))
 
     if (t > 0) {
       const percent = Math.round((c / t) * 100)
