@@ -138,11 +138,18 @@ export default function Page() {
             <label style={label}>OKR Time Frame</label>
 
             <div style={monthSelector}>
-              <button onClick={() => changeMonth(-1)}>←</button>
-              <span>{formatMonth(selectedMonth)}</span>
-              <button disabled={isFutureMonth()} onClick={() => changeMonth(1)}>→</button>
-            </div>
+  <button style={arrowButton} onClick={() => changeMonth(-1)}>←</button>
 
+  <span style={monthText}>{formatMonth(selectedMonth)}</span>
+
+  <button
+    style={{ ...arrowButton, opacity: isFutureMonth() ? 0.3 : 1 }}
+    disabled={isFutureMonth()}
+    onClick={() => changeMonth(1)}
+  >
+    →
+  </button>
+</div>
             <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
               {isEditing ? 'Save' : 'Edit'}
             </button>
@@ -406,4 +413,17 @@ const initiativeRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr 1fr',
   gap: 8
+}
+const arrowButton: React.CSSProperties = {
+  backgroundColor: '#1F2937',
+  border: 'none',
+  padding: '6px 10px',
+  borderRadius: 6,
+  color: '#fff',
+  cursor: 'pointer'
+}
+
+const monthText: React.CSSProperties = {
+  fontSize: 14,
+  fontWeight: 600
 }
