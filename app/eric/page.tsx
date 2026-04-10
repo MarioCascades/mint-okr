@@ -331,17 +331,31 @@ if (!base) {
     <div style={row}>
       <span>{label}</span>
 
-      <input
-        style={cell}
-        value={
-  isPercentage && lastMonth
-    ? lastMonth + '%'
-    : isCurrency && lastMonth
-    ? '$' + Number(lastMonth).toLocaleString()
-    : lastMonth
-}
-        readOnly
-      />
+      {/* LAST MONTH */}
+<input
+  style={cell}
+  value={
+    isPercentage && lastMonth
+      ? lastMonth + '%'
+      : isCurrency && lastMonth
+      ? '$' + Number(lastMonth).toLocaleString()
+      : lastMonth
+  }
+  readOnly
+/>
+
+{/* TARGET */}
+<input
+  style={cell}
+  value={
+    isPercentage && target
+      ? target + '%'
+      : isCurrency && target
+      ? '$' + Number(target).toLocaleString()
+      : target
+  }
+  readOnly
+/>
 
 <input
   style={cell}
