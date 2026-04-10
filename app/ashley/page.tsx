@@ -20,6 +20,8 @@ export default function Page() {
   const [lastUpdated, setLastUpdated] = useState('')
   const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
   const [isEditing, setIsEditing] = useState(false)
+  const isAprilOrLater =
+  selectedMonth >= new Date(2026, 3, 1) // April = month index 3
 
   
 
@@ -140,28 +142,184 @@ export default function Page() {
 
       {/* CONTENT */}
       <div style={content}>
+        {isAprilOrLater && (
+  <>
 
-        <Objective title="Objective 1: Keep Observation Patients Engaged with the Practice">
+        <Objective title="Objective 1: Office Efficiency">
+          
 
-          <KeyResult
-            label="FD Obs Due Next Month, This Month, and Last Month"
-            selectedMonth={selectedMonth}
-            isEditing={isEditing}
-          />
+  <KeyResult
+    label="FD Call Answer Rate"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
 
-          <KeyResult
-            label="FD Obs Overdue 30+"
-            selectedMonth={selectedMonth}
-            isEditing={isEditing}
-          />
+  <KeyResult
+    label="FD # of Missed Calls"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
 
-          <KeyResult
-            label="FD Obs No Show"
-            selectedMonth={selectedMonth}
-            isEditing={isEditing}
-          />
+  <KeyResult
+    label="# of Patients Waited 10+ Minutes"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
 
-        </Objective>
+  <KeyResult
+    label="FD # of tasks in Lead Sigma"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+</Objective>
+
+<Objective title="Objective 2: Bright Referral">
+
+  <KeyResult
+    label="FD Bright Referral"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+  <KeyResult
+    label="FD Reception Rate Bright Referral"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+  <KeyResult
+    label="FD DM Engage"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+  <KeyResult
+    label="FD Reception Rate DM Engage"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+</Objective>
+
+<Objective title="Objective 3: New Patient Process">
+
+  <KeyResult
+    label="FD NP Scheduled (GF)"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+  <KeyResult
+    label="FD NP Scheduled Next Month"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+  <KeyResult
+    label="FD NP NSC"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+  <KeyResult
+    label="FD New Patients Missing Information (EOD NP Prep)"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+</Objective>
+
+<Objective title="Objective 4: RETAIN Engagement">
+
+  <KeyResult
+    label="Retain Invited"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+  <KeyResult
+    label="Retain Subscribed"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+  />
+
+</Objective>
+  </>
+)}
+{!isAprilOrLater && (
+  <>
+
+    <Objective title="Objective 1: Understanding Referral Mix">
+
+      <KeyResult
+        label="FD Patient Referral"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+      <KeyResult
+        label="FD Dental Referrals"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+      <KeyResult
+        label="FD # of Dentists Referred"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+      <KeyResult
+        label="FD Digital Marketing"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+    </Objective>
+
+
+    <Objective title="Objective 2: Inquiry Tracking">
+
+      <KeyResult
+        label="FD DM Engage"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+      <KeyResult
+        label="FD Reception Rate DM Engage"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+      <KeyResult
+        label="FD Bright Referral"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+    </Objective>
+
+
+    <Objective title="Objective 3: New Patient Process">
+
+      <KeyResult
+        label="FD NP Scheduled (GF)"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+      <KeyResult
+        label="FD NP Incomplete Appointment"
+        selectedMonth={selectedMonth}
+        isEditing={isEditing}
+      />
+
+    </Objective>
+
+  </>
+)}
 
       </div>
     </div>
@@ -174,7 +332,32 @@ export default function Page() {
 const displayLabelMap: Record<string, string> = {
   "FD Obs Due Next Month, This Month, and Last Month": "Observation Patients Due (Next / This / Last)",
   "FD Obs Overdue 30+": "Observation Patients Overdue 30+ Days",
-  "FD Obs No Show": "Observation Patient No Shows"
+  "FD Obs No Show": "Observation Patient No Shows",
+  // April OKRs
+"FD Call Answer Rate": "Call Answer Rate",
+"FD # of Missed Calls": "# of Missed Calls",
+"# of Patients Waited 10+ Minutes": "Patients Waited 10+ Minutes",
+"FD # of tasks in Lead Sigma": "Tasks in Lead Sigma",
+
+"FD Bright Referral": "Bright Referral",
+"FD Reception Rate Bright Referral": "Reception Rate (Bright Referral)",
+"FD DM Engage": "DM Engage",
+"FD Reception Rate DM Engage": "Reception Rate (DM Engage)",
+
+"FD NP Scheduled (GF)": "NP Scheduled",
+"FD NP Scheduled Next Month": "NP Scheduled (Next Month)",
+"FD NP NSC": "NP NSC",
+"FD New Patients Missing Information (EOD NP Prep)": "Missing NP Info (EOD Prep)",
+}
+const directionMap: Record<string, 'increase' | 'decrease' | 'none'> = {
+  // Decrease metrics (lower is better)
+  "FD # of Missed Calls": "decrease",
+  "FD NP NSC": "decrease",
+  "# of Patients Waited 10+ Minutes": "decrease",
+  "FD NP Incomplete Appointment": "decrease",
+
+  // No score metrics
+  "FD # of tasks in Lead Sigma": "none",
 }
 
 // =========================
@@ -262,12 +445,25 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
       setLastMonth(String(prevData?.value ?? 0))
 
-      if (t > 0) {
-        const percent = Math.round((c / t) * 100)
-        setScore(percent + '%')
-      } else {
-        setScore('—')
-      }
+      const direction = directionMap[label] || 'increase'
+
+if (direction === 'none') {
+  setScore('—')
+} else if (t > 0 && c >= 0) {
+
+  let percent = 0
+
+  if (direction === 'increase') {
+    percent = Math.round((c / t) * 100)
+  } else if (direction === 'decrease') {
+    percent = c === 0 ? 100 : Math.round((t / c) * 100)
+  }
+
+  setScore(percent + '%')
+
+} else {
+  setScore('—')
+}
     }
 
     fetchData()
@@ -315,12 +511,18 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         />
 
         <input 
-  style={{ 
-    ...cell, 
-    color: score.includes('%') && Number(score.replace('%','')) >= 100 
-      ? '#22c55e' 
-      : '#c2410c'
-  }} 
+ style={{ 
+  ...cell, 
+  color: (() => {
+    if (!score.includes('%')) return '#9CA3AF' // neutral (—)
+
+    const value = Number(score.replace('%',''))
+
+    if (isNaN(value)) return '#9CA3AF'
+
+    return value >= 100 ? '#22c55e' : '#c2410c'
+  })()
+}}
   value={score} 
   readOnly 
 />
