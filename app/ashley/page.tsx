@@ -360,9 +360,35 @@ const displayLabelMap: Record<string, string> = {
 // Fix for missing mappings (April)
 "Retain Invited": "Retain Invited",
 "Retain Subscribed": "Retain Subscribed",
-
-
 }
+const queryLabelMap: Record<string, string> = {
+  // April (exact DB titles)
+  "FD Call Answer Rate": "FD Call Answer Rate",
+  "FD # of Missed Calls": "FD # of Missed Calls",
+  "# of Patients Waited 10+ Minutes": "# of Patients Waited 10+ Minutes",
+  "FD # of tasks in Lead Sigma": "FD # of tasks in Lead Sigma",
+
+  "FD Bright Referral": "FD Bright Referral",
+  "FD Reception Rate Bright Referral": "FD Reception Rate Bright Referral",
+  "FD DM Engage": "FD DM Engage",
+  "FD Reception Rate DM Engage": "FD Reception Rate DM Engage",
+
+  "FD NP Scheduled (GF)": "FD NP Scheduled (GF)",
+  "FD NP Scheduled Next Month": "FD NP Scheduled Next Month",
+  "FD NP NSC": "FD NP NSC",
+  "FD New Patients Missing Information (EOD NP Prep)": "FD New Patients Missing Information (EOD NP Prep)",
+
+  "Retain Invited": "FD Retain Invited",
+  "Retain Subscribed": "FD Retain Subscribed",
+
+  // March
+  "FD Patient Referral": "FD Patient Referral",
+  "FD Dental Referrals": "FD Dental Referrals",
+  "FD # of Dentists Referred": "FD # of Dentists Referred",
+  "FD Digital Marketing": "FD Digital Marketing",
+  "FD NP Incomplete Appointment": "FD NP Incomplete Appointment",
+}
+
 const directionMap: Record<string, 'increase' | 'decrease' | 'none'> = {
   // Decrease metrics (lower is better)
   "FD # of Missed Calls": "decrease",
@@ -416,7 +442,10 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         .from('dashboard_okr_data')
         .select('*')
         .eq('user_name', 'Ashley')
-        .ilike('key_result_title', `%${label.replace(/FD /g, '').split('(')[0].trim()}%`)
+        .eq(
+  'key_result_title',
+  queryLabelMap[label] || label
+)
         .maybeSingle()
 
       if (!base) return
