@@ -416,7 +416,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         .from('dashboard_okr_data')
         .select('*')
         .eq('user_name', 'Ashley')
-        .ilike('key_result_title', `%${label.replace(/FD /g, '').replace(/\(.*?\)/g, '').trim()}%`)
+        .ilike('key_result_title', `%${label.replace(/FD /g, '').split('(')[0].trim()}%`)
         .maybeSingle()
 
       if (!base) return
