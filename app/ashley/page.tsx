@@ -348,6 +348,16 @@ const displayLabelMap: Record<string, string> = {
 "FD NP Scheduled Next Month": "NP Scheduled (Next Month)",
 "FD NP NSC": "NP NSC",
 "FD New Patients Missing Information (EOD NP Prep)": "Missing NP Info (EOD Prep)",
+
+// OLD OKRs (March)
+
+"FD Patient Referral": "Patient Referral",
+"FD Dental Referrals": "Dental Referrals",
+"FD # of Dentists Referred": "# of Dentists Referred",
+"FD Digital Marketing": "Digital Marketing",
+
+
+"FD NP Incomplete Appointment": "NP Incomplete Appointment",
 }
 const directionMap: Record<string, 'increase' | 'decrease' | 'none'> = {
   // Decrease metrics (lower is better)
