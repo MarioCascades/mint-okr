@@ -351,7 +351,7 @@ const topBar : React.CSSProperties = {
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '12px 20px',
-  backgroundColor: '#000',
+  backgroundColor: '#f8f8f8',
   borderBottom: '1px solid #1F2937'
 }
 
@@ -379,7 +379,7 @@ const metaRow : React.CSSProperties = { display: 'flex', gap: 20 }
 
 const label : React.CSSProperties = { fontSize: 12 }
 
-const input : React.CSSProperties = { padding: 6, backgroundColor: '#111', color: '#fff', border: '1px solid #333' }
+const input : React.CSSProperties = { padding: 6, backgroundColor: '#f0f0f0', color: '#080808', border: '1px solid #333' }
 
 const monthSelector : React.CSSProperties = { display: 'flex', gap: 10 }
 
