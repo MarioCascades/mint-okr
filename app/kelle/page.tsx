@@ -224,6 +224,11 @@ const KeyResult = ({ label, selectedMonth, isEditing, isPercent = false }: any) 
   const [target, setTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
+  const getScoreColor = () => {
+  const num = Number(score.replace('%', ''))
+  if (isNaN(num)) return '#fff'
+  return num >= 100 ? '#22c55e' : '#c2410c'
+}
 
   const handleSave = async () => {
 
@@ -362,7 +367,15 @@ const c = Number(currentData?.value ?? 0)
             onBlur={handleSave}
 />
 
-        <input style={cell} value={score} readOnly />
+        <input
+  style={{
+    ...cell,
+    color: getScoreColor(),
+    fontWeight: 600
+  }}
+  value={score}
+  readOnly
+/>
 
         <button style={button}>+ Initiatives</button>
       </div>
