@@ -86,10 +86,10 @@ export default function Page() {
      <TopNav /> 
 
       <div style={stickyHeader}>
-        <h1 style={title}>Kelle - Front Desk Coordinator</h1>
+        <h1 style={title}>Kelle - New Patient Intake + Experience Coordinator</h1>
 
         <p style={description}>
-          Responsible for referral tracking, inquiry conversion, new patient intake, and communication performance.
+          The New Patient Intake & Experience Coordinator is responsible for ensuring every new patient is fully prepared prior to their appointment. This role owns the accuracy, completeness, and organization of all new patient information—eliminating friction, reducing delays, and creating a seamless, high-quality first visit experience.
         </p>
 
         <div style={topSection}>

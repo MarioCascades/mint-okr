@@ -88,10 +88,10 @@ export default function Page() {
       {/* HEADER */}
       <div style={stickyHeader}>
 
-        <h1 style={title}>Ashley - Front Desk Coordinator</h1>
+        <h1 style={title}>Ashley - Front Desk Manager (Patient Experience & Scheduling Lead)</h1>
 
         <p style={description}>
-          Responsible for keeping observation patients engaged with the practice through consistent follow-up and tracking.
+          Responsible for delivering an exceptional first impression, maximizing new patient conversion, and maintaining an efficient, fully optimized schedule. This role drives practice growth by owning phone performance, new patient intake, referral engagement, and front desk systems while leading and supporting the front desk team to ensure consistency and efficiency.
         </p>
 
         <div style={topSection}>
