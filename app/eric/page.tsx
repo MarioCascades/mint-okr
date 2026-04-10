@@ -31,8 +31,10 @@ const keywordMap: Record<string, string> = {
 
 const percentageFields = [
   "Overdue Insurance Accounts",
-  "Total Balance Transferred to Patient Ledgers",
   "Reception Rate (Inquiry to Booked) for BrightReferral"
+]
+const currencyFields = [
+  "Total Balance Transferred to Patient Ledgers"
 ]
 
 // =========================
@@ -134,11 +136,18 @@ export default function Page() {
             <label style={label}>OKR Time Frame</label>
 
             <div style={monthSelector}>
-              <button onClick={() => changeMonth(-1)}>←</button>
-              <span>{formatMonth(selectedMonth)}</span>
-              <button disabled={isFutureMonth()} onClick={() => changeMonth(1)}>→</button>
-            </div>
+  <button style={arrowButton} onClick={() => changeMonth(-1)}>←</button>
 
+  <span style={monthText}>{formatMonth(selectedMonth)}</span>
+
+  <button
+    style={{ ...arrowButton, opacity: isFutureMonth() ? 0.3 : 1 }}
+    disabled={isFutureMonth()}
+    onClick={() => changeMonth(1)}
+  >
+    →
+  </button>
+</div>
             <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
               {isEditing ? 'Save' : 'Edit'}
             </button>
@@ -205,6 +214,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
 
   const isPercentage = percentageFields.includes(label)
+  const isCurrency = currencyFields.includes(label)
 
   useEffect(() => {
 
@@ -323,23 +333,31 @@ if (!base) {
 
       <input
         style={cell}
-        value={isPercentage && lastMonth ? lastMonth + '%' : lastMonth}
+        value={
+  isPercentage && lastMonth
+    ? lastMonth + '%'
+    : isCurrency && lastMonth
+    ? '$' + Number(lastMonth).toLocaleString()
+    : lastMonth
+}
         readOnly
       />
 
-      <input
-        style={cell}
-        value={isPercentage && target ? target + '%' : target}
-        readOnly
-      />
-
-      <input
-        style={cell}
-        value={isPercentage && value ? value + '%' : value}
-        disabled={!isEditing}
-        onChange={(e) => setValue(e.target.value.replace(/[^0-9]/g, ''))}
-        onBlur={handleSave}
-      />
+<input
+  style={cell}
+  value={
+    isPercentage && value
+      ? value + '%'
+      : isCurrency && value
+      ? '$' + Number(value).toLocaleString()
+      : value
+  }
+  disabled={!isEditing}
+  onChange={(e) =>
+    setValue(e.target.value.replace(/[^0-9.]/g, ''))
+  }
+  onBlur={handleSave}
+/>
 
       <input style={cell} value={score} readOnly />
 
@@ -505,4 +523,17 @@ const initiativeRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr 1fr',
   gap: 8
+}
+const arrowButton: React.CSSProperties = {
+  backgroundColor: '#1F2937',
+  border: 'none',
+  padding: '6px 10px',
+  borderRadius: 6,
+  color: '#fff',
+  cursor: 'pointer'
+}
+
+const monthText: React.CSSProperties = {
+  fontSize: 14,
+  fontWeight: 600
 }
