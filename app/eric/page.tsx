@@ -212,6 +212,11 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const [target, setTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
+  const getScoreColor = () => {
+  const num = Number(score.replace('%', ''))
+  if (isNaN(num)) return '#fff'
+  return num >= 100 ? '#22c55e' : '#c2410c'
+}
 
   const isPercentage = percentageFields.includes(label)
   const isCurrency = currencyFields.includes(label)
@@ -375,7 +380,15 @@ if (!base) {
   onBlur={handleSave}
 />
 
-      <input style={cell} value={score} readOnly />
+      <input
+  style={{
+    ...cell,
+    color: getScoreColor(),
+    fontWeight: 600
+  }}
+  value={score}
+  readOnly
+/>
 
       <button
         style={button}
