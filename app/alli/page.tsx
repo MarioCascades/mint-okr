@@ -76,7 +76,7 @@ export default function Page() {
         <TopNav />
 
       <div style={stickyHeader}>
-        <h1 style={title}>Alli - Patient Retention and Fincial Coordinator - </h1>
+        <h1 style={title}>Alli - Patient Retention and Fincial Coordinator </h1>
 
         <p style={description}>
           Ensure timely patient collections, maintaining strong engagement with observation patients, and supporting overall practice efficiency through task management and follow-up systems. This role directly impacts cash flow, patient experience, and case conversion.
