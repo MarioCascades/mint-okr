@@ -415,7 +415,13 @@ const directionMap: Record<string, 'increase' | 'decrease' | 'none'> = {
 
   // No score metrics
   "FD # of tasks in Lead Sigma": "none",
+  
 }
+const percentageMetrics = [
+  "FD Call Answer Rate",
+  "FD Reception Rate Bright Referral",
+  "FD Reception Rate DM Engage",
+]
 
 // =========================
 // OBJECTIVE
@@ -486,8 +492,13 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 setValue(data.value.toString())
 setTarget(data.target.toString())
 
-const c = data.value
-const t = data.target
+let c = data.value
+let t = data.target
+
+// normalize percentage metrics
+if (percentageMetrics.includes(label)) {
+  c = c * 100
+}
 
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
@@ -586,7 +597,7 @@ if (direction === 'none') {
 
         <input
           style={cell}
-          value={value}
+          value={percentageMetrics.includes(label) ? Number(value) * 100 : value}
           disabled={!isEditing}
           onChange={(e) => setValue(e.target.value)}
        
