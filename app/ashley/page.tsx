@@ -565,7 +565,9 @@ if (direction === 'none') {
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-  await supabase.from('key_result_updates').upsert(
+  const { data, error } = await supabase
+  .from('key_result_updates')
+  .upsert(
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
@@ -574,6 +576,8 @@ if (direction === 'none') {
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
+
+console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reportingDate })
 }
 
   return (
