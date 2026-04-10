@@ -356,8 +356,12 @@ const displayLabelMap: Record<string, string> = {
 "FD # of Dentists Referred": "# of Dentists Referred",
 "FD Digital Marketing": "Digital Marketing",
 
-
 "FD NP Incomplete Appointment": "NP Incomplete Appointment",
+// Fix for missing mappings (April)
+"Retain Invited": "Retain Invited",
+"Retain Subscribed": "Retain Subscribed",
+
+
 }
 const directionMap: Record<string, 'increase' | 'decrease' | 'none'> = {
   // Decrease metrics (lower is better)
@@ -412,7 +416,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         .from('dashboard_okr_data')
         .select('*')
         .eq('user_name', 'Ashley')
-        .ilike('key_result_title', `%${label}%`)
+        .ilike('key_result_title', `%${label.replace(/FD /g, '').replace(/\(.*?\)/g, '').trim()}%`)
         .maybeSingle()
 
       if (!base) return
