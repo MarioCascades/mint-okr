@@ -309,7 +309,21 @@ setLastMonth(prevVal.toString())
       t = Number(kr?.target_value ?? 0)
     }
 
-    const c = Number(base.current_value ?? 0)
+    // =========================
+    // CURRENT MONTH VALUE 
+    // =========================
+
+
+const currentDate = formatDate(selectedMonth)
+
+const { data: currentData } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
+const c = Number(currentData?.value ?? 0)
 
     const format = (v: number) => {
       if (isPercent) return formatPercent(v)
@@ -317,7 +331,7 @@ setLastMonth(prevVal.toString())
     }
 
     setTarget(format(t))
-    setValue(format(c))
+    setValue(c.toString())
 
     if (t > 0) {
       const percent = Math.round((c / t) * 100)
