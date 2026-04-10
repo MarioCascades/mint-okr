@@ -133,9 +133,21 @@ export default function Page() {
               </button>
             </div>
 
-            <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? 'Save' : 'Edit'}
-            </button>
+            <button
+  style={editButton}
+  onClick={async () => {
+
+    if (isEditing) {
+      // trigger save for ALL rows
+      const event = new Event('save-all')
+      window.dispatchEvent(event)
+    }
+
+    setIsEditing(!isEditing)
+  }}
+>
+  {isEditing ? 'Save' : 'Edit'}
+</button>
 
           </div>
 
@@ -513,7 +525,19 @@ if (direction === 'none') {
 
   }, [label, selectedMonth])
 
- const handleSave = async (e?: any) => {
+  useEffect(() => {
+  const handleGlobalSave = () => {
+    handleSave()
+  }
+
+  window.addEventListener('save-all', handleGlobalSave)
+
+  return () => {
+    window.removeEventListener('save-all', handleGlobalSave)
+  }
+}, [value, target, keyResultId])
+
+ const handleSave = async () => {
 
   if (!keyResultId) return
 
@@ -521,23 +545,12 @@ if (direction === 'none') {
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-  // read fresh values directly
-  const inputs = rowRef.current?.querySelectorAll('input') || []
- 
-
-  
-  const targetInput = inputs[1] // target column
-  const valueInput = inputs[2]  // value column
-
-  const latestTarget = Number(targetInput?.value || 0)
-  const latestValue = Number(valueInput?.value || 0)
-
   await supabase.from('key_result_updates').upsert(
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
-      value: latestValue,
-      target_value: latestTarget,
+      value: Number(value),
+      target_value: Number(target),
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
@@ -554,18 +567,20 @@ if (direction === 'none') {
         <input style={cell} value={lastMonth} readOnly />
 
         <input
-          style={cell}
-          value={target}
-          disabled={!isEditing}
-          onChange={(e) => setTarget(e.target.value)}
-        />
+  style={cell}
+  value={target}
+  disabled={!isEditing}
+  onChange={(e) => setTarget(e.target.value)}
+ onBlur={handleSave}
+/>
+
 
         <input
           style={cell}
           value={value}
           disabled={!isEditing}
           onChange={(e) => setValue(e.target.value)}
-         onBlur={(e) => handleSave(e)}
+        onBlur={handleSave}
         />
 
         <input 
