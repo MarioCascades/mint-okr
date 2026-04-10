@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import { getKeyResultData } from '@/lib/getKeyResultData'
 
 
 export default function Page() {
@@ -366,7 +367,6 @@ const queryLabelMap: Record<string, string> = {
   "FD Call Answer Rate": "FD Call Answer Rate",
   "FD # of Missed Calls": "FD # of Missed Calls",
   "# of Patients Waited 10+ Minutes": "# of Patients Waited 10+ Minutes",
-  "FD # of tasks in Lead Sigma": "FD # of tasks in Lead Sigma",
 
   "FD Bright Referral": "FD Bright Referral",
   "FD Reception Rate Bright Referral": "FD Reception Rate Bright Referral",
@@ -375,13 +375,16 @@ const queryLabelMap: Record<string, string> = {
 
   "FD NP Scheduled (GF)": "FD NP Scheduled (GF)",
   "FD NP Scheduled Next Month": "FD NP Scheduled Next Month",
-  "FD NP NSC": "FD NP NSC",
   "FD New Patients Missing Information (EOD NP Prep)": "FD New Patients Missing Information (EOD NP Prep)",
 
   "Retain Invited": "FD Retain Invited",
   "Retain Subscribed": "FD Retain Subscribed",
 
-  // March
+  // These currently DO NOT exist in DB (will not show until inserted)
+  "FD # of tasks in Lead Sigma": "FD # of tasks in Lead Sigma",
+  "FD NP NSC": "FD NP NSC",
+
+  // March (missing in DB)
   "FD Patient Referral": "FD Patient Referral",
   "FD Dental Referrals": "FD Dental Referrals",
   "FD # of Dentists Referred": "FD # of Dentists Referred",
@@ -452,32 +455,26 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
       setKeyResultId(base.key_result_id)
 
-      const { data: kr } = await supabase
-        .from('key_results')
-        .select('target_value')
-        .eq('id', base.key_result_id)
-        .maybeSingle()
-
-      const t = Number(kr?.target_value ?? 0)
-      setTarget(t.toString())
+      
 
       const formatDate = (d: Date) =>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
       const currentDate = formatDate(selectedMonth)
+      const data = await getKeyResultData({
+  keyResultId: base.key_result_id,
+  currentDate,
+  baseValue: base.current_value,
+})
+
+setValue(data.value.toString())
+setTarget(data.target.toString())
+
+const c = data.value
+const t = data.target
 
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
-
-      const { data: current } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', currentDate)
-        .maybeSingle()
-
-      const c = Number(current?.value ?? base.current_value ?? 0)
-      setValue(c.toString())
 
       const { data: prevData } = await supabase
         .from('key_result_updates')
@@ -526,6 +523,7 @@ if (direction === 'none') {
         key_result_id: keyResultId,
         reporting_month: reportingDate,
         value: Number(value),
+        target_value: Number(target),
       },
       { onConflict: 'key_result_id,reporting_month' }
     )
