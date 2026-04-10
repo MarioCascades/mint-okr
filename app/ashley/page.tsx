@@ -2,11 +2,12 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
 import { getKeyResultData } from '@/lib/getKeyResultData'
+
 
 
 export default function Page() {
@@ -437,6 +438,8 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [showInitiatives, setShowInitiatives] = useState(false)
 
+  const rowRef = useRef<HTMLDivElement | null>(null)
+
   useEffect(() => {
 
     const fetchData = async () => {
@@ -510,28 +513,42 @@ if (direction === 'none') {
 
   }, [label, selectedMonth])
 
-  const handleSave = async () => {
+ const handleSave = async (e?: any) => {
 
-    if (!keyResultId) return
+  if (!keyResultId) return
 
-    const y = selectedMonth.getFullYear()
-    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
-    const reportingDate = `${y}-${m}-01`
+  const y = selectedMonth.getFullYear()
+  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+  const reportingDate = `${y}-${m}-01`
 
-    await supabase.from('key_result_updates').upsert(
-      {
-        key_result_id: keyResultId,
-        reporting_month: reportingDate,
-        value: Number(value),
-        target_value: Number(target),
-      },
-      { onConflict: 'key_result_id,reporting_month' }
-    )
-  }
+  // read fresh values directly
+  const inputs = rowRef.current?.querySelectorAll('input') || []
+ 
+
+  
+  const targetInput = inputs[1] // target column
+  const valueInput = inputs[2]  // value column
+
+  const latestTarget = Number(targetInput?.value || 0)
+  const latestValue = Number(valueInput?.value || 0)
+
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      value: latestValue,
+      target_value: latestTarget,
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
+}
 
   return (
     <div style={{ marginBottom: 10 }}>
-      <div style={row}>
+      <div style={row} ref={(el) => {
+  rowRef.current = el
+}}
+>
        <span>{displayLabelMap[label] || label}</span>
 
         <input style={cell} value={lastMonth} readOnly />
@@ -548,7 +565,7 @@ if (direction === 'none') {
           value={value}
           disabled={!isEditing}
           onChange={(e) => setValue(e.target.value)}
-          onBlur={handleSave}
+         onBlur={(e) => handleSave(e)}
         />
 
         <input 
