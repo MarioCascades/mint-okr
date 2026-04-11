@@ -192,28 +192,28 @@ export default function Page() {
 <Objective title="Objective 2: Bright Referral">
 
   <KeyResult
-    label="FD Bright Referral"
-    selectedMonth={selectedMonth}
-    isEditing={isEditing}
-  />
+  label="FD Referring Offices"
+  selectedMonth={selectedMonth}
+  isEditing={isEditing}
+/>
 
-  <KeyResult
-    label="FD Reception Rate Bright Referral"
-    selectedMonth={selectedMonth}
-    isEditing={isEditing}
-  />
+<KeyResult
+  label="FD Bright Referral Users"
+  selectedMonth={selectedMonth}
+  isEditing={isEditing}
+/>
 
-  <KeyResult
-    label="FD DM Engage"
-    selectedMonth={selectedMonth}
-    isEditing={isEditing}
-  />
+<KeyResult
+  label="FD Bright Referral Inquiries"
+  selectedMonth={selectedMonth}
+  isEditing={isEditing}
+/>
 
-  <KeyResult
-    label="FD Reception Rate DM Engage"
-    selectedMonth={selectedMonth}
-    isEditing={isEditing}
-  />
+<KeyResult
+  label="FD Bright Referral Reception Rate"
+  selectedMonth={selectedMonth}
+  isEditing={isEditing}
+/>
 
 </Objective>
 
