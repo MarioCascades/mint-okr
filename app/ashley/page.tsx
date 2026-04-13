@@ -494,11 +494,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 if (percentageMetrics.includes(label)) {
   setValue((data.value * 100).toString())
 } else {
-  if (percentageMetrics.includes(label)) {
-  setValue((data.value * 100).toString())
-} else {
   setValue(data.value.toString())
-}
 }
 
 
@@ -529,7 +525,7 @@ if (percentageMetrics.includes(label)) {
 } else {
   setLastMonth(String(prevData?.value ?? 0))
 }
-      // ✅ TARGET FROM PREVIOUS MONTH
+      // TARGET FROM PREVIOUS MONTH
 if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
   if (percentageMetrics.includes(label)) {
     setTarget(String(prevData.target_value * 100))
@@ -539,7 +535,6 @@ if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
 } else {
   setTarget('')
 }
-
       const direction = directionMap[label] || 'increase'
 
 if (direction === 'none') {
@@ -585,11 +580,6 @@ if (direction === 'none') {
 
  const handleSave = async (monthOverride?: Date) => {
 
-  console.log('SAVE ATTEMPT:', {
-  keyResultId,
-  value,
-  target
-})
 
   if (!keyResultId) {
   console.log('❌ keyResultId missing, skipping save')
@@ -601,6 +591,12 @@ if (direction === 'none') {
 const y = monthToUse.getFullYear()
 const m = String(monthToUse.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
+  console.log('SAVE ATTEMPT:', {
+  keyResultId,
+  value,
+  target,
+  reportingDate
+})
 
   const { data, error } = await supabase
   .from('key_result_updates')
@@ -611,7 +607,7 @@ const m = String(monthToUse.getMonth() + 1).padStart(2, '0')
       value: percentageMetrics.includes(label)
   ? Number(value) / 100
   : Number(value),
-      target_value: Number(target),
+      target_value: target === '' ? null : Number(target),
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
@@ -633,7 +629,12 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
   style={cell}
   value={target}
   disabled={!isEditing}
-  onChange={(e) => setTarget(e.target.value)}
+  onChange={(e) => {
+  const val = e.target.value
+  if (/^\d*\.?\d*$/.test(val)) {
+    setTarget(val)
+  }
+}}
 
 />
 
