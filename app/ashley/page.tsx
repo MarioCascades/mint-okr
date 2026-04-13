@@ -497,7 +497,7 @@ const { data: currentData } = await supabase
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
-// ✅ LOAD CURRENT MONTH TARGET FIRST
+// LOAD CURRENT MONTH TARGET FIRST
 if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
   setTarget(
     percentageMetrics.includes(label)
@@ -667,7 +667,19 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
 
         <input style={cell} value={lastMonth} readOnly />
 
-        <input
+<input
+  style={cell}
+  value={target}
+  disabled={!isEditing}
+  onChange={(e) => {
+    const val = e.target.value
+    if (/^\d*\.?\d*$/.test(val)) {
+      setTarget(val)
+    }
+  }}
+/>
+
+<input
   style={cell}
   value={
     percentageMetrics.includes(label) && value !== ''
@@ -677,28 +689,11 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
   disabled={!isEditing}
   onChange={(e) => {
     let val = e.target.value.replace('%', '')
-
     if (/^\d*\.?\d*$/.test(val)) {
       setValue(val)
     }
   }}
 />
-
-
-        <input
-          style={cell}
-          value={value}
-          disabled={!isEditing}
-          onChange={(e) => {
-  const val = e.target.value
-
-  // allow decimals
-  if (/^\d*\.?\d*$/.test(val)) {
-    setValue(val)
-  }
-}}
-       
-        />
 
         <input 
  style={{ 
