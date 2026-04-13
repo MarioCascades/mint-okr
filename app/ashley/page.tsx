@@ -140,8 +140,10 @@ export default function Page() {
  if (isEditing) {
   await new Promise((r) => setTimeout(r, 0))
 
-  const event = new Event('save-all')
-  window.dispatchEvent(event)
+  const event = new CustomEvent('save-all', {
+  detail: { selectedMonth }
+})
+window.dispatchEvent(event)
 }
 
   setIsEditing(!isEditing)
@@ -489,7 +491,11 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   baseValue: base.current_value,
 })
 
-setValue(data.value.toString())
+if (percentageMetrics.includes(label)) {
+  setValue((data.value * 100).toString())
+} else {
+  setValue(data.value.toString())
+}
 
 
 let c = data.value
@@ -544,23 +550,24 @@ if (direction === 'none') {
   }, [label, selectedMonth])
 
   useEffect(() => {
-  const handleGlobalSave = () => {
-    if (!keyResultId) {
-      console.log('❌ skipping save — no keyResultId yet')
-      return
-    }
+ const handleGlobalSave = (e: any) => {
+  const monthFromEvent = e.detail?.selectedMonth
 
-    handleSave()
+  if (!keyResultId || !monthFromEvent) {
+    console.log('❌ skipping save — missing data')
+    return
   }
 
+  handleSave(monthFromEvent)
+}
   window.addEventListener('save-all', handleGlobalSave)
 
   return () => {
     window.removeEventListener('save-all', handleGlobalSave)
   }
-}, [value, target, keyResultId])
+}, [keyResultId])
 
- const handleSave = async () => {
+ const handleSave = async (monthOverride?: Date) => {
 
   console.log('SAVE ATTEMPT:', {
   keyResultId,
@@ -573,8 +580,10 @@ if (direction === 'none') {
   return
 }
 
-  const y = selectedMonth.getFullYear()
-  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+ const monthToUse = monthOverride || selectedMonth
+
+const y = monthToUse.getFullYear()
+const m = String(monthToUse.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
   const { data, error } = await supabase
