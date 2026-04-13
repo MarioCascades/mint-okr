@@ -138,7 +138,7 @@ export default function Page() {
  onClick={async () => {
 
  if (isEditing) {
-  await new Promise((r) => setTimeout(r, 0))
+  await new Promise((r) => setTimeout(r, 100))
 
   const event = new CustomEvent('save-all', {
   detail: { selectedMonth }
@@ -597,17 +597,26 @@ const m = String(monthToUse.getMonth() + 1).padStart(2, '0')
   target,
   reportingDate
 })
+console.log('FINAL SAVE:', {
+  label,
+  keyResultId,
+  value,
+  target,
+  reportingDate
+})
 
-  const { data, error } = await supabase
+  const cleanTarget = target?.toString().trim()
+
+const { data, error } = await supabase
   .from('key_result_updates')
   .upsert(
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
       value: percentageMetrics.includes(label)
-  ? Number(value) / 100
-  : Number(value),
-      target_value: target === '' ? null : Number(target),
+        ? Number(value) / 100
+        : Number(value),
+      target_value: cleanTarget === '' ? null : Number(cleanTarget),
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
