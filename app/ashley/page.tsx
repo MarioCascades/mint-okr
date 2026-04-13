@@ -514,7 +514,16 @@ if (percentageMetrics.includes(label)) {
 
 
 let c = data.value
-let t = data.target
+let t = 0
+
+// PRIORITY: current month target
+if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
+  t = percentageMetrics.includes(label)
+    ? currentData.target_value * 100
+    : currentData.target_value
+}
+
+
 
 // normalize percentage metrics
 if (percentageMetrics.includes(label)) {
@@ -525,11 +534,22 @@ if (percentageMetrics.includes(label)) {
       prev.setMonth(prev.getMonth() - 1)
 
       const { data: prevData } = await supabase
-        .from('key_result_updates')
-        .select('value, target_value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', formatDate(prev))
-        .maybeSingle()
+  .from('key_result_updates')
+  .select('value, target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', formatDate(prev))
+  .maybeSingle()
+
+// fallback AFTER prevData is properly loaded
+if (
+  (currentData?.target_value === null || currentData?.target_value === undefined) &&
+  prevData?.target_value !== null &&
+  prevData?.target_value !== undefined
+) {
+  t = percentageMetrics.includes(label)
+    ? prevData.target_value * 100
+    : prevData.target_value
+}
 
       if (percentageMetrics.includes(label)) {
   setLastMonth(
@@ -596,7 +616,6 @@ if (direction === 'none') {
 }, [keyResultId])
 
  const handleSave = async (monthOverride?: Date) => {
-
 
   if (!keyResultId) {
   console.log('❌ keyResultId missing, skipping save')
