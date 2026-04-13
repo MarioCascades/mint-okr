@@ -583,7 +583,9 @@ if (direction === 'none') {
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
-      value: Number(value),
+      value: percentageMetrics.includes(label)
+  ? Number(value) / 100
+  : Number(value),
       target_value: Number(target),
     },
     { onConflict: 'key_result_id,reporting_month' }
@@ -613,9 +615,16 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
 
         <input
           style={cell}
-          value={percentageMetrics.includes(label) ? Number(value) * 100 : value}
+          value={value}
           disabled={!isEditing}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+  const val = e.target.value
+
+  // allow decimals
+  if (/^\d*\.?\d*$/.test(val)) {
+    setValue(val)
+  }
+}}
        
         />
 
