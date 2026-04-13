@@ -22,8 +22,8 @@ export default function Page() {
   const [lastUpdated, setLastUpdated] = useState('')
   const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
   const [isEditing, setIsEditing] = useState(false)
-  const isAprilOrLater =
-  selectedMonth >= new Date(2026, 3, 1) // April = month index 3
+  const isMarchOrLater =
+  selectedMonth >= new Date(2026, 2, 1) // March = month index 3
 
   
 
@@ -157,7 +157,7 @@ export default function Page() {
 
       {/* CONTENT */}
       <div style={content}>
-        {isAprilOrLater && (
+        {isMarchOrLater && (
   <>
 
         <Objective title="Objective 1: Office Efficiency">
@@ -262,7 +262,7 @@ export default function Page() {
 </Objective>
   </>
 )}
-{!isAprilOrLater && (
+{!isMarchOrLater && (
   <>
 
     <Objective title="Objective 1: Understanding Referral Mix">
