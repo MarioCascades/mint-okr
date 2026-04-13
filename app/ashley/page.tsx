@@ -499,11 +499,7 @@ const { data: currentData } = await supabase
 
 // LOAD CURRENT MONTH TARGET FIRST
 if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
-  setTarget(
-    percentageMetrics.includes(label)
-      ? String(currentData.target_value * 100)
-      : String(currentData.target_value)
-  )
+setTarget(String(currentData.target_value))
 }
 
 if (percentageMetrics.includes(label)) {
@@ -555,15 +551,11 @@ if (
 }
 // FINAL TARGET LOGIC (stable)
 if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
-  setTarget(
-    percentageMetrics.includes(label)
-      ? String(currentData.target_value * 100)
-      : String(currentData.target_value)
-  )
+  setTarget(String(currentData.target_value))
 } else if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
   setTarget(
     percentageMetrics.includes(label)
-      ? String(prevData.target_value * 100)
+      ? String(prevData.target_value)
       : String(prevData.target_value)
   )
 } else {
