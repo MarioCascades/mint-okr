@@ -490,6 +490,21 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   currentDate,
   baseValue: base.current_value,
 })
+const { data: currentData } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
+// ✅ LOAD CURRENT MONTH TARGET FIRST
+if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
+  setTarget(
+    percentageMetrics.includes(label)
+      ? String(currentData.target_value * 100)
+      : String(currentData.target_value)
+  )
+}
 
 if (percentageMetrics.includes(label)) {
   setValue((data.value * 100).toString())
@@ -526,14 +541,16 @@ if (percentageMetrics.includes(label)) {
   setLastMonth(String(prevData?.value ?? 0))
 }
       // TARGET FROM PREVIOUS MONTH
-if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
-  if (percentageMetrics.includes(label)) {
-    setTarget(String(prevData.target_value * 100))
+if (!currentData?.target_value) {
+  if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
+    setTarget(
+      percentageMetrics.includes(label)
+        ? String(prevData.target_value * 100)
+        : String(prevData.target_value)
+    )
   } else {
-    setTarget(String(prevData.target_value))
+    setTarget('')
   }
-} else {
-  setTarget('')
 }
       const direction = directionMap[label] || 'increase'
 
