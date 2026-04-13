@@ -494,7 +494,11 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 if (percentageMetrics.includes(label)) {
   setValue((data.value * 100).toString())
 } else {
+  if (percentageMetrics.includes(label)) {
+  setValue((data.value * 100).toString())
+} else {
   setValue(data.value.toString())
+}
 }
 
 
@@ -516,10 +520,22 @@ if (percentageMetrics.includes(label)) {
         .eq('reporting_month', formatDate(prev))
         .maybeSingle()
 
-      setLastMonth(String(prevData?.value ?? 0))
+      if (percentageMetrics.includes(label)) {
+  setLastMonth(
+    prevData?.value !== null && prevData?.value !== undefined
+      ? String(prevData.value * 100)
+      : ''
+  )
+} else {
+  setLastMonth(String(prevData?.value ?? 0))
+}
       // ✅ TARGET FROM PREVIOUS MONTH
 if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
-  setTarget(String(prevData.target_value))
+  if (percentageMetrics.includes(label)) {
+    setTarget(String(prevData.target_value * 100))
+  } else {
+    setTarget(String(prevData.target_value))
+  }
 } else {
   setTarget('')
 }
