@@ -523,13 +523,6 @@ if (currentData?.target_value !== null && currentData?.target_value !== undefine
     : currentData.target_value
 }
 
-
-
-// normalize percentage metrics
-if (percentageMetrics.includes(label)) {
-  c = c * 100
-}
-
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
 
@@ -560,17 +553,21 @@ if (
 } else {
   setLastMonth(String(prevData?.value ?? 0))
 }
-      // TARGET FROM PREVIOUS MONTH
-if (!currentData?.target_value) {
-  if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
-    setTarget(
-      percentageMetrics.includes(label)
-        ? String(prevData.target_value * 100)
-        : String(prevData.target_value)
-    )
-  } else {
-    setTarget('')
-  }
+// FINAL TARGET LOGIC (stable)
+if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
+  setTarget(
+    percentageMetrics.includes(label)
+      ? String(currentData.target_value * 100)
+      : String(currentData.target_value)
+  )
+} else if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
+  setTarget(
+    percentageMetrics.includes(label)
+      ? String(prevData.target_value * 100)
+      : String(prevData.target_value)
+  )
+} else {
+  setTarget('')
 }
       const direction = directionMap[label] || 'increase'
 
@@ -672,15 +669,19 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
 
         <input
   style={cell}
-  value={target}
+  value={
+    percentageMetrics.includes(label) && value !== ''
+      ? value + '%'
+      : value
+  }
   disabled={!isEditing}
   onChange={(e) => {
-  const val = e.target.value
-  if (/^\d*\.?\d*$/.test(val)) {
-    setTarget(val)
-  }
-}}
+    let val = e.target.value.replace('%', '')
 
+    if (/^\d*\.?\d*$/.test(val)) {
+      setValue(val)
+    }
+  }}
 />
 
 
