@@ -490,7 +490,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 })
 
 setValue(data.value.toString())
-setTarget(data.target.toString())
+
 
 let c = data.value
 let t = data.target
@@ -511,6 +511,12 @@ if (percentageMetrics.includes(label)) {
         .maybeSingle()
 
       setLastMonth(String(prevData?.value ?? 0))
+      // ✅ TARGET FROM PREVIOUS MONTH
+if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
+  setTarget(String(prevData.target_value))
+} else {
+  setTarget('')
+}
 
       const direction = directionMap[label] || 'increase'
 
