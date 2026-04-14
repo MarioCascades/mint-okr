@@ -508,11 +508,8 @@ if (percentageMetrics.includes(label)) {
 let c = data.value
 let t = 0
 
-// PRIORITY: current month target
 if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
-  t = percentageMetrics.includes(label)
-    ? currentData.target_value * 100
-    : currentData.target_value
+  t = currentData.target_value
 }
 
       const prev = new Date(selectedMonth)
@@ -531,9 +528,7 @@ if (
   prevData?.target_value !== null &&
   prevData?.target_value !== undefined
 ) {
-  t = percentageMetrics.includes(label)
-    ? prevData.target_value * 100
-    : prevData.target_value
+  t = prevData.target_value
 }
 
       if (percentageMetrics.includes(label)) {
