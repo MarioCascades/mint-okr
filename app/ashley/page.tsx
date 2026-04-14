@@ -497,10 +497,6 @@ const { data: currentData } = await supabase
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
-// LOAD CURRENT MONTH TARGET FIRST
-if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
-setTarget(String(currentData.target_value))
-}
 
 if (percentageMetrics.includes(label)) {
   setValue((data.value * 100).toString())
