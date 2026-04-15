@@ -601,7 +601,7 @@ const reportingDate = new Date(
   monthToUse.getFullYear(),
   monthToUse.getMonth(),
   1
-).toISOString().split('T')[0]01`
+).toISOString().split('T')[0]
 
 
   console.log('SAVE ATTEMPT:', {
