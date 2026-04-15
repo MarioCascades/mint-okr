@@ -520,12 +520,20 @@ const { data: currentData } = await supabase
  .eq('reporting_month', currentDate)
   .maybeSingle()
 
+const isEmptyRow =
+  currentData?.value === 0 &&
+  (currentData?.target_value === null || currentData?.target_value === undefined)
+
 const currentValue =
-  currentData?.value !== null && currentData?.value !== undefined
+  currentData?.value !== null &&
+  currentData?.value !== undefined &&
+  !isEmptyRow
     ? currentData.value
     : ''
 const currentTarget =
-  currentData?.target_value !== null && currentData?.target_value !== undefined
+  currentData?.target_value !== null &&
+  currentData?.target_value !== undefined &&
+  !isEmptyRow
     ? currentData.target_value
     : ''
 
@@ -555,10 +563,15 @@ const { data: prevData } = await supabase
   .eq('reporting_month', formatDate(prev))
   .maybeSingle()
 
-    setLastMonth(
+  const prevIsEmpty =
+  prevData?.value === 0 || prevData?.value === null || prevData?.value === undefined
+
+const prevVal = prevIsEmpty ? '' : prevData?.value
+
+setLastMonth(
   percentageMetrics.includes(label)
-    ? String((prevData?.value ?? 0) * 100)
-    : String(prevData?.value ?? 0)
+    ? prevVal !== '' ? String(prevVal * 100) : ''
+    : prevVal !== '' ? String(prevVal) : ''
 )
  setTarget(
   currentTarget !== null && currentTarget !== undefined
