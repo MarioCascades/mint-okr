@@ -365,6 +365,10 @@ const displayLabelMap: Record<string, string> = {
 "FD NP Scheduled Next Month": "NP Scheduled (Next Month)",
 "FD NP NSC": "NP NSC",
 "FD New Patients Missing Information (EOD NP Prep)": "Missing NP Info (EOD Prep)",
+"FD Referring Offices": "Referring Offices",
+"FD Bright Referral Users": "Bright Referral Users",
+"FD Bright Referral Inquiries": "Bright Referral Inquiries",
+"FD Bright Referral Reception Rate": "Bright Referral Reception Rate",
 
 // OLD OKRs (March)
 
@@ -484,18 +488,21 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
     const currentDate = formatDate(selectedMonth)
 
-    const data = await getKeyResultData({
-      keyResultId: base.data.key_result_id,
-      currentDate,
-      baseValue: base.data.current_value,
-    })
+    const { data: currentData } = await supabase
+  .from('key_result_updates')
+  .select('value, target_value')
+  .eq('key_result_id', base.data.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
 
-    // SIMPLE STATE SET
+const currentValue = currentData?.value ?? base.data.current_value ?? 0
+const currentTarget = currentData?.target_value ?? ''
+
     setValue(
-      percentageMetrics.includes(label)
-        ? (data.value * 100).toString()
-        : data.value.toString()
-    )
+  percentageMetrics.includes(label)
+    ? String(currentValue * 100)
+    : String(currentValue)
+)
     const prev = new Date(selectedMonth)
 prev.setMonth(prev.getMonth() - 1)
 
@@ -513,11 +520,11 @@ const { data: prevData } = await supabase
     ? String((prevData?.value ?? 0) * 100)
     : String(prevData?.value ?? 0)
 )
-    setTarget(
-      data.target !== null && data.target !== undefined
-        ? String(data.target)
-        : ''
-    )
+   setTarget(
+  currentTarget !== null && currentTarget !== undefined
+    ? String(currentTarget)
+    : ''
+)
   }
 
   loadData()
