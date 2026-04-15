@@ -517,8 +517,7 @@ const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value, target_value')
  .eq('key_result_id', baseData[0].key_result_id)
-  .gte('reporting_month', currentStart.toISOString())
-  .lt('reporting_month', currentEnd.toISOString())
+  .eq('reporting_month', currentDate)
   .maybeSingle()
 
 const currentValue =
@@ -556,8 +555,7 @@ const { data: prevData } = await supabase
   .from('key_result_updates')
   .select('value')
  .eq('key_result_id', baseData[0].key_result_id)
-  .gte('reporting_month', prevStart.toISOString())
-  .lt('reporting_month', prevEnd.toISOString())
+  .eq('reporting_month', currentDate)
   .maybeSingle()
 
     setLastMonth(
