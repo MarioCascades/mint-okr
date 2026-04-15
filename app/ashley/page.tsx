@@ -570,6 +570,7 @@ const { data: prevData } = await supabase
       : ''
   )
 }
+}
 
   loadData()
 }, [label, selectedMonth])
