@@ -529,7 +529,7 @@ const currentValue =
   !isEmptyRow
     ? currentData.value
     : ''
-const currentTarget =
+let currentTarget =
   currentData?.target_value !== null &&
   currentData?.target_value !== undefined &&
   !isEmptyRow
@@ -557,7 +557,7 @@ prevEnd.setMonth(prevEnd.getMonth() + 1)
 
 const { data: prevData } = await supabase
   .from('key_result_updates')
-  .select('value')
+  .select('value, target_value')
  .eq('key_result_id', baseData[0].key_result_id)
   .eq('reporting_month', formatDate(prev))
   .maybeSingle()
@@ -566,6 +566,9 @@ const { data: prevData } = await supabase
   prevData?.value === 0 || prevData?.value === null || prevData?.value === undefined
 
 const prevVal = prevIsEmpty ? '' : prevData?.value
+if (currentTarget === '' || currentTarget === null || currentTarget === undefined) {
+  currentTarget = prevData?.target_value ?? null
+}
 
 setLastMonth(
   percentageMetrics.includes(label)
