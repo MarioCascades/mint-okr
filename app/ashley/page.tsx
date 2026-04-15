@@ -471,16 +471,19 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
  useEffect(() => {
   const loadData = async () => {
 
-    const base = await supabase
-      .from('dashboard_okr_data')
-      .select('*')
-      .eq('user_name', 'Ashley')
-      .eq('key_result_title', label)
-      .maybeSingle()
+    const { data: baseData } = await supabase
+  .from('dashboard_okr_data')
+  .select('*')
+  .eq('user_name', 'Ashley')
+  .ilike('key_result_title', `%${label.trim()}%`)
+  .limit(1)
 
-    if (!base.data) return
+if (!baseData || baseData.length === 0) {
+  console.log('NO MATCH FOUND FOR:', label)
+  return
+}
 
-    setKeyResultId(base.data.key_result_id)
+setKeyResultId(baseData[0].key_result_id)
 
     const formatDate = (d: Date) => {
   return new Date(d.getFullYear(), d.getMonth(), 1)
@@ -508,7 +511,7 @@ const currentEnd = new Date(
 const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value, target_value')
-  .eq('key_result_id', base.data.key_result_id)
+ .eq('key_result_id', baseData[0].key_result_id)
   .gte('reporting_month', currentStart.toISOString())
   .lt('reporting_month', currentEnd.toISOString())
   .maybeSingle()
@@ -541,7 +544,7 @@ prevEnd.setMonth(prevEnd.getMonth() + 1)
 const { data: prevData } = await supabase
   .from('key_result_updates')
   .select('value')
-  .eq('key_result_id', base.data.key_result_id)
+ .eq('key_result_id', baseData[0].key_result_id)
   .gte('reporting_month', prevStart.toISOString())
   .lt('reporting_month', prevEnd.toISOString())
   .maybeSingle()
