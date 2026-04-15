@@ -69,6 +69,7 @@ export default function Page() {
     fetchLastUpdated()
   }, [])
 
+
   const formatMonth = (date: Date) =>
     date.toLocaleString('default', { month: 'short', year: 'numeric' })
 
@@ -457,7 +458,6 @@ const Objective = ({ title, children }: any) => (
 
 
 const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
-  const keyResultIdRef = useRef<string | null>(null)
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -488,7 +488,6 @@ if (!baseData || baseData.length === 0) {
 }
 
 setKeyResultId(baseData[0].key_result_id)
-keyResultIdRef.current = baseData[0].key_result_id
 
     const formatDate = (d: Date) => {
   return new Date(d.getFullYear(), d.getMonth(), 1)
@@ -607,26 +606,27 @@ useEffect(() => {
   if (!monthFromEvent) return
 
   // wait briefly to ensure keyResultId is set
-  await new Promise((r) => setTimeout(r, 50))
+  
 
-  if (!keyResultIdRef.current) {
-  console.log('still missing keyResultId, skipping:', label)
+  if (!keyResultId) {
+  console.log('❌ BLOCKED SAVE — missing keyResultId', label)
   return
 }
 
-
-  handleSave(monthFromEvent, keyResultIdRef.current)
+console.log('GLOBAL SAVE USING ID:', keyResultId, 'LABEL:', label)
+  handleSave(monthFromEvent, keyResultId)
 }
   window.addEventListener('save-all', handleGlobalSave)
 
   return () => {
     window.removeEventListener('save-all', handleGlobalSave)
   }
-}, [])
+}, [keyResultId, value, target, selectedMonth])
 
-const handleSave = async (monthOverride?: Date, idOverride?: string | null) => {
-console.log('HANDLE SAVE FIRED:', label, value, target, idOverride)
-  const finalId = idOverride || keyResultId
+const handleSave = async (monthOverride?: Date, passedId?: string | null) => {
+console.log('HANDLE SAVE FIRED:', label, value, target, passedId, keyResultId)
+  const finalId = passedId || keyResultId
+  console.log('FINAL ID USED:', finalId)
 
 if (!finalId) {
   console.log('keyResultId missing, skipping save')
@@ -660,6 +660,8 @@ console.log('FINAL SAVE:', {
 })
 
   const cleanTarget = target?.toString().trim()
+  const parsedValue = value === '' ? null : Number(value)
+const parsedTarget = target === '' ? null : Number(target)
 
 const { data, error } = await supabase
   .from('key_result_updates')
@@ -676,6 +678,7 @@ const { data, error } = await supabase
       target_value: cleanTarget === '' ? null : Number(cleanTarget),
     },
     { onConflict: 'key_result_id,reporting_month' }
+    
   )
 
 console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reportingDate })
