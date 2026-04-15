@@ -461,121 +461,73 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
   const rowRef = useRef<HTMLDivElement | null>(null)
 
-  useEffect(() => {
+  
 
-    const fetchData = async () => {
-
-      const { data: base } = await supabase
-        .from('dashboard_okr_data')
-        .select('*')
-        .eq('user_name', 'Ashley')
-        .eq(
-  'key_result_title',
-  queryLabelMap[label] || label
-)
-        .maybeSingle()
-
-      if (!base) return
-
-      setKeyResultId(base.key_result_id)
-
-      
-
-      const formatDate = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-
-      const currentDate = formatDate(selectedMonth)
-      const data = await getKeyResultData({
-  keyResultId: base.key_result_id,
-  currentDate,
-  baseValue: base.current_value,
-})
-const { data: currentData } = await supabase
-  .from('key_result_updates')
-  .select('target_value')
-  .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', currentDate)
-  .maybeSingle()
-
-
-if (percentageMetrics.includes(label)) {
-  setValue((data.value * 100).toString())
-} else {
-  setValue(data.value.toString())
-}
-
-
-let c = data.value
-let t = 0
-
-if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
-  t = currentData.target_value
-}
-
-      const prev = new Date(selectedMonth)
-      prev.setMonth(prev.getMonth() - 1)
-
-      const { data: prevData } = await supabase
-  .from('key_result_updates')
-  .select('value, target_value')
-  .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', formatDate(prev))
-  .maybeSingle()
-
-// fallback AFTER prevData is properly loaded
-if (
-  (currentData?.target_value === null || currentData?.target_value === undefined) &&
-  prevData?.target_value !== null &&
-  prevData?.target_value !== undefined
-) {
-  t = prevData.target_value
-}
-
-      if (percentageMetrics.includes(label)) {
-  setLastMonth(
-    prevData?.value !== null && prevData?.value !== undefined
-      ? String(prevData.value * 100)
-      : ''
-  )
-} else {
-  setLastMonth(String(prevData?.value ?? 0))
-}
 // FINAL TARGET LOGIC (stable)
-if (currentData?.target_value !== null && currentData?.target_value !== undefined) {
-  setTarget(String(currentData.target_value))
-} else if (prevData?.target_value !== null && prevData?.target_value !== undefined) {
-  setTarget(
-    percentageMetrics.includes(label)
-      ? String(prevData.target_value)
-      : String(prevData.target_value)
-  )
-} else {
-  setTarget('')
-}
-      const direction = directionMap[label] || 'increase'
 
-if (direction === 'none') {
-  setScore('—')
-} else if (t > 0 && c >= 0) {
+ useEffect(() => {
+  const loadData = async () => {
 
-  let percent = 0
+    const base = await supabase
+      .from('dashboard_okr_data')
+      .select('*')
+      .eq('user_name', 'Ashley')
+      .eq('key_result_title', queryLabelMap[label] || label)
+      .maybeSingle()
 
-  if (direction === 'increase') {
-    percent = Math.round((c / t) * 100)
-  } else if (direction === 'decrease') {
-    percent = c === 0 ? 100 : Math.round((t / c) * 100)
+    if (!base.data) return
+
+    setKeyResultId(base.data.key_result_id)
+
+    const formatDate = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+
+    const currentDate = formatDate(selectedMonth)
+
+    const data = await getKeyResultData({
+      keyResultId: base.data.key_result_id,
+      currentDate,
+      baseValue: base.data.current_value,
+    })
+
+    // SIMPLE STATE SET
+    setValue(
+      percentageMetrics.includes(label)
+        ? (data.value * 100).toString()
+        : data.value.toString()
+    )
+    const prev = new Date(selectedMonth)
+prev.setMonth(prev.getMonth() - 1)
+
+const prevFormatted = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-01`
+
+const { data: prevData } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.data.key_result_id)
+  .eq('reporting_month', prevFormatted)
+  .maybeSingle()
+
+    setLastMonth(
+  percentageMetrics.includes(label)
+    ? String((prevData?.value ?? 0) * 100)
+    : String(prevData?.value ?? 0)
+)
+    setTarget(
+      data.target !== null && data.target !== undefined
+        ? String(data.target)
+        : ''
+    )
+
   }
 
-  setScore(percent + '%')
+  loadData()
+}, [label, selectedMonth])
+// =========================
+// PREVIOUS MONTH FETCH
+// =========================
 
-} else {
-  setScore('—')
-}
-    }
 
-    fetchData()
-
-  }, [label, selectedMonth])
 
   useEffect(() => {
  const handleGlobalSave = (e: any) => {
@@ -598,7 +550,7 @@ if (direction === 'none') {
  const handleSave = async (monthOverride?: Date) => {
 
   if (!keyResultId) {
-  console.log('❌ keyResultId missing, skipping save')
+  console.log('keyResultId missing, skipping save')
   return
 }
 
