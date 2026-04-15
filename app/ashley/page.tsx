@@ -625,7 +625,7 @@ useEffect(() => {
 }, [])
 
 const handleSave = async (monthOverride?: Date, idOverride?: string | null) => {
-
+console.log('HANDLE SAVE FIRED:', label, value, target, idOverride)
   const finalId = idOverride || keyResultId
 
 if (!finalId) {
