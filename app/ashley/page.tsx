@@ -475,7 +475,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
       .from('dashboard_okr_data')
       .select('*')
       .eq('user_name', 'Ashley')
-      .eq('key_result_title', queryLabelMap[label] || label)
+      .eq('key_result_title', label)
       .maybeSingle()
 
     if (!base.data) return
