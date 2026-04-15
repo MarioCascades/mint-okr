@@ -6,7 +6,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
-import { getKeyResultData } from '@/lib/getKeyResultData'
 
 
 
@@ -491,11 +490,27 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
     const currentDate = formatDate(selectedMonth)
 
-    const { data: currentData } = await supabase
+const currentStart = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+)
+
+const nextMonth = new Date(selectedMonth)
+nextMonth.setMonth(nextMonth.getMonth() + 1)
+
+const currentEnd = new Date(
+  nextMonth.getFullYear(),
+  nextMonth.getMonth(),
+  1
+)
+
+const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value, target_value')
   .eq('key_result_id', base.data.key_result_id)
-  .eq('reporting_month', currentDate)
+  .gte('reporting_month', currentStart.toISOString())
+  .lt('reporting_month', currentEnd.toISOString())
   .maybeSingle()
 
 const currentValue =
@@ -507,21 +522,28 @@ const currentTarget =
     ? currentData.target_value
     : ''
 
-    setValue(
-  percentageMetrics.includes(label)
-    ? String(currentValue * 100)
-    : String(currentValue)
+setValue(
+  currentValue === ''
+    ? ''
+    : percentageMetrics.includes(label)
+      ? String(Number(currentValue) * 100)
+      : String(currentValue)
 )
-    const prev = new Date(selectedMonth)
+
+ const prev = new Date(selectedMonth)
 prev.setMonth(prev.getMonth() - 1)
 
-const prevFormatted = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-01`
+const prevStart = new Date(prev.getFullYear(), prev.getMonth(), 1)
+
+const prevEnd = new Date(prevStart)
+prevEnd.setMonth(prevEnd.getMonth() + 1)
 
 const { data: prevData } = await supabase
   .from('key_result_updates')
   .select('value')
   .eq('key_result_id', base.data.key_result_id)
-  .eq('reporting_month', prevFormatted)
+  .gte('reporting_month', prevStart.toISOString())
+  .lt('reporting_month', prevEnd.toISOString())
   .maybeSingle()
 
     setLastMonth(
