@@ -137,7 +137,7 @@ export default function Page() {
  onClick={async () => {
 
  if (isEditing) {
-  await new Promise((r) => setTimeout(r, 100))
+  await new Promise((r) => setTimeout(r, 300))
 
   const event = new CustomEvent('save-all', {
   detail: { selectedMonth }
@@ -593,11 +593,16 @@ useEffect(() => {
 
 
   useEffect(() => {
- const handleGlobalSave = (e: any) => {
+ const handleGlobalSave = async (e: any) => {
   const monthFromEvent = e.detail?.selectedMonth
 
-  if (!keyResultId || !monthFromEvent) {
-    console.log('❌ skipping save — missing data')
+  if (!monthFromEvent) return
+
+  // wait briefly to ensure keyResultId is set
+  await new Promise((r) => setTimeout(r, 50))
+
+  if (!keyResultId) {
+    console.log('still missing keyResultId, skipping:', label)
     return
   }
 
@@ -608,7 +613,7 @@ useEffect(() => {
   return () => {
     window.removeEventListener('save-all', handleGlobalSave)
   }
-}, [keyResultId])
+}, [])
 
  const handleSave = async (monthOverride?: Date) => {
 
