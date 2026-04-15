@@ -638,11 +638,9 @@ if (value === '' && target === '') {
 
  const monthToUse = monthOverride || selectedMonth
 
-const reportingDate = new Date(
-  monthToUse.getFullYear(),
-  monthToUse.getMonth(),
-  1
-).toISOString().split('T')[0]
+const reportingDate = `${monthToUse.getFullYear()}-${String(
+  monthToUse.getMonth() + 1
+).padStart(2, '0')}-01`
 
 
   console.log('SAVE ATTEMPT:', {
