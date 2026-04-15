@@ -517,7 +517,7 @@ const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value, target_value')
  .eq('key_result_id', baseData[0].key_result_id)
-  .eq('reporting_month', currentDate)
+ .eq('reporting_month', currentDate)
   .maybeSingle()
 
 const currentValue =
@@ -555,7 +555,7 @@ const { data: prevData } = await supabase
   .from('key_result_updates')
   .select('value')
  .eq('key_result_id', baseData[0].key_result_id)
-  .eq('reporting_month', currentDate)
+  .eq('reporting_month', formatDate(prev))
   .maybeSingle()
 
     setLastMonth(
@@ -563,12 +563,13 @@ const { data: prevData } = await supabase
     ? String((prevData?.value ?? 0) * 100)
     : String(prevData?.value ?? 0)
 )
-   setTarget(
-  currentTarget !== null && currentTarget !== undefined
-    ? String(currentTarget)
-    : ''
-)
-  }
+  if (loadedMonth !== currentMonthKey) {
+  setTarget(
+    currentTarget !== null && currentTarget !== undefined
+      ? String(currentTarget)
+      : ''
+  )
+}
 
   loadData()
 }, [label, selectedMonth])
@@ -614,7 +615,7 @@ useEffect(() => {
   
 
   if (!keyResultId) {
-  console.log('❌ BLOCKED SAVE — missing keyResultId', label)
+  console.log('BLOCKED SAVE — missing keyResultId', label)
   return
 }
 
@@ -673,12 +674,12 @@ const { data, error } = await supabase
       key_result_id: finalId,
       reporting_month: reportingDate,
       value:
-        value === '' ? 0 :
+        value === '' ? null :
         percentageMetrics.includes(label)
           ? Number(value) / 100
           : Number(value),
       target_value:
-        cleanTarget === '' ? 0 : Number(cleanTarget),
+  cleanTarget === '' ? null : Number(cleanTarget),
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
@@ -757,7 +758,7 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
 const container : React.CSSProperties = { backgroundColor: '#000', minHeight: '100vh', color: '#fff' }
 const stickyHeader : React.CSSProperties = { 
   position: 'sticky', 
-  top: 60, // 👈 push below TopNav
+  top: 60, // push below TopNav
   zIndex: 10,
   backgroundColor: '#000',
   padding: 20,
