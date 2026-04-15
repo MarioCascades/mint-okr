@@ -616,6 +616,10 @@ useEffect(() => {
   console.log('keyResultId missing, skipping save')
   return
 }
+if (value === '' && target === '') {
+  console.log('skipping empty save')
+  return
+}
 
  const monthToUse = monthOverride || selectedMonth
 
@@ -648,9 +652,12 @@ const { data, error } = await supabase
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
-      value: percentageMetrics.includes(label)
-        ? Number(value) / 100
-        : Number(value),
+      value:
+  value === ''
+    ? null
+    : percentageMetrics.includes(label)
+      ? Number(value) / 100
+      : Number(value),
       target_value: cleanTarget === '' ? null : Number(cleanTarget),
     },
     { onConflict: 'key_result_id,reporting_month' }
