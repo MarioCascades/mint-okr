@@ -1,12 +1,13 @@
 'use client'
 
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
 
+import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
-
 
 
 export default function Page() {
@@ -453,7 +454,10 @@ const Objective = ({ title, children }: any) => (
 // KEY RESULT
 // =========================
 
-const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
+
+
+const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
+  const keyResultIdRef = useRef<string | null>(null)
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -484,6 +488,7 @@ if (!baseData || baseData.length === 0) {
 }
 
 setKeyResultId(baseData[0].key_result_id)
+keyResultIdRef.current = baseData[0].key_result_id
 
     const formatDate = (d: Date) => {
   return new Date(d.getFullYear(), d.getMonth(), 1)
@@ -604,12 +609,13 @@ useEffect(() => {
   // wait briefly to ensure keyResultId is set
   await new Promise((r) => setTimeout(r, 50))
 
-  if (!keyResultId) {
-    console.log('still missing keyResultId, skipping:', label)
-    return
-  }
+  if (!keyResultIdRef.current) {
+  console.log('still missing keyResultId, skipping:', label)
+  return
+}
 
-  handleSave(monthFromEvent)
+
+  handleSave(monthFromEvent, keyResultIdRef.current)
 }
   window.addEventListener('save-all', handleGlobalSave)
 
@@ -618,9 +624,11 @@ useEffect(() => {
   }
 }, [])
 
- const handleSave = async (monthOverride?: Date) => {
+const handleSave = async (monthOverride?: Date, idOverride?: string | null) => {
 
-  if (!keyResultId) {
+  const finalId = idOverride || keyResultId
+
+if (!finalId) {
   console.log('keyResultId missing, skipping save')
   return
 }
@@ -658,7 +666,7 @@ const { data, error } = await supabase
   .from('key_result_updates')
   .upsert(
     {
-      key_result_id: keyResultId,
+      key_result_id: finalId,
       reporting_month: reportingDate,
       value:
   value === ''
