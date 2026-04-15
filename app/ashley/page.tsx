@@ -479,7 +479,7 @@ const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
   .from('dashboard_okr_data')
   .select('*')
   .eq('user_name', 'Ashley')
-  .eq('key_result_title', label)
+  .eq('key_result_title', queryLabelMap[label] || label)
   .limit(1)
 
 if (!baseData || baseData.length === 0) {
@@ -633,8 +633,7 @@ if (!finalId) {
   return
 }
 if (value === '' && target === '') {
-  console.log('skipping empty save')
-  return
+  console.log('allowing empty save (no-op)')
 }
 
  const monthToUse = monthOverride || selectedMonth
