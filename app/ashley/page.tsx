@@ -518,15 +518,40 @@ const { data: prevData } = await supabase
         ? String(data.target)
         : ''
     )
-
   }
 
   loadData()
 }, [label, selectedMonth])
-// =========================
-// PREVIOUS MONTH FETCH
-// =========================
 
+useEffect(() => {
+  const direction = directionMap[label] || 'increase'
+
+  const numericValue = Number(value)
+  const numericTarget = Number(target)
+
+  if (direction === 'none') {
+    setScore('—')
+    return
+  }
+
+  if (!numericTarget || numericTarget === 0) {
+    setScore('—')
+    return
+  }
+
+  let percent = 0
+
+  if (direction === 'increase') {
+    percent = Math.round((numericValue / numericTarget) * 100)
+  } else {
+    percent = numericValue === 0
+      ? 100
+      : Math.round((numericTarget / numericValue) * 100)
+  }
+
+  setScore(percent + '%')
+
+}, [value, target, label])
 
 
   useEffect(() => {
