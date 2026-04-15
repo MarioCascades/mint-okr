@@ -668,17 +668,16 @@ const { data, error } = await supabase
       key_result_id: finalId,
       reporting_month: reportingDate,
       value:
-  value === '' ? 0 :
-  percentageMetrics.includes(label)
-    ? Number(value) / 100
-    : Number(value),
-
-target_value:
-  cleanTarget === '' ? 0 : Number(cleanTarget),
+        value === '' ? 0 :
+        percentageMetrics.includes(label)
+          ? Number(value) / 100
+          : Number(value),
+      target_value:
+        cleanTarget === '' ? 0 : Number(cleanTarget),
     },
     { onConflict: 'key_result_id,reporting_month' }
-    
   )
+  .select()
 
 console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reportingDate })
 }
