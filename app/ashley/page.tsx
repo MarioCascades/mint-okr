@@ -465,7 +465,7 @@ const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [showInitiatives, setShowInitiatives] = useState(false)
-  const [loadedMonth, setLoadedMonth] = useState('')
+
 
   const rowRef = useRef<HTMLDivElement | null>(null)
 
@@ -531,17 +531,14 @@ const currentTarget =
 
 const currentMonthKey = selectedMonth.toISOString()
 
-if (loadedMonth !== currentMonthKey) {
-  const formattedValue =
-    currentValue === ''
-      ? ''
-      : percentageMetrics.includes(label)
-        ? String(Number(currentValue) * 100)
-        : String(currentValue)
+const formattedValue =
+  currentValue === ''
+    ? ''
+    : percentageMetrics.includes(label)
+      ? String(Number(currentValue) * 100)
+      : String(currentValue)
 
-  setValue(formattedValue)
-  setLoadedMonth(currentMonthKey)
-}
+setValue(formattedValue)
 
  const prev = new Date(selectedMonth)
 prev.setMonth(prev.getMonth() - 1)
@@ -563,13 +560,11 @@ const { data: prevData } = await supabase
     ? String((prevData?.value ?? 0) * 100)
     : String(prevData?.value ?? 0)
 )
-  if (loadedMonth !== currentMonthKey) {
-  setTarget(
-    currentTarget !== null && currentTarget !== undefined
-      ? String(currentTarget)
-      : ''
-  )
-}
+ setTarget(
+  currentTarget !== null && currentTarget !== undefined
+    ? String(currentTarget)
+    : ''
+)
 }
 
   loadData()
