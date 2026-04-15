@@ -475,7 +475,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   .from('dashboard_okr_data')
   .select('*')
   .eq('user_name', 'Ashley')
-  .ilike('key_result_title', `%${label.trim()}%`)
+  .eq('key_result_title', label)
   .limit(1)
 
 if (!baseData || baseData.length === 0) {
