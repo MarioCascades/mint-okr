@@ -639,8 +639,11 @@ if (!finalId) {
   console.log('keyResultId missing, skipping save')
   return
 }
-if (value === '' && target === '') {
-  console.log('skipping empty save — prevent overwrite')
+const hasValue = value !== '' && value !== null && value !== '0'
+const hasTarget = target !== '' && target !== null
+
+if (!hasValue && !hasTarget) {
+  console.log('skipping untouched row:', label)
   return
 }
  const monthToUse = monthOverride || selectedMonth
