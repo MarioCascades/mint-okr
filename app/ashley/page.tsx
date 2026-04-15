@@ -483,8 +483,11 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
     setKeyResultId(base.data.key_result_id)
 
-    const formatDate = (d: Date) =>
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+    const formatDate = (d: Date) => {
+  return new Date(d.getFullYear(), d.getMonth(), 1)
+    .toISOString()
+    .split('T')[0]
+}
 
     const currentDate = formatDate(selectedMonth)
 
@@ -495,8 +498,14 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
-const currentValue = currentData?.value ?? base.data.current_value ?? 0
-const currentTarget = currentData?.target_value ?? ''
+const currentValue =
+  currentData?.value !== null && currentData?.value !== undefined
+    ? currentData.value
+    : ''
+const currentTarget =
+  currentData?.target_value !== null && currentData?.target_value !== undefined
+    ? currentData.target_value
+    : ''
 
     setValue(
   percentageMetrics.includes(label)
@@ -588,9 +597,13 @@ useEffect(() => {
 
  const monthToUse = monthOverride || selectedMonth
 
-const y = monthToUse.getFullYear()
-const m = String(monthToUse.getMonth() + 1).padStart(2, '0')
-  const reportingDate = `${y}-${m}-01`
+const reportingDate = new Date(
+  monthToUse.getFullYear(),
+  monthToUse.getMonth(),
+  1
+).toISOString().split('T')[0]01`
+
+
   console.log('SAVE ATTEMPT:', {
   keyResultId,
   value,
