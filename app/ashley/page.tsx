@@ -490,12 +490,11 @@ if (!baseData || baseData.length === 0) {
 
 setKeyResultId(baseData[0].key_result_id)
 
-    const formatDate = (d: Date) => {
-  return new Date(d.getFullYear(), d.getMonth(), 1)
-    .toISOString()
-    .split('T')[0]
+  const formatDate = (d: Date) => {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  return `${year}-${month}-01`
 }
-
     const currentDate = formatDate(selectedMonth)
 
 const currentStart = new Date(
