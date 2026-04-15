@@ -633,9 +633,9 @@ if (!finalId) {
   return
 }
 if (value === '' && target === '') {
-  console.log('allowing empty save (no-op)')
+  console.log('skipping empty save — prevent overwrite')
+  return
 }
-
  const monthToUse = monthOverride || selectedMonth
 
 const reportingDate = `${monthToUse.getFullYear()}-${String(
