@@ -248,7 +248,7 @@ const Objective = ({ title, children }: any) => (
 // KEY RESULT
 // =========================
 
-const KeyResult = ({ label, selectedMonth, isEditing, isPercent = false }: any) => {
+const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
   const KR_MAP: Record<string, string> = {
   "Patient Referral": "10354c03-f5f2-44be-9768-c67403aed3d7",
@@ -277,10 +277,18 @@ const KeyResult = ({ label, selectedMonth, isEditing, isPercent = false }: any) 
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
+  const percentLabels = [
+  "Call Answer Rate",
+  "Reception Rate (inquiry to booked) for DM Engage",
+  "Reception Rate (inquiry to booked) for Bright Referral"
+]
+
+const isPercent = percentLabels.includes(label)
   const format = (v: number) => {
       if (isPercent) return formatPercent(v)
       return v.toString()
     }
+    
 
   const getScoreColor = () => {
   const num = Number(score.replace('%', ''))
