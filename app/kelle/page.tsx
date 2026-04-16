@@ -368,18 +368,44 @@ const formatDate = (d: Date) => {
 
 const currentDate = formatDate(selectedMonth)
 
+const currentStart = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+)
+
+const nextMonth = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() + 1,
+  1
+)
+
 const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value')
   .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', currentDate)
+  .gte('reporting_month', currentStart.toISOString())
+  .lt('reporting_month', nextMonth.toISOString())
   .maybeSingle()
+
+const prevStart = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() - 1,
+  1
+)
+
+const prevEnd = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+)
 
 const { data: prevData } = await supabase
   .from('key_result_updates')
   .select('value')
   .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', formatDate(prev))
+  .gte('reporting_month', prevStart.toISOString())
+  .lt('reporting_month', prevEnd.toISOString())
   .maybeSingle()
 
 const prevVal =
