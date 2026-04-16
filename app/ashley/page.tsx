@@ -519,22 +519,15 @@ const { data: currentData } = await supabase
  .eq('reporting_month', currentDate)
   .maybeSingle()
 
-const isEmptyRow =
-  currentData?.value === 0 &&
-  (currentData?.target_value === null || currentData?.target_value === undefined)
-
 const currentValue =
-  currentData?.value !== null &&
-  currentData?.value !== undefined &&
-  !isEmptyRow
+  currentData?.value !== null && currentData?.value !== undefined
     ? currentData.value
     : ''
+
 let currentTarget =
-  currentData?.target_value !== null &&
-  currentData?.target_value !== undefined &&
-  !isEmptyRow
+  currentData?.target_value !== null && currentData?.target_value !== undefined
     ? currentData.target_value
-    : ''
+    : null
 
 const currentMonthKey = selectedMonth.toISOString()
 
@@ -566,6 +559,7 @@ const { data: prevData } = await supabase
   prevData?.value === 0 || prevData?.value === null || prevData?.value === undefined
 
 const prevVal = prevIsEmpty ? '' : prevData?.value
+
 if (currentTarget === '' || currentTarget === null || currentTarget === undefined) {
   currentTarget = prevData?.target_value ?? null
 }
