@@ -378,7 +378,7 @@ const { data: prevData } = await supabase
 const prevVal =
   prevData?.value !== null && prevData?.value !== undefined
     ? Number(prevData.value)
-    : Number(currentData?.value ?? 0)
+    : 0
 
 setLastMonth(format(prevVal))
 
