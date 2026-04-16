@@ -223,7 +223,7 @@ export default function Page() {
 </div>
 </div>
   )}
-  
+
 // =========================
 // OBJECTIVE
 // =========================
@@ -276,6 +276,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, isPercent = false }: any) 
   const [target, setTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
+  const [isDirty, setIsDirty] = useState(false)
   const format = (v: number) => {
       if (isPercent) return formatPercent(v)
       return v.toString()
@@ -300,6 +301,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, isPercent = false }: any) 
       key_result_id: keyResultId,
       reporting_month: reportingDate,
       value: Number(value),
+      target_value: Number(target),
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
@@ -387,17 +389,17 @@ const { data: currentData } = await supabase
 
 const c = Number(currentData?.value ?? 0)
 
-    
-
-    setTarget(format(t))
+        if (!isDirty) setTarget(format(t))
     setValue(format(c))
 
-    if (t > 0) {
-      const percent = Math.round((c / t) * 100)
-      setScore(percent + '%')
-    } else {
-      setScore('—')
-    }
+    const finalTarget = Number(target || t)
+
+if (finalTarget > 0) {
+  const percent = Math.round((c / finalTarget) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('—')
+}
   }
 
   fetchData()
@@ -411,7 +413,16 @@ const c = Number(currentData?.value ?? 0)
         <span>{label}</span>
 
         <input style={cell} value={lastMonth} readOnly />
-        <input style={cell} value={target} readOnly />
+        <input
+  style={cell}
+  value={target}
+  readOnly={!isEditing}
+  onChange={(e) => {
+    setTarget(e.target.value)
+    setIsDirty(true)
+  }}
+  onBlur={handleSave}
+/>
 
         <input
             style={cell}
