@@ -354,11 +354,17 @@ base = baseData
 
     setKeyResultId(base.key_result_id)
 
-    const prev = new Date(selectedMonth)
-prev.setMonth(prev.getMonth() - 1)
+const prev = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() - 1,
+  1
+)
 
-const formatDate = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+const formatDate = (d: Date) => {
+  const year = d.getFullYear()
+  const month = d.getMonth() + 1
+  return `${year}-${month.toString().padStart(2, '0')}-01`
+}
 
 const currentDate = formatDate(selectedMonth)
 
@@ -379,7 +385,7 @@ const { data: prevData } = await supabase
 const prevVal =
   prevData?.value !== null && prevData?.value !== undefined
     ? Number(prevData.value)
-    : Number(currentData?.value ?? 0)
+    : 0
 
 setLastMonth(format(prevVal))
 
