@@ -268,7 +268,8 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   "Call Answer Rate": "4902ee9f-d94d-474f-9a37-14c4d976902",
   "# of Missed Calls": "ccf6cf73-8e37-48b6-9c9f-bcc8e0235b3c",
 
-  "# of tasks in Lead Sigma": "0ab7f27a-8cab-46b9-a8a1-671960a68c68"
+  "# of tasks in Lead Sigma": "0ab7f27a-8cab-46b9-a8a1-671960a68c68",
+
 }
 
   const [value, setValue] = useState('')
@@ -323,34 +324,37 @@ useEffect(() => {
     //  STEP 1 — try ID match
     const mappedId = KR_MAP[label]
 
-    if (keyResultId) {
+    if (mappedId) {
       const { data } = await supabase
         .from('dashboard_okr_data')
         .select('*')
-        .eq('key_result_id', keyResultId)
+        .eq('key_result_id', mappedId)
         .maybeSingle()
 
       if (data) base = data
     }
 
-    //  STEP 2 — fallback
-    if (!base) {
-      const { data } = await supabase
-        .from('dashboard_okr_data')
-        .select('*')
-        .eq('user_name', 'Kelle')
+    // ✅ STEP 2 — fallback
+if (!base) {
+  const { data } = await supabase
+    .from('dashboard_okr_data')
+    .select('*')
+    .eq('user_name', 'Kelle')
 
-      if (!data) return
+    
 
-      base = data.find(item =>
-  item.key_result_title
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '') ===
-  label
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
-)
-    }
+  if (!data) return
+
+  console.log('LABEL:', label)
+  console.log('AVAILABLE TITLES:', data.map(d => d.key_result_title))
+  
+
+  base = data.find(item =>
+    item.key_result_title.toLowerCase().includes(
+      label.toLowerCase().replace('referal', 'referral')
+    )
+  )
+}
 
     if (!base) return
 
