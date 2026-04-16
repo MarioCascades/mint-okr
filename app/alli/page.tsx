@@ -232,7 +232,10 @@ const { data: currentData } = await supabase
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
-const t = Number(currentData?.target_value ?? base.target_value ?? 0)
+const t =
+  currentData && currentData.target_value !== null
+    ? Number(currentData.target_value)
+    : Number(base.target_value ?? 0)
 const c = Number(currentData?.value ?? base.current_value ?? 0)
 
       setTarget(isCurrency ? formatCurrency(t) : t.toString())
@@ -272,12 +275,15 @@ const c = Number(currentData?.value ?? base.current_value ?? 0)
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-await supabase.from('key_result_updates').upsert(
+  const cleanValue = value.replace(/[^0-9.]/g, '')
+  const cleanTarget = target.replace(/[^0-9.]/g, '')
+
+  await supabase.from('key_result_updates').upsert(
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: Number(value.replace(/[^0-9.]/g, '')),
-    target_value: Number(target.replace(/[^0-9.]/g, '')),
+    value: cleanValue ? Number(cleanValue) : 0,
+    target_value: cleanTarget ? Number(cleanTarget) : null,
   },
   { onConflict: 'key_result_id,reporting_month' }
 )
