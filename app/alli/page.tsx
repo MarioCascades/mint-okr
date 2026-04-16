@@ -238,7 +238,11 @@ const t =
     ? Number(currentData.target_value)
     : Number(base.target_value ?? 0)
 
-const c = Number(currentData?.value ?? base.current_value ?? 0)
+const c =
+  currentData?.value !== null &&
+  currentData?.value !== undefined
+    ? Number(currentData.value)
+    : 0
 
       setTarget(isCurrency ? formatCurrency(t) : t.toString())
       setValue(isCurrency ? formatCurrency(c) : c.toString())
