@@ -272,19 +272,15 @@ const c = Number(currentData?.value ?? base.current_value ?? 0)
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-await supabase
-  .from('key_result_updates')
-  .upsert(
-    {
-      key_result_id: keyResultId,
-      reporting_month: reportingDate,
-      value: Number(value.replace(/[^0-9.]/g, '')),
-      target_value: Number(target.replace(/[^0-9.]/g, '')),
-    },
-    {
-      onConflict: 'key_result_id,reporting_month',
-          }
-  )
+await supabase.from('key_result_updates').upsert(
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: Number(value.replace(/[^0-9.]/g, '')),
+    target_value: Number(target.replace(/[^0-9.]/g, '')),
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
   
 }
 
@@ -294,19 +290,23 @@ await supabase
         <span>{labelMap[label] || label}</span>
 
         <input style={cell} value={lastMonth} readOnly />
-       <input
-  style={cell}
-  value={isEditing ? target.replace(/[^0-9.]/g, '') : target}
-  disabled={!isEditing}
-  onChange={(e) => setTarget(e.target.value)}
-/>
-
+       
+  {/* TARGET */}
 <input
   style={cell}
   value={isEditing ? target.replace(/[^0-9.]/g, '') : target}
   disabled={!isEditing}
   onChange={(e) => setTarget(e.target.value)}
-  onBlur={handleSave} 
+  onBlur={handleSave}
+/>
+
+{/* VALUE */}
+<input
+  style={cell}
+  value={isEditing ? value.replace(/[^0-9.]/g, '') : value}
+  disabled={!isEditing}
+  onChange={(e) => setValue(e.target.value)}
+  onBlur={handleSave}
 />
         <input style={cell} value={score} readOnly />
 
