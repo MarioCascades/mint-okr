@@ -220,8 +220,20 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any)
 
       setKeyResultId(base.key_result_id)
 
-      const t = Number(base.target_value ?? 0)
-      const c = Number(base.current_value ?? 0)
+     const formatDate = (d: Date) =>
+       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+
+const currentDate = formatDate(selectedMonth)
+
+const { data: currentData } = await supabase
+  .from('key_result_updates')
+  .select('value, target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
+const t = Number(currentData?.target_value ?? base.target_value ?? 0)
+const c = Number(currentData?.value ?? base.current_value ?? 0)
 
       setTarget(isCurrency ? formatCurrency(t) : t.toString())
       setValue(isCurrency ? formatCurrency(c) : c.toString())
@@ -229,8 +241,6 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any)
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
 
-      const formatDate = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
       const { data: prevData } = await supabase
         .from('key_result_updates')
@@ -262,14 +272,20 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any)
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-  await supabase.from('key_result_updates').upsert(
+await supabase
+  .from('key_result_updates')
+  .upsert(
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
       value: Number(value.replace(/[^0-9.]/g, '')),
+      target_value: Number(target.replace(/[^0-9.]/g, '')),
     },
-    { onConflict: 'key_result_id,reporting_month' }
+    {
+      onConflict: 'key_result_id,reporting_month',
+          }
   )
+  
 }
 
   return (
@@ -287,10 +303,10 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any)
 
 <input
   style={cell}
-  value={isEditing ? value.replace(/[^0-9.]/g, '') : value}
+  value={isEditing ? target.replace(/[^0-9.]/g, '') : target}
   disabled={!isEditing}
-  onChange={(e) => setValue(e.target.value)}
-  onBlur={handleSave}
+  onChange={(e) => setTarget(e.target.value)}
+  onBlur={handleSave} 
 />
         <input style={cell} value={score} readOnly />
 
