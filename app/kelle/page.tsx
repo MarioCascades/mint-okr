@@ -28,6 +28,11 @@ export default function Page() {
     return new Date(now.getFullYear(), now.getMonth(), 1)
   })
 
+  const isAprilOrLater = () => {
+  const cutoff = new Date(2026, 3, 1) // April = 3
+  return selectedMonth >= cutoff
+}
+
   const [lastUpdated, setLastUpdated] = useState('')
   const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
   const [isEditing, setIsEditing] = useState(false)
@@ -125,6 +130,7 @@ export default function Page() {
               >
                 →
               </button>
+
             </div>
 
             <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
@@ -135,42 +141,89 @@ export default function Page() {
         </div>
       </div>
 
-      <div style={content}>
 
-        <Objective title="Objective 1: Understanding Referral Mix">
-          <KeyResult label="Patient Referral" {...{ selectedMonth, isEditing }} />
-          <KeyResult label="Dental Referrals" {...{ selectedMonth, isEditing }} />
-          <KeyResult label="# of Dentists Referred" {...{ selectedMonth, isEditing }} />
-          <KeyResult label="Digital Marketing" {...{ selectedMonth, isEditing }} />
-          <KeyResult label="Community" {...{ selectedMonth, isEditing }} />
-        </Objective>
+  
+  <div style={content}>
 
-        <Objective title="Objective 2: Inquiry Tracking">
-          <KeyResult label="DM Engage" {...{ selectedMonth, isEditing }} />
-          <KeyResult label="Reception Rate (inquiry to booked) for DM Engage" {...{ selectedMonth, isEditing }} isPercent />
-          <KeyResult label="Bright Referral" {...{ selectedMonth, isEditing }} />
-          <KeyResult label="Reception Rate (inquiry to booked) for Bright Referral" {...{ selectedMonth, isEditing }} isPercent />
-        </Objective>
+  {isAprilOrLater() ? (
+    <>
+      {/* ========================= */}
+      {/* NEW OKRs (APRIL+) */}
+      {/* ========================= */}
 
-        <Objective title="Objective 3: New Patient Process">
-          <KeyResult label="NP Scheduled (GF) include consult inquiries" {...{ selectedMonth, isEditing }} />
-          <KeyResult label="NP Incomplete Appointment" {...{ selectedMonth, isEditing }} />
-        </Objective>
+      <Objective title="Objective 1: New Patient Process">
+        <KeyResult label="# NP Scheduled" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# NP Scheduled Next Month" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# New Patients - NSC" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# of New Patients Missing Information (EOD NP Prep)" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
 
-        <Objective title="Objective 4: Phone/SMS Engagement">
-          <KeyResult label="Call Answer Rate" {...{ selectedMonth, isEditing }} isPercent />
-          <KeyResult label="# of Missed Calls" {...{ selectedMonth, isEditing }} />
-        </Objective>
+      <Objective title="Objective 2: DM Engage">
+        <KeyResult label="DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Reception Rate (inquiry to booked) for DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
 
-        <Objective title="Objective 5: Tasks Tracking">
-          <KeyResult label="# of tasks in Lead Sigma" {...{ selectedMonth, isEditing }} />
-        </Objective>
+      <Objective title="Objective 3: Bright Referral">
+        <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Reception Rate (inquiry to booked) for Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
 
-      </div>
-    </div>
-  )
-}
+      <Objective title="Objective 4: Understanding Referral Mix">
+        <KeyResult label="Patient Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Dental Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# of Dentists Referred" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Digital Marketing" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Community" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
 
+      <Objective title="Objective 5: Office Efficiency">
+        <KeyResult label="Call Answer Rate" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# of Missed Calls" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# of patients waited 10+ minutes" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# of tasks in Lead Sigma" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
+    </>
+  ) : (
+    <>
+      {/* ========================= */}
+      {/* OLD OKRs (PRE-APRIL) */}
+      {/* ========================= */}
+
+      <Objective title="Objective 1: Understanding Referral Mix">
+        <KeyResult label="Patient Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Dental Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# of Dentists Referred" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Digital Marketing" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Community" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
+
+      <Objective title="Objective 2: Inquiry Tracking">
+        <KeyResult label="DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Reception Rate (inquiry to booked) for DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="Reception Rate (inquiry to booked) for Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
+
+      <Objective title="Objective 3: New Patient Process">
+        <KeyResult label="NP Scheduled (GF) include consult inquiries" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="NP Incomplete Appointment" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
+
+      <Objective title="Objective 4: Phone/SMS Engagement">
+        <KeyResult label="Call Answer Rate" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <KeyResult label="# of Missed Calls" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
+
+      <Objective title="Objective 5: Tasks Tracking">
+        <KeyResult label="# of tasks in Lead Sigma" selectedMonth={selectedMonth} isEditing={isEditing} />
+      </Objective>
+    </>
+  )}
+
+</div>
+</div>
+  )}
+  
 // =========================
 // OBJECTIVE
 // =========================
@@ -191,7 +244,6 @@ const Objective = ({ title, children }: any) => (
     {children}
   </div>
 )
-
 // =========================
 // KEY RESULT
 // =========================
