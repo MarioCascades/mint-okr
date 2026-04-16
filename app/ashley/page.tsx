@@ -643,13 +643,8 @@ if (!finalId) {
   console.log('keyResultId missing, skipping save')
   return
 }
-const hasValue = value !== '' && value !== null && value !== '0'
-const hasTarget = target !== '' && target !== null
-
-if (!hasValue && !hasTarget) {
-  console.log('skipping untouched row:', label)
-  return
-}
+// ALWAYS allow saving if target exists
+if (!keyResultId) return
  const monthToUse = monthOverride || selectedMonth
 
 const reportingDate = `${monthToUse.getFullYear()}-${String(
