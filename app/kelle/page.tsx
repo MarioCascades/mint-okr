@@ -317,6 +317,7 @@ const isPercent = percentLabels.includes(label)
 useEffect(() => {
 
   const fetchData = async () => {
+    setIsDirty(false)
 
     let base = null
 
@@ -378,7 +379,7 @@ const { data: prevData } = await supabase
 const prevVal =
   prevData?.value !== null && prevData?.value !== undefined
     ? Number(prevData.value)
-    : 0
+    : Number(currentData?.value ?? 0)
 
 setLastMonth(format(prevVal))
 
@@ -404,10 +405,10 @@ setLastMonth(format(prevVal))
 
 const c = Number(currentData?.value ?? 0)
 
-        if (!isDirty) setTarget(format(t))
+        setTarget(format(t))
     setValue(format(c))
 
-    const finalTarget = Number(target || t)
+    const finalTarget = t
 
 if (finalTarget > 0) {
   const percent = Math.round((c / finalTarget) * 100)
