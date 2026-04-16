@@ -151,13 +151,10 @@ export default function Page() {
       {/* NEW OKRs (APRIL+) */}
       {/* ========================= */}
 
-      <Objective title="Objective 1: New Patient Process">
-        <KeyResult label="# NP Scheduled" selectedMonth={selectedMonth} isEditing={isEditing} />
-        <KeyResult label="# NP Scheduled Next Month" selectedMonth={selectedMonth} isEditing={isEditing} />
-        <KeyResult label="# New Patients - NSC" selectedMonth={selectedMonth} isEditing={isEditing} />
-        <KeyResult label="# of New Patients Missing Information (EOD NP Prep)" selectedMonth={selectedMonth} isEditing={isEditing} />
-      </Objective>
-
+     <Objective title="Objective 1: New Patient Process">
+  <KeyResult label="NP Scheduled (GF) include consult inquiries" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="NP Incomplete Appointment" selectedMonth={selectedMonth} isEditing={isEditing} />
+</Objective>
       <Objective title="Objective 2: DM Engage">
         <KeyResult label="DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
         <KeyResult label="Reception Rate (inquiry to booked) for DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -263,15 +260,15 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   "Reception Rate (inquiry to booked) for Bright Referral": "e7e5deb0-5ddf-482b-a50d-18e20476946c",
 
   "NP Scheduled (GF) include consult inquiries": "cd8194e4-f8cf-479c-91a9-fb013aa4cc9a",
-  "NP Incomplete Appointment": "e215acd1-f73c-4d58-926e-444dcb3eeeae",
+  "NP Incomplete Appointment": "e215ac1d-f173-4d58-9286-444dcb3eeeae",
 
-  "Call Answer Rate": "4902ee9f-d94d-474f-9a37-14c4d976902",
-  "# of Missed Calls": "ccf6cf73-8e37-48b6-9c9f-bcc8e0235b3c",
+  "Call Answer Rate": "4902ee9f-d948-474f-9437-14a0d8976902",
+  "# of Missed Calls": "cc6fcff3-8e37-486b-9c9f-bcc8e0235b3c",
 
   "# of tasks in Lead Sigma": "0ab7f27a-8cab-46b9-a8a1-671960a68c68",
-  
-  "# of patients waited 10+ minutes": "9dde3061-b067-41b7-9412-eaef4cd1c2c7",
 
+  "# of patients waited 10+ minutes": "9dde3061-b067-41b7-9412-eaef4cd1c2c7",
+  
 }
 
   const [value, setValue] = useState('')
