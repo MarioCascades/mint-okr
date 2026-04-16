@@ -232,11 +232,6 @@ const { data: currentData } = await supabase
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
-const t =
-  currentData?.target_value !== null &&
-  currentData?.target_value !== undefined
-    ? Number(currentData.target_value)
-    : Number(base.target_value ?? 0)
 
     let t = 0
 
