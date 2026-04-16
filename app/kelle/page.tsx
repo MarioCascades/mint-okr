@@ -248,11 +248,11 @@ const Objective = ({ title, children }: any) => (
 const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
   const KR_MAP: Record<string, string> = {
-  "Patient Referral": "10354c03-f5f2-44be-9768-c67403aed3d7",
-  "Dental Referrals": "d55a033b-3ab5-40fe-af0a-b269156e3513",
-  "# of Dentists Referred": "dad83ca3-4fab-4b73-86a4-d873ea0ca2c",
-  "Digital Marketing": "3b6b1a4e-25f4-41e4-849b-676d7bb4154",
-  "Community": "e3de00cf-b1f5-4ac3-99c5-b3354f0ababb",
+ "Patient Referral": "10354c03-f512-448e-9768-c67403aded87",
+"Dental Referrals": "d55a03a3-ba57-40fe-af0a-b269155e3133",
+"# of Dentists Referred": "dad83ca3-4fab-4b73-8e6a-db873ea0ca2a",
+"Digital Marketing": "3b5b1a4a-e25f-41e4-849b-676d87bb4134",
+"Community": "e3de00c1-b815-4c3a-99c5-b2354f0ababb",
 
   "DM Engage": "8775d9b2-7c5a-4751-8e6a-839a7248bab1",
   "Reception Rate (inquiry to booked) for DM Engage": "bcbd6805-e373-4b39-ac7b-25ea3e122c09",
