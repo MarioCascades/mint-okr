@@ -269,6 +269,8 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   "# of Missed Calls": "ccf6cf73-8e37-48b6-9c9f-bcc8e0235b3c",
 
   "# of tasks in Lead Sigma": "0ab7f27a-8cab-46b9-a8a1-671960a68c68",
+  
+  "# of patients waited 10+ minutes": "9dde3061-b067-41b7-9412-eaef4cd1c2c7",
 
 }
 
@@ -335,26 +337,20 @@ useEffect(() => {
     }
 
     // ✅ STEP 2 — fallback
-if (!base) {
-  const { data } = await supabase
-    .from('dashboard_okr_data')
-    .select('*')
-    .eq('user_name', 'Kelle')
-
-    
-
-  if (!data) return
-
-  console.log('LABEL:', label)
-  console.log('AVAILABLE TITLES:', data.map(d => d.key_result_title))
-  
-
-  base = data.find(item =>
-    item.key_result_title.toLowerCase().includes(
-      label.toLowerCase().replace('referal', 'referral')
-    )
-  )
+if (!mappedId) {
+  console.log('MISSING MAP FOR:', label)
+  return
 }
+
+const { data: baseData } = await supabase
+  .from('dashboard_okr_data')
+  .select('*')
+  .eq('key_result_id', mappedId)
+  .maybeSingle()
+
+if (!baseData) return
+
+base = baseData
 
     if (!base) return
 
