@@ -233,8 +233,9 @@ const { data: currentData } = await supabase
   .maybeSingle()
 
 const t =
-  typeof currentData?.target_value === 'number'
-    ? currentData.target_value
+  currentData?.target_value !== null &&
+  currentData?.target_value !== undefined
+    ? Number(currentData.target_value)
     : Number(base.target_value ?? 0)
 
 const c = Number(currentData?.value ?? base.current_value ?? 0)
