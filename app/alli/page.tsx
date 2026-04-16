@@ -238,6 +238,35 @@ const t =
     ? Number(currentData.target_value)
     : Number(base.target_value ?? 0)
 
+    let t = 0
+
+// STEP 1 — use current month if exists
+if (
+  currentData &&
+  currentData.target_value !== null &&
+  currentData.target_value !== undefined
+) {
+  t = Number(currentData.target_value)
+} else {
+  // STEP 2 — look for latest previous target
+  const { data: prevTarget } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', base.key_result_id)
+    .lt('reporting_month', currentDate)
+    .not('target_value', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (prevTarget?.target_value !== null && prevTarget?.target_value !== undefined) {
+    t = Number(prevTarget.target_value)
+  } else {
+    // STEP 3 — fallback to base
+    t = Number(base.target_value ?? 0)
+  }
+}
+
 const c =
   currentData?.value !== null &&
   currentData?.value !== undefined
