@@ -529,15 +529,12 @@ const currentValue =
   !isEmptyRow
     ? currentData.value
     : ''
-let currentTarget = null
-
-if (
-  currentData &&
-  currentData.target_value !== null &&
-  currentData.target_value !== undefined
-) {
-  currentTarget = currentData.target_value
-}
+let currentTarget =
+  currentData?.target_value !== null &&
+  currentData?.target_value !== undefined &&
+  !isEmptyRow
+    ? currentData.target_value
+    : ''
 
 const currentMonthKey = selectedMonth.toISOString()
 
@@ -725,7 +722,6 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
       setTarget(val)
     }
   }}
-  onBlur={() => handleSave()}
 />
 
 <input
@@ -742,7 +738,6 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
       setValue(val)
     }
   }}
-  onBlur={() => handleSave()}
 />
 
         <input 
