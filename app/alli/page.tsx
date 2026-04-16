@@ -205,6 +205,12 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any)
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
 
+  const getScoreColor = () => {
+  const num = Number(score.replace('%', ''))
+  if (isNaN(num)) return '#fff'
+  return num >= 100 ? '#22c55e' : '#c2410c'
+}
+
   useEffect(() => {
 
     const fetchData = async () => {
@@ -357,7 +363,15 @@ const { data: prevData } = await supabase
   onChange={(e) => setValue(e.target.value)}
   onBlur={handleSave}
 />
-        <input style={cell} value={score} readOnly />
+        <input
+  style={{
+    ...cell,
+    color: getScoreColor(),
+    fontWeight: 600
+  }}
+  value={score}
+  readOnly
+/>
 
         <button style={button}>+ Initiatives</button>
       </div>
