@@ -343,8 +343,12 @@ useEffect(() => {
       if (!data) return
 
       base = data.find(item =>
-  item.key_result_title.toLowerCase().replace(/\s+/g, ' ').trim() ===
-  label.toLowerCase().replace(/\s+/g, ' ').trim()
+  item.key_result_title
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '') ===
+  label
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
 )
     }
 
