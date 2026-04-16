@@ -722,6 +722,7 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
       setTarget(val)
     }
   }}
+  onBlur={() => handleSave()}
 />
 
 <input
@@ -738,6 +739,7 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
       setValue(val)
     }
   }}
+  onBlur={() => handleSave()}
 />
 
         <input 
