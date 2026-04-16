@@ -343,10 +343,9 @@ useEffect(() => {
       if (!data) return
 
       base = data.find(item =>
-        item.key_result_title.toLowerCase().includes(
-          label.toLowerCase().replace('referal', 'referral')
-        )
-      )
+  item.key_result_title.toLowerCase().replace(/\s+/g, ' ').trim() ===
+  label.toLowerCase().replace(/\s+/g, ' ').trim()
+)
     }
 
     if (!base) return
