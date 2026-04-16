@@ -233,9 +233,10 @@ const { data: currentData } = await supabase
   .maybeSingle()
 
 const t =
-  currentData && currentData.target_value !== null
-    ? Number(currentData.target_value)
+  typeof currentData?.target_value === 'number'
+    ? currentData.target_value
     : Number(base.target_value ?? 0)
+
 const c = Number(currentData?.value ?? base.current_value ?? 0)
 
       setTarget(isCurrency ? formatCurrency(t) : t.toString())
@@ -244,13 +245,26 @@ const c = Number(currentData?.value ?? base.current_value ?? 0)
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
 
+const prevStart = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() - 1,
+  1
+)
 
-      const { data: prevData } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', formatDate(prev))
-        .maybeSingle()
+const prevEnd = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+)
+
+const { data: prevData } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.key_result_id)
+  .gte('reporting_month', prevStart.toISOString())
+  .lt('reporting_month', prevEnd.toISOString())
+  .maybeSingle()
+     
 
       const prevVal = Number(prevData?.value ?? 0)
       setLastMonth(isCurrency ? formatCurrency(prevVal) : prevVal.toString())
