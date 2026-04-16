@@ -254,7 +254,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 "Digital Marketing": "3b5b1a4a-e25f-41e4-849b-676d87bb4134",
 "Community": "e3de00c1-b815-4c3a-99c5-b2354f0ababb",
 
-  "DM Engage": "8775d9b2-7c5a-4751-8e6a-839a7248bab1",
+  "DM Engage": "8775d9b2-7c5a-4751-8a68-39aa7248ba14",
   "Reception Rate (inquiry to booked) for DM Engage": "bcbd6805-e373-4b39-ac7b-25ea3e122c09",
   "Bright Referral": "f73bb83b-a651-4788-96ee-c8b82aeb4ff4",
   "Reception Rate (inquiry to booked) for Bright Referral": "e7e5deb0-5ddf-482b-a50d-18e20476946c",
@@ -334,7 +334,7 @@ useEffect(() => {
       if (data) base = data
     }
 
-    // ✅ STEP 2 — fallback
+    // STEP 2 — fallback
 if (!mappedId) {
   console.log('MISSING MAP FOR:', label)
   return
@@ -354,19 +354,11 @@ base = baseData
 
     setKeyResultId(base.key_result_id)
 
-const prev = new Date(
+const prevStart = new Date(
   selectedMonth.getFullYear(),
   selectedMonth.getMonth() - 1,
   1
 )
-
-const formatDate = (d: Date) => {
-  const year = d.getFullYear()
-  const month = d.getMonth() + 1
-  return `${year}-${month.toString().padStart(2, '0')}-01`
-}
-
-const currentDate = formatDate(selectedMonth)
 
 const currentStart = new Date(
   selectedMonth.getFullYear(),
@@ -380,6 +372,12 @@ const nextMonth = new Date(
   1
 )
 
+console.log('--- DEBUG PREV ---')
+console.log('LABEL:', label)
+console.log('PREV START:', prevStart.toISOString())
+console.log('CURRENT START:', currentStart.toISOString())
+console.log('NEXT MONTH:', nextMonth.toISOString())
+
 const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value')
@@ -388,11 +386,6 @@ const { data: currentData } = await supabase
   .lt('reporting_month', nextMonth.toISOString())
   .maybeSingle()
 
-const prevStart = new Date(
-  selectedMonth.getFullYear(),
-  selectedMonth.getMonth() - 1,
-  1
-)
 
 const prevEnd = new Date(
   selectedMonth.getFullYear(),
@@ -407,6 +400,7 @@ const { data: prevData } = await supabase
   .gte('reporting_month', prevStart.toISOString())
   .lt('reporting_month', prevEnd.toISOString())
   .maybeSingle()
+  console.log('PREV DATA RESULT:', prevData)
 
 const prevVal =
   prevData?.value !== null && prevData?.value !== undefined
