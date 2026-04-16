@@ -320,8 +320,8 @@ useEffect(() => {
 
     let base = null
 
-    // ✅ STEP 1 — try ID match
-    const keyResultId = KR_MAP[label]
+    //  STEP 1 — try ID match
+    const mappedId = KR_MAP[label]
 
     if (keyResultId) {
       const { data } = await supabase
@@ -333,7 +333,7 @@ useEffect(() => {
       if (data) base = data
     }
 
-    // ✅ STEP 2 — fallback
+    //  STEP 2 — fallback
     if (!base) {
       const { data } = await supabase
         .from('dashboard_okr_data')
@@ -359,6 +359,15 @@ prev.setMonth(prev.getMonth() - 1)
 const formatDate = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
+const currentDate = formatDate(selectedMonth)
+
+const { data: currentData } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
 const { data: prevData } = await supabase
   .from('key_result_updates')
   .select('value')
@@ -366,7 +375,11 @@ const { data: prevData } = await supabase
   .eq('reporting_month', formatDate(prev))
   .maybeSingle()
 
-const prevVal = Number(prevData?.value ?? 0)
+const prevVal =
+  prevData?.value !== null && prevData?.value !== undefined
+    ? Number(prevData.value)
+    : Number(currentData?.value ?? 0)
+
 setLastMonth(format(prevVal))
 
     let t = Number(base.target_value ?? 0)
@@ -386,14 +399,8 @@ setLastMonth(format(prevVal))
     // =========================
 
 
-const currentDate = formatDate(selectedMonth)
 
-const { data: currentData } = await supabase
-  .from('key_result_updates')
-  .select('value')
-  .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', currentDate)
-  .maybeSingle()
+
 
 const c = Number(currentData?.value ?? 0)
 
