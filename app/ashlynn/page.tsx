@@ -258,11 +258,13 @@ const prevDate = formatDate(prevMonthDate)
 
   const { data: prevRows } = await supabase
   .from('key_result_updates')
+
   .select('target_value, value, reporting_month')
-  .eq('key_result_id', base.key_result_id)
-  .lt('reporting_month', currentDate)
-  .order('reporting_month', { ascending: false })
-  .limit(1)
+.eq('key_result_id', base.key_result_id)
+.lt('reporting_month', currentDate)
+.not('target_value', 'is', null)
+.order('reporting_month', { ascending: false })
+.limit(1)
 const prevRow = prevRows?.[0] ?? null
 
 // CURRENT MONTH TARGET
