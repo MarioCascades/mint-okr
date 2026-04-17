@@ -150,9 +150,21 @@ export default function Page() {
     →
   </button>
 </div>
-            <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? 'Save' : 'Edit'}
-            </button>
+            <button
+  style={editButton}
+  onClick={async () => {
+    if (isEditing) {
+      const event = new CustomEvent('save-all', {
+        detail: { selectedMonth }
+      })
+      window.dispatchEvent(event)
+    }
+
+    setIsEditing(!isEditing)
+  }}
+>
+  {isEditing ? 'Save' : 'Edit'}
+</button>
           </div>
         </div>
       </div>
@@ -321,6 +333,18 @@ if (!currentRow && resolvedTarget !== null) {
 
   }, [label, selectedMonth])
 
+  useEffect(() => {
+  const handleGlobalSave = () => {
+    handleSave()
+  }
+
+  window.addEventListener('save-all', handleGlobalSave)
+
+  return () => {
+    window.removeEventListener('save-all', handleGlobalSave)
+  }
+}, [value, target, keyResultId, selectedMonth])
+
   const handleSave = async () => {
 
   if (!keyResultId) return
@@ -356,7 +380,11 @@ if (!currentRow && resolvedTarget !== null) {
   style={cell}
   value={target}
   disabled={!isEditing}
-  onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ''))}
+  onChange={(e) => {
+    const val = e.target.value.replace(/[^0-9]/g, '')
+    setTarget(val)
+  }}
+  onBlur={handleSave}
 />
 
       <input
