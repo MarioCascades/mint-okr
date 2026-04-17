@@ -240,7 +240,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   .from('dashboard_okr_data')
   .select('*')
   .eq('user_name', 'Ashlynn')
-  .ilike('key_result_title', `%${keyword}%`)
+ .eq('key_result_title', dbLabel)
   .maybeSingle()
 
 if (!base) return
