@@ -572,6 +572,20 @@ const prevVal = prevIsEmpty ? '' : prevRow?.value
 
 if (currentTarget === null || currentTarget === undefined) {
   currentTarget = prevTarget
+
+  // 🔥 NEW: persist it forward into this month
+  if (prevTarget !== null && prevTarget !== undefined && baseData[0]?.key_result_id) {
+    const reportingDate = currentDate
+
+    await supabase
+      .from('key_result_updates')
+      .upsert({
+        key_result_id: baseData[0].key_result_id,
+        reporting_month: reportingDate,
+        target_value: prevTarget,
+        value: null
+      }, { onConflict: 'key_result_id,reporting_month' })
+  }
 }
 
 setLastMonth(
