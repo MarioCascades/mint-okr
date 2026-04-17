@@ -291,7 +291,13 @@ let resolvedTarget =
 
 
 setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
-if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
+
+const hasTargetThisMonth =
+  currentRow &&
+  currentRow.target_value !== null &&
+  currentRow.target_value !== undefined
+
+if (!hasTargetThisMonth && resolvedTarget !== null && resolvedTarget !== '') {
   await supabase
     .from('key_result_updates')
     .upsert(
