@@ -281,11 +281,13 @@ const { data: baseKR } = await supabase
   .maybeSingle()
 
 let resolvedTarget =
-  currentRow?.target_value ??
-  prevRow?.target_value ??
-  baseKR?.target_value ??
-  null
-
+  currentRow?.target_value != null
+    ? currentRow.target_value
+    : prevRow?.target_value != null
+    ? prevRow.target_value
+    : baseKR?.target_value != null
+    ? baseKR.target_value
+    : null
 setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
 
 const hasCurrentTarget =
