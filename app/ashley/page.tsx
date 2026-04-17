@@ -554,9 +554,10 @@ prevEnd.setMonth(prevEnd.getMonth() + 1)
 
 const { data: prevDataList } = await supabase
   .from('key_result_updates')
-  .select('value, target_value')
+  .select('value, target_value, reporting_month')
   .eq('key_result_id', baseData[0].key_result_id)
   .lt('reporting_month', currentDate)
+  .not('target_value', 'is', null) // 🔥 THIS IS THE FIX
   .order('reporting_month', { ascending: false })
   .limit(1)
 
