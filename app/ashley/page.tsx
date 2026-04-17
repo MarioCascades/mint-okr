@@ -520,8 +520,7 @@ const { data: currentData } = await supabase
   .maybeSingle()
 
 const isEmptyRow =
-  currentData?.value === null &&
-  (currentData?.target_value === null || currentData?.target_value === undefined)
+  currentData?.target_value === null || currentData?.target_value === undefined
 
 const currentValue =
   currentData && !isEmptyRow && currentData.value !== null && currentData.value !== undefined
@@ -557,7 +556,7 @@ const { data: prevDataList } = await supabase
   .select('value, target_value, reporting_month')
   .eq('key_result_id', baseData[0].key_result_id)
   .lt('reporting_month', currentDate)
-  .not('target_value', 'is', null) // 🔥 THIS IS THE FIX
+  .not('target_value', 'is', null)
   .order('reporting_month', { ascending: false })
   .limit(1)
 
@@ -577,14 +576,6 @@ if (currentTarget === null || currentTarget === undefined) {
   if (prevTarget !== null && prevTarget !== undefined && baseData[0]?.key_result_id) {
     const reportingDate = currentDate
 
-    await supabase
-      .from('key_result_updates')
-      .upsert({
-        key_result_id: baseData[0].key_result_id,
-        reporting_month: reportingDate,
-        target_value: prevTarget,
-        value: null
-      }, { onConflict: 'key_result_id,reporting_month' })
   }
 }
 
