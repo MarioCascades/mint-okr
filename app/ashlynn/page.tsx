@@ -256,6 +256,14 @@ const prevMonthDate = new Date(selectedMonth)
 prevMonthDate.setMonth(prevMonthDate.getMonth() - 1)
 const prevDate = formatDate(prevMonthDate)
 
+  const { data: prevRows } = await supabase
+  .from('key_result_updates')
+  .select('target_value, value, reporting_month')
+  .eq('key_result_id', base.key_result_id)
+  .lt('reporting_month', currentDate)
+  .order('reporting_month', { ascending: false })
+  .limit(1)
+const prevRow = prevRows?.[0] ?? null
 
 // CURRENT MONTH TARGET
 const { data: currentRow } = await supabase
@@ -263,14 +271,6 @@ const { data: currentRow } = await supabase
   .select('target_value')
   .eq('key_result_id', base.key_result_id)
   .eq('reporting_month', currentDate)
-  .maybeSingle()
-
-// PREVIOUS TARGET
-const { data: prevRow } = await supabase
-  .from('key_result_updates')
-  .select('target_value')
-  .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', prevDate)
   .maybeSingle()
 
 // BASE TARGET (fallback only)
@@ -288,14 +288,10 @@ let resolvedTarget =
     : baseKR?.target_value != null
     ? baseKR.target_value
     : null
+
+
 setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
-
-const hasCurrentTarget =
-  currentRow &&
-  currentRow.target_value !== null &&
-  currentRow.target_value !== undefined
-
-if (!hasCurrentTarget && resolvedTarget !== null && resolvedTarget !== '') {
+if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
   await supabase
     .from('key_result_updates')
     .upsert(
@@ -308,6 +304,7 @@ if (!hasCurrentTarget && resolvedTarget !== null && resolvedTarget !== '') {
     )
 }
 
+
       
       const { data: current } = await supabase
         .from('key_result_updates')
@@ -319,14 +316,9 @@ if (!hasCurrentTarget && resolvedTarget !== null && resolvedTarget !== '') {
       const currentValue = current?.value ?? base.current_value ?? ''
       setValue(currentValue)
 
-      const { data: prevData } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', prevDate)
-        .maybeSingle()
+   
 
-      setLastMonth(prevData?.value ?? '')
+     setLastMonth(prevRow?.value ?? '')
 
     if (resolvedTarget && Number(resolvedTarget) > 0) {
   const percent = Math.round((Number(currentValue) / Number(resolvedTarget)) * 100)
