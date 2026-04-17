@@ -515,8 +515,14 @@ const currentEnd = new Date(
 const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value, target_value')
+  
  .eq('key_result_id', baseData[0].key_result_id)
- .eq('reporting_month', currentDate)
+ .gte('reporting_month', currentDate)
+.lt('reporting_month', (() => {
+  const d = new Date(selectedMonth)
+  d.setMonth(d.getMonth() + 1)
+  return d.toISOString().slice(0, 10)
+})())
   .maybeSingle()
 
 const isEmptyRow =
