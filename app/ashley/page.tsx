@@ -519,13 +519,17 @@ const { data: currentData } = await supabase
  .eq('reporting_month', currentDate)
   .maybeSingle()
 
+const isEmptyRow =
+  currentData?.value === null &&
+  (currentData?.target_value === null || currentData?.target_value === undefined)
+
 const currentValue =
-  currentData?.value !== null && currentData?.value !== undefined
+  currentData && !isEmptyRow && currentData.value !== null && currentData.value !== undefined
     ? currentData.value
     : ''
 
 let currentTarget =
-  currentData?.target_value !== null && currentData?.target_value !== undefined
+  currentData && !isEmptyRow && currentData.target_value !== null && currentData.target_value !== undefined
     ? currentData.target_value
     : null
 
@@ -550,7 +554,7 @@ prevEnd.setMonth(prevEnd.getMonth() + 1)
 
 const { data: prevDataList } = await supabase
   .from('key_result_updates')
-  .select('target_value')
+  .select('value, target_value')
   .eq('key_result_id', baseData[0].key_result_id)
   .lt('reporting_month', currentDate)
   .order('reporting_month', { ascending: false })
@@ -558,10 +562,12 @@ const { data: prevDataList } = await supabase
 
 const prevTarget = prevDataList?.[0]?.target_value ?? null
 
-  const prevIsEmpty =
-  prevData?.value === 0 || prevData?.value === null || prevData?.value === undefined
+ const prevRow = prevDataList?.[0]
 
-const prevVal = prevIsEmpty ? '' : prevData?.value
+const prevIsEmpty =
+  prevRow?.value === 0 || prevRow?.value === null || prevRow?.value === undefined
+
+const prevVal = prevIsEmpty ? '' : prevRow?.value
 
 if (currentTarget === null || currentTarget === undefined) {
   currentTarget = prevTarget
