@@ -288,7 +288,11 @@ let resolvedTarget =
 
 setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
 
-if (!currentRow && resolvedTarget !== null) {
+const hasCurrentTarget =
+  currentRow?.target_value !== null &&
+  currentRow?.target_value !== undefined
+
+if (!hasCurrentTarget && resolvedTarget !== null) {
   await supabase
     .from('key_result_updates')
     .upsert(
@@ -332,18 +336,6 @@ if (!currentRow && resolvedTarget !== null) {
     fetchData()
 
   }, [label, selectedMonth])
-
-  useEffect(() => {
-  const handleGlobalSave = () => {
-    handleSave()
-  }
-
-  window.addEventListener('save-all', handleGlobalSave)
-
-  return () => {
-    window.removeEventListener('save-all', handleGlobalSave)
-  }
-}, [value, target, keyResultId, selectedMonth])
 
   const handleSave = async () => {
 
