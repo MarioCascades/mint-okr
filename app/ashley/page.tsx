@@ -515,14 +515,8 @@ const currentEnd = new Date(
 const { data: currentData } = await supabase
   .from('key_result_updates')
   .select('value, target_value')
-  
- .eq('key_result_id', baseData[0].key_result_id)
- .gte('reporting_month', currentDate)
-.lt('reporting_month', (() => {
-  const d = new Date(selectedMonth)
-  d.setMonth(d.getMonth() + 1)
-  return d.toISOString().slice(0, 10)
-})())
+  .eq('key_result_id', baseData[0].key_result_id)
+  .eq('reporting_month', currentDate)
   .maybeSingle()
 
 const isEmptyRow =
@@ -575,13 +569,30 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-if (currentTarget === null || currentTarget === undefined) {
+const hasRow = !!currentData
+
+if (!hasRow) {
   currentTarget = prevTarget
 
-  // 🔥 NEW: persist it forward into this month
-  if (prevTarget !== null && prevTarget !== undefined && baseData[0]?.key_result_id) {
+  if (
+    prevTarget !== null &&
+    prevTarget !== undefined &&
+    baseData[0]?.key_result_id
+  ) {
     const reportingDate = currentDate
 
+    await supabase
+      .from('key_result_updates')
+      .upsert(
+        {
+          key_result_id: baseData[0].key_result_id,
+          reporting_month: reportingDate,
+          target_value: prevTarget,
+        },
+        { onConflict: 'key_result_id,reporting_month' }
+      )
+
+    console.log('FORWARDED TARGET →', label, prevTarget, reportingDate)
   }
 }
 
