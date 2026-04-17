@@ -548,20 +548,23 @@ const prevStart = new Date(prev.getFullYear(), prev.getMonth(), 1)
 const prevEnd = new Date(prevStart)
 prevEnd.setMonth(prevEnd.getMonth() + 1)
 
-const { data: prevData } = await supabase
+const { data: prevDataList } = await supabase
   .from('key_result_updates')
-  .select('value, target_value')
- .eq('key_result_id', baseData[0].key_result_id)
-  .eq('reporting_month', formatDate(prev))
-  .maybeSingle()
+  .select('target_value')
+  .eq('key_result_id', baseData[0].key_result_id)
+  .lt('reporting_month', currentDate)
+  .order('reporting_month', { ascending: false })
+  .limit(1)
+
+const prevTarget = prevDataList?.[0]?.target_value ?? null
 
   const prevIsEmpty =
   prevData?.value === 0 || prevData?.value === null || prevData?.value === undefined
 
 const prevVal = prevIsEmpty ? '' : prevData?.value
 
-if (currentTarget === '' || currentTarget === null || currentTarget === undefined) {
-  currentTarget = prevData?.target_value ?? null
+if (currentTarget === null || currentTarget === undefined) {
+  currentTarget = prevTarget
 }
 
 setLastMonth(
