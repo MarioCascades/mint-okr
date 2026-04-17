@@ -289,10 +289,11 @@ let resolvedTarget =
 setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
 
 const hasCurrentTarget =
-  currentRow?.target_value !== null &&
-  currentRow?.target_value !== undefined
+  currentRow &&
+  currentRow.target_value !== null &&
+  currentRow.target_value !== undefined
 
-if (!hasCurrentTarget && resolvedTarget !== null) {
+if (!hasCurrentTarget && resolvedTarget !== null && resolvedTarget !== '') {
   await supabase
     .from('key_result_updates')
     .upsert(
