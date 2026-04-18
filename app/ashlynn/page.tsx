@@ -355,11 +355,16 @@ if (
     { onConflict: 'key_result_id,reporting_month' }
   )
 }
-  const getScoreColor = () => {
-    const num = Number(score.replace('%', ''))
-    return num >= 100 ? '#22c55e' : '#c2410c'
-  }
+ const getScoreColor = () => {
+  if (!score) return '#fff'
 
+  const num = Number(score.replace('%', ''))
+
+  if (isNaN(num)) return '#fff'
+
+  return num >= 100 ? '#22c55e' : '#c2410c'
+}
+ console.log('SCORE:', score)
   return (
   <div style={{ marginBottom: 10 }}>
 
@@ -387,10 +392,10 @@ if (
         onBlur={handleSave}
       />
 
-      <input
+     <input
   style={{
     ...cell,
-    color: score ? getScoreColor() : '#fff',
+    color: getScoreColor(),
     fontWeight: 600
   }}
   value={score}
