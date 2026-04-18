@@ -171,7 +171,6 @@ const Objective = ({ title, children }: any) => (
 // =========================
 // KEY RESULT
 // =========================
-
 const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
   const [value, setValue] = useState('')
@@ -187,10 +186,8 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-
       const inputs = Array.from(document.querySelectorAll('input'))
       const index = inputs.indexOf(e.target)
-
       if (index > -1 && index < inputs.length - 1) {
         (inputs[index + 1] as HTMLElement).focus()
       }
@@ -198,7 +195,6 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   }
 
   useEffect(() => {
-
     const fetchData = async () => {
 
       const { data: base } = await supabase
@@ -218,7 +214,6 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         .eq('id', base.key_result_id)
         .maybeSingle()
 
-      setTarget(kr?.target_value ?? '')
       setMetricType(kr?.metric_type ?? '')
 
       const formatDate = (d: Date) =>
@@ -228,34 +223,55 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
+      const prevDate = formatDate(prev)
 
-      const { data: current } = await supabase
+      const { data: currentRow } = await supabase
         .from('key_result_updates')
-        .select('value')
+        .select('value, target_value')
         .eq('key_result_id', base.key_result_id)
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
-      const currentValue = current?.value ?? base.current_value ?? ''
-      setValue(currentValue)
-
-      const { data: prevData } = await supabase
+      const { data: prevRow } = await supabase
         .from('key_result_updates')
-        .select('value')
+        .select('value, target_value')
         .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', formatDate(prev))
+        .eq('reporting_month', prevDate)
         .maybeSingle()
 
-      setLastMonth(prevData?.value ?? '')
+      const currentValue = currentRow?.value ?? base.current_value ?? ''
+      setValue(currentValue)
+      setLastMonth(prevRow?.value ?? '')
 
-      const c = Number(currentValue)
-      const t = Number(kr?.target_value)
+      let resolvedTarget =
+        currentRow?.target_value ??
+        prevRow?.target_value ??
+        kr?.target_value ??
+        null
 
-      if (t > 0) {
-        const percent = Math.round((c / t) * 100)
-        setScore(percent + '%')
+      if (target === '') {
+        setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
       }
 
+      if ((!currentRow || currentRow.target_value == null) && resolvedTarget != null) {
+        await supabase.from('key_result_updates').upsert(
+          {
+            key_result_id: base.key_result_id,
+            reporting_month: currentDate,
+            target_value: Number(resolvedTarget),
+          },
+          { onConflict: 'key_result_id,reporting_month' }
+        )
+      }
+
+      const c = Number(currentValue)
+      const t = Number(resolvedTarget)
+
+      if (t > 0) {
+        setScore(Math.round((c / t) * 100) + '%')
+      } else {
+        setScore('')
+      }
     }
 
     fetchData()
@@ -263,7 +279,6 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   }, [label, selectedMonth])
 
   const handleSave = async () => {
-
     if (!keyResultId) return
 
     const y = selectedMonth.getFullYear()
@@ -274,52 +289,36 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
       {
         key_result_id: keyResultId,
         reporting_month: reportingDate,
-        value: Number(value),
+        value: value === '' ? null : Number(value),
+        target_value: target === '' ? null : Number(target),
       },
       { onConflict: 'key_result_id,reporting_month' }
     )
   }
+
   const isLowerBetter = (label: string) => {
-  const l = label.toLowerCase()
-
-  return (
-    l.includes('late arrivals') ||
-    l.includes('call outs')
-  )
-}
-
- const getScoreColor = () => {
-  const num = Number(score.replace('%', ''))
-
-  if (!num) return '#ff0000'
-
-  if (isLowerBetter(label)) {
-    return num <= 100 ? '#22c55e' : '#c2410c'
-  } else {
-    return num >= 100 ? '#22c55e' : '#c2410c'
+    const l = label.toLowerCase()
+    return l.includes('late arrivals') || l.includes('call outs')
   }
-}
+
+  const getScoreColor = () => {
+    const num = Number(score.replace('%', ''))
+    if (!num) return '#9CA3AF'
+    return isLowerBetter(label)
+      ? num <= 100 ? '#22c55e' : '#c2410c'
+      : num >= 100 ? '#22c55e' : '#c2410c'
+  }
 
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
         <span>{label}</span>
 
-        <input
-          style={cell}
-          value={isPercentage && lastMonth ? lastMonth + '%' : lastMonth}
-          readOnly
-        />
+        <input style={cell} value={lastMonth} readOnly />
 
         <input
           style={cell}
-          value={
-            isEditing
-              ? target
-              : isPercentage && target
-              ? target + '%'
-              : target
-          }
+          value={target}
           disabled={!isEditing}
           onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ''))}
           onKeyDown={handleEnter}
@@ -327,13 +326,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
         <input
           style={cell}
-          value={
-            isEditing
-              ? value
-              : isPercentage && value
-              ? value + '%'
-              : value
-          }
+          value={value}
           disabled={!isEditing}
           onChange={(e) => setValue(e.target.value.replace(/[^0-9]/g, ''))}
           onBlur={handleSave}
@@ -346,14 +339,6 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
           {showInitiatives ? 'Hide' : '+ Initiatives'}
         </button>
       </div>
-
-      {showInitiatives && (
-        <div style={initiativeRow}>
-          <input style={cell} placeholder="Initiative 1..." />
-          <input style={cell} placeholder="Initiative 2..." />
-          <input style={cell} placeholder="Initiative 3..." />
-        </div>
-      )}
     </div>
   )
 }
