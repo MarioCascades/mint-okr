@@ -387,7 +387,15 @@ if (
         onBlur={handleSave}
       />
 
-      <input style={cell} value={score} readOnly />
+      <input
+  style={{
+    ...cell,
+    color: score ? getScoreColor() : '#fff',
+    fontWeight: 600
+  }}
+  value={score}
+  readOnly
+/>
 
       <button
         style={button}
