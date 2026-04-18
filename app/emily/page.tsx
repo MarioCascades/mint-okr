@@ -317,21 +317,37 @@ if (
       <div style={row}>
         <span>{label}</span>
 
-        <input style={cell} value={lastMonth} readOnly />
+        <input style={cell} value={
+  isPercentage && lastMonth
+    ? lastMonth + '%'
+    : lastMonth
+} readOnly />
 
         <input
   style={cell}
-  value={target}
+  value={
+  isEditing
+    ? target
+    : isPercentage && target
+    ? target + '%'
+    : target
+}
   disabled={!isEditing}
-  onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ''))}
+  onChange={(e) => setTarget(e.target.value.replace(/[^0-9.]/g, ''))}
   onBlur={handleSave}
         />
 
         <input
           style={cell}
-          value={value}
+          value={
+  isEditing
+    ? value
+    : isPercentage && value
+    ? value + '%'
+    : value
+}
           disabled={!isEditing}
-          onChange={(e) => setValue(e.target.value.replace(/[^0-9]/g, ''))}
+          onChange={(e) => setValue(e.target.value.replace(/[^0-9.]/g, ''))}
           onBlur={handleSave}
           onKeyDown={handleEnter}
         />
