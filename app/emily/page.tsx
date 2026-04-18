@@ -174,6 +174,9 @@ const Objective = ({ title, children }: any) => (
 const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
   const [targetLoaded, setTargetLoaded] = useState(false)
+  useEffect(() => {
+  setTargetLoaded(false)
+}, [selectedMonth, label])
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
   const [target, setTarget] = useState('')
@@ -244,7 +247,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         console.log('CURRENT ROW:', currentRow)
         console.log('PREV ROW:', prevRow)
 
-        
+
       const currentValue = currentRow?.value ?? base.current_value ?? ''
       setValue(currentValue)
       setLastMonth(prevRow?.value ?? '')
@@ -260,7 +263,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 }
 
       const c = Number(currentValue)
-      const t = Number(resolvedTarget)
+      const t = Number(resolvedTarget ?? target)
 
       if (t > 0) {
         setScore(Math.round((c / t) * 100) + '%')
