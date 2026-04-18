@@ -245,26 +245,14 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
       setLastMonth(prevRow?.value ?? '')
 
       let resolvedTarget =
-        currentRow?.target_value ??
-        prevRow?.target_value ??
-        kr?.target_value ??
-        null
-
+  currentRow?.target_value ??
+  prevRow?.target_value ??
+  null
+  
       if (!targetLoaded) {
   setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
   setTargetLoaded(true)
 }
-
-      if ((!currentRow || currentRow.target_value == null) && resolvedTarget != null) {
-        await supabase.from('key_result_updates').upsert(
-          {
-            key_result_id: base.key_result_id,
-            reporting_month: currentDate,
-            target_value: Number(resolvedTarget),
-          },
-          { onConflict: 'key_result_id,reporting_month' }
-        )
-      }
 
       const c = Number(currentValue)
       const t = Number(resolvedTarget)
