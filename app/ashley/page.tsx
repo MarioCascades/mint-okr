@@ -595,13 +595,15 @@ setLastMonth(
     ? prevVal !== '' ? String(prevVal * 100) : ''
     : prevVal !== '' ? String(prevVal) : ''
 )
- setTarget(
-  currentTarget !== null && currentTarget !== undefined
-    ? String(currentTarget)
-    : ''
-)
+ if (target === '') {
+  setTarget(
+    currentTarget !== null && currentTarget !== undefined
+      ? String(currentTarget)
+      : ''
+  )
 }
-
+  }
+  
   loadData()
 }, [label, selectedMonth])
 
