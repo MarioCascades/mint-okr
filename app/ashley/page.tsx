@@ -543,26 +543,20 @@ const formattedValue =
 
 setValue(formattedValue)
 
- const prev = new Date(selectedMonth)
+const prev = new Date(selectedMonth)
 prev.setMonth(prev.getMonth() - 1)
 
-const prevStart = new Date(prev.getFullYear(), prev.getMonth(), 1)
-
-const prevEnd = new Date(prevStart)
-prevEnd.setMonth(prevEnd.getMonth() + 1)
+const prevDate = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-01`
 
 const { data: prevDataList } = await supabase
   .from('key_result_updates')
-  .select('value, target_value, reporting_month')
+  .select('value, target_value')
   .eq('key_result_id', baseData[0].key_result_id)
-  .lt('reporting_month', currentDate)
-  .not('target_value', 'is', null)
-  .order('reporting_month', { ascending: false })
-  .limit(1)
+  .eq('reporting_month', prevDate)
+  .maybeSingle()
 
-const prevTarget = prevDataList?.[0]?.target_value ?? null
-
- const prevRow = prevDataList?.[0]
+const prevTarget = prevDataList?.target_value ?? null
+const prevRow = prevDataList
 
 const prevIsEmpty =
   prevRow?.value === 0 || prevRow?.value === null || prevRow?.value === undefined
