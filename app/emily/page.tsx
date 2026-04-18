@@ -173,6 +173,7 @@ const Objective = ({ title, children }: any) => (
 // =========================
 const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
+  const [targetLoaded, setTargetLoaded] = useState(false)
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
   const [target, setTarget] = useState('')
@@ -249,9 +250,10 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         kr?.target_value ??
         null
 
-      if (target === '') {
-        setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
-      }
+      if (!targetLoaded) {
+  setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
+  setTargetLoaded(true)
+}
 
       if ((!currentRow || currentRow.target_value == null) && resolvedTarget != null) {
         await supabase.from('key_result_updates').upsert(
