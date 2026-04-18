@@ -233,6 +233,9 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
+        console.log('CURRENT ROW:', currentRow)
+        console.log('PREV ROW:', prevRow)
+
       const { data: prevRow } = await supabase
         .from('key_result_updates')
         .select('value, target_value')
@@ -248,7 +251,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   currentRow?.target_value ??
   prevRow?.target_value ??
   null
-  
+
       if (!targetLoaded) {
   setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
   setTargetLoaded(true)
