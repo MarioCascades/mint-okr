@@ -173,10 +173,6 @@ const Objective = ({ title, children }: any) => (
 // =========================
 const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
-  const [targetLoaded, setTargetLoaded] = useState(false)
-  useEffect(() => {
-  setTargetLoaded(false)
-}, [selectedMonth, label])
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
   const [target, setTarget] = useState('')
@@ -252,16 +248,25 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
       setValue(currentValue)
       setLastMonth(prevRow?.value ?? '')
 
-      let resolvedTarget =
-  currentRow?.target_value ??
-  prevRow?.target_value ??
-  null
+   const resolvedTarget = currentRow?.target_value ?? prevRow?.target_value ?? null
 
-      if (!targetLoaded) {
-  setTarget(resolvedTarget !== null ? String(resolvedTarget) : '')
-  setTargetLoaded(true)
+setTarget(
+  resolvedTarget !== null ? String(resolvedTarget) : ''
+)
+//  Persist carry-forward target into DB
+if (
+  currentRow?.target_value == null &&
+  prevRow?.target_value != null
+) {
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: base.key_result_id,
+      reporting_month: currentDate,
+      target_value: prevRow.target_value,
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
 }
-
       const c = Number(currentValue)
       const t = Number(resolvedTarget ?? target)
 
@@ -315,11 +320,11 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         <input style={cell} value={lastMonth} readOnly />
 
         <input
-          style={cell}
-          value={target}
-          disabled={!isEditing}
-          onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ''))}
-          onKeyDown={handleEnter}
+  style={cell}
+  value={target}
+  disabled={!isEditing}
+  onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ''))}
+  onBlur={handleSave}
         />
 
         <input
