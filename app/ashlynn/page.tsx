@@ -240,7 +240,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   .from('dashboard_okr_data')
   .select('*')
   .eq('user_name', 'Ashlynn')
- .eq('key_result_title', dbLabel)
+ .ilike('key_result_title', `%${keyword}%`)
   .maybeSingle()
 
 if (!base) return
@@ -256,16 +256,12 @@ const prevMonthDate = new Date(selectedMonth)
 prevMonthDate.setMonth(prevMonthDate.getMonth() - 1)
 const prevDate = formatDate(prevMonthDate)
 
-  const { data: prevRows } = await supabase
+ const { data: prevRow } = await supabase
   .from('key_result_updates')
-
-  .select('target_value, value, reporting_month')
-.eq('key_result_id', base.key_result_id)
-.lt('reporting_month', currentDate)
-.not('target_value', 'is', null)
-.order('reporting_month', { ascending: false })
-.limit(1)
-const prevRow = prevRows?.[0] ?? null
+  .select('target_value, value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', prevDate)
+  .maybeSingle()
 
 // CURRENT MONTH TARGET
 const { data: currentRow } = await supabase
