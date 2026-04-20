@@ -267,22 +267,48 @@ if (!base) {
 
       setKeyResultId(base.key_result_id)
 
-      const { data: kr } = await supabase
-        .from('key_results')
-        .select('target_value')
-        .eq('id', base.key_result_id)
-        .maybeSingle()
+    const formatDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
-      const t = Number(kr?.target_value ?? 0)
-      setTarget(t > 0 ? t.toString() : '')
+const currentDate = formatDate(selectedMonth)
 
-      const formatDate = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+const prev = new Date(selectedMonth)
+prev.setMonth(prev.getMonth() - 1)
 
-      const currentDate = formatDate(selectedMonth)
+const prevDate = formatDate(prev)
 
-      const prev = new Date(selectedMonth)
-      prev.setMonth(prev.getMonth() - 1)
+// 👉 fetch CURRENT month target
+const { data: currentRow } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
+// 👉 fetch PREVIOUS month target
+const { data: prevRow } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', prevDate)
+  .maybeSingle()
+
+let resolvedTarget =
+  currentRow?.target_value ??
+  prevRow?.target_value ??
+  null
+
+setTarget(resolvedTarget ? resolvedTarget.toString() : '')
+
+if (!currentRow && resolvedTarget !== null) {
+  await supabase.from('key_result_updates').upsert({
+    key_result_id: base.key_result_id,
+    reporting_month: currentDate,
+    target_value: resolvedTarget,
+  }, {
+    onConflict: 'key_result_id,reporting_month'
+  })
+}
 
       const { data: current } = await supabase
         .from('key_result_updates')
@@ -298,17 +324,21 @@ if (!base) {
         .from('key_result_updates')
         .select('value')
         .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', formatDate(prev))
+        .eq('reporting_month', prevDate)
         .maybeSingle()
 
       setLastMonth(prevData?.value ?? '')
 
-      if (t > 0) {
-        const percent = Math.round((Number(currentValue) / t) * 100)
-        setScore(percent + '%')
-      }
+   if (resolvedTarget && Number(resolvedTarget) > 0) {
+  const percent = Math.round(
+    (Number(currentValue) / Number(resolvedTarget)) * 100
+  )
+  setScore(percent + '%')
+} else {
+  setScore('')
+}
     }
-
+    
     fetchData()
 
   }, [label, selectedMonth])
@@ -320,14 +350,15 @@ if (!base) {
     const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
     const reportingDate = `${y}-${m}-01`
 
-    await supabase.from('key_result_updates').upsert(
-      {
-        key_result_id: keyResultId,
-        reporting_month: reportingDate,
-        value: Number(value),
-      },
-      { onConflict: 'key_result_id,reporting_month' }
-    )
+ await supabase.from('key_result_updates').upsert(
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: value === '' ? null : Number(value),
+    target_value: target === '' ? null : Number(target),
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
   }
 
  return (
@@ -353,13 +384,19 @@ if (!base) {
 <input
   style={cell}
   value={
-    isPercentage && target
-      ? target + '%'
-      : isCurrency && target
-      ? '$' + Number(target).toLocaleString()
+    !isEditing
+      ? isPercentage && target
+        ? target + '%'
+        : isCurrency && target
+        ? '$' + Number(target).toLocaleString()
+        : target
       : target
   }
-  readOnly
+  disabled={!isEditing}
+  onChange={(e) =>
+    setTarget(e.target.value.replace(/[^0-9.]/g, ''))
+  }
+  onBlur={handleSave}
 />
 
 <input
