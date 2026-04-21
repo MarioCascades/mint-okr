@@ -44,6 +44,8 @@ export default function Page() {
     return new Date(now.getFullYear(), now.getMonth(), 1)
   })
 
+  const [kitsTarget, setKitsTarget] = useState(0)
+
   const [lastUpdated, setLastUpdated] = useState('')
   const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
 
@@ -294,23 +296,71 @@ setScheduledTarget(scheduledTargetValue)
       const conversionTargetValue = await getTarget('Jordyn', labelMap["Conversion Rate"])
     setConversionTarget(conversionTargetValue)
 
-   
-
-     // =========================
-    // TOTAL WHITENING KITS
-    // =========================
 
       const jordynKits = await getValue('Jordyn', labelMap["Whitening Kits"])
       const oliviaKits = await getValue('Olivia', labelMap["Whitening Kits"])
 
     setKits(jordynKits + oliviaKits)
 
+    const getTargetWithCarryForward = async (user: string, krTitle: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', user)
+    .eq('key_result_title', krTitle)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data: current } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', formatDate(selectedMonth))
+    .maybeSingle()
+
+  if (current?.target_value !== null && current?.target_value !== undefined) {
+    return Number(current.target_value)
+  }
+
+  const { data: prev } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .lt('reporting_month', formatDate(selectedMonth))
+    .not('target_value', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  return Number(prev?.target_value ?? 0)
+}
+   
+
+     // =========================
+    // TOTAL WHITENING KITS
+    // =========================
+    
+
     const prevJKits = await getPrevValue('Jordyn', labelMap["Whitening Kits"])
     const prevOKits = await getPrevValue('Olivia', labelMap["Whitening Kits"])
 
     setPrevKits(prevJKits + prevOKits)
-  }
 
+      const jordynKitsTarget = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Whitening Kits"]
+)
+
+const oliviaKitsTarget = await getTargetWithCarryForward(
+  'Olivia',
+  labelMap["Whitening Kits"]
+)
+
+setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
+  }
+  
   // =========================
   // MONTH NAV
   // =========================
@@ -382,36 +432,75 @@ setScheduledTarget(scheduledTargetValue)
   value={totalStarts} 
   prev={prevStarts}
   target={startsTarget}
+  setTarget={setStartsTarget}
+  onSave={() => {
+  saveTarget('Jordyn', 'Total Starts (Individual)', startsTarget / 2, selectedMonth)
+  saveTarget('Olivia', 'Total Starts (Individual)', startsTarget / 2, selectedMonth)
+}}
 />
         <Card
   title="Total Production"
   value={`$${Number(totalProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
   prev={`$${Number(prevProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-  target={`$${Number(productionTarget || 0).toLocaleString()}`}
+  target={productionTarget}
+  setTarget={setProductionTarget}
+  onSave={() => {
+    saveTarget('Jordyn', 'Total Production (Individual)', productionTarget / 2, selectedMonth)
+    saveTarget('Olivia', 'Total Production (Individual)', productionTarget / 2, selectedMonth)
+  }}
 />
         <Card 
   title="Scheduled New Patients" 
   value={scheduled}
   prev={prevScheduled}
   target={scheduledTarget}
+  setTarget={setScheduledTarget}
+ onSave={() => {
+  saveTarget(
+    'Jordyn',
+    labelMap["Scheduled New Patients"],
+    scheduledTarget,
+    selectedMonth
+  )
+}}
 />
         <Card 
   title="Kept New Patients" 
   value={kept}
   prev={prevKept}
   target={keptTarget}
+  setTarget={setKeptTarget}
+  onSave={() => {
+    saveTarget('Jordyn', labelMap["Kept New Patients"], keptTarget / 2, selectedMonth)
+    saveTarget('Olivia', labelMap["Kept New Patients"], keptTarget / 2, selectedMonth)
+  }}
 />
 
         <Card 
   title="New Patient Conversion" 
   value={`${conversion.toFixed(0)}%`}
   prev={`${prevConversion.toFixed(0)}%`}
-  target={`${conversionTarget}%`}
+  target={conversionTarget}
+  setTarget={setConversionTarget}
+  onSave={() => {
+  saveTarget(
+    'Jordyn',
+    labelMap["Conversion Rate"],
+    conversionTarget,
+    selectedMonth
+  )
+}}
 />
         <Card 
   title="Total Whitening Kits" 
   value={kits}
   prev={prevKits}
+  target={kitsTarget}
+  setTarget={setKitsTarget}
+  onSave={() => {
+    saveTarget('Jordyn', labelMap["Whitening Kits"], kitsTarget / 2, selectedMonth)
+    saveTarget('Olivia', labelMap["Whitening Kits"], kitsTarget / 2, selectedMonth)
+  }}
 />
 
       </div>
@@ -430,7 +519,7 @@ setScheduledTarget(scheduledTargetValue)
 // CARD
 // =========================
 
-const Card = ({ title, value, prev = 0, target = 0 }: any) => (
+const Card = ({ title, value, prev = 0, target = 0, setTarget, onSave }: any) => (
   <div style={card}>
     <div style={cardTitle}>{title}</div>
     <div style={cardValue}>{value}</div>
@@ -440,13 +529,49 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) => (
         <span style={smallLabel}>Previous</span>
         <div style={smallBox}>{prev}</div>
       </div>
+
       <div>
         <span style={smallLabel}>Target</span>
-        <div style={smallBox}>{target}</div>
+
+        <input
+          style={smallBox}
+          value={target}
+          onChange={(e) => {
+            const val = e.target.value.replace(/[^0-9]/g, '')
+            setTarget(Number(val))
+          }}
+          onBlur={onSave}
+        />
       </div>
     </div>
   </div>
 )
+const saveTarget = async (
+  user: string,
+  krTitle: string,
+  targetValue: number,
+  selectedMonth: Date
+) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', user)
+    .eq('key_result_title', krTitle)
+    .maybeSingle()
+
+  if (!row) return
+
+  await supabase
+    .from('key_result_updates')
+    .upsert({
+      key_result_id: row.key_result_id,
+      reporting_month: formatDate(selectedMonth),
+      target_value: targetValue
+    }, {
+      onConflict: 'key_result_id,reporting_month'
+    })
+}
 
 // =========================
 // STYLES

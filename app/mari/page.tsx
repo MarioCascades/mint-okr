@@ -363,7 +363,7 @@ const isLowerBetter = (label: string) => {
           value={target}
           disabled={!isEditing}
           onChange={(e) => {
-  const val = e.target.value.replace(/[^0-9]/g, '')
+  const val = e.target.value.replace(/[^0-9.]/g, '')
   setTarget(val)
   setIsDirty(true)
 }}
