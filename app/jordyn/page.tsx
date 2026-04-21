@@ -382,7 +382,7 @@ if (loadedMonth !== currentMonthKey) {
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
-      const currentValue = current?.value ?? base.current_value ?? ''
+      const currentValue = current?.value ?? ''
         
 // =========================
 // PREVIOUS MONTH (NORMAL KRs)
