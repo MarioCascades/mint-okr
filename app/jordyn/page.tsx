@@ -540,7 +540,7 @@ const reportingDate = `${y}-${m}-01`
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: Number(value) || 0,
+    value: value ? Number(value) : null,
     target_value: localTarget ? Number(localTarget) : null,
   },
   
@@ -585,7 +585,7 @@ onChange={async (e) => {
 
   if (isCurrency || isPercentage) {
     const raw = e.target.value.replace(/[^0-9.]/g, '')
-    const parts = raw.split('.')
+    const parts = raw.split('.').slice(0, 2)
 
     val = parts[0]
 
@@ -637,7 +637,7 @@ onKeyDown={handleEnter}
           disabled={!isEditing || (isComputed && label !== "Total Whitening Kits")}
           onChange={(e) => {
               const raw = e.target.value.replace(/[^0-9.]/g, '')
-              const parts = raw.split('.')
+              const parts = raw.split('.').slice(0, 2)
 
               let val = parts[0]
 
