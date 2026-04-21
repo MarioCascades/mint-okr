@@ -271,6 +271,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
+  const [localTarget, setLocalTarget] = useState('')
   const [dbTarget, setDbTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
@@ -336,38 +337,62 @@ if (label === "Total Whitening Kits") {
 
         console.log("BASE OBJECT:", base)
 
-      const { data: kr } = await supabase
-        .from('key_results')
-        .select('target_value, metric_type')
-        .eq('id', base.key_result_id)
-        .maybeSingle()
-
-
-        console.log("BASE:", base)
-        console.log("KR:", kr)
-
-      setDbTarget(
-  kr?.target_value !== null && kr?.target_value !== undefined
-    ? kr.target_value.toString()
-    : ''
-)
-      setMetricType(kr?.metric_type ?? '')
-
-
-
+    
       const formatDate = (d: Date) =>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
-      const currentDate = formatDate(selectedMonth)
+const currentDate2 = formatDate(selectedMonth)
 
-      const prev = new Date(selectedMonth)
-      prev.setMonth(prev.getMonth() - 1)
+const prev2 = new Date(selectedMonth)
+prev2.setMonth(prev2.getMonth() - 1)
+
+const prevDate2 = formatDate(prev2)
+
+
+// current month (value + target)
+const { data: currentRow } = await supabase
+  .from('key_result_updates')
+  .select('value, target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate2)
+  .maybeSingle()
+
+// previous month target
+const { data: prevRow } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', prevDate2)
+  .maybeSingle()
+
+let resolvedTarget =
+  currentRow?.target_value ??
+  prevRow?.target_value ??
+  null
+
+// carry forward if missing
+if (!currentRow?.target_value && resolvedTarget !== null) {
+  await supabase
+    .from('key_result_updates')
+    .upsert({
+      key_result_id: base.key_result_id,
+      reporting_month: currentDate2,
+      target_value: resolvedTarget,
+    }, {
+      onConflict: 'key_result_id,reporting_month'
+    })
+}
+
+// set target state
+setLocalTarget(
+  resolvedTarget !== null ? resolvedTarget.toString() : ''
+)
 
       const { data: current } = await supabase
         .from('key_result_updates')
         .select('value')
         .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', currentDate)
+        .eq('reporting_month', currentDate2)
         .maybeSingle()
 
       const currentValue = current?.value ?? ''
@@ -435,7 +460,7 @@ setLoadedMonth(currentMonthKey)
 // =========================
 // SCORE CALCULATION 
 // =========================
-const t = Number(kr?.target_value ?? 0)
+const t = Number(localTarget || 0)
 
 if (t > 0) {
   setScore(Math.round((total / t) * 100) + '%')
@@ -510,7 +535,7 @@ return
         .from('key_result_updates')
         .select('value')
         .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', formatDate(prev))
+        .eq('reporting_month', prevDate2)
         .maybeSingle()
 
       if (loadedMonth !== currentMonthKey) {
@@ -518,7 +543,7 @@ return
 }
 
       const c = Number(currentValue)
-      const t = Number(kr?.target_value ?? 0)
+      const t = Number(localTarget || 0)
 
       if (t > 0) {
         setScore(Math.round((c / t) * 100) + '%')
@@ -538,13 +563,14 @@ return
     const reportingDate = `${y}-${m}-01`
 
     await supabase.from('key_result_updates').upsert(
-      {
-        key_result_id: keyResultId,
-        reporting_month: reportingDate,
-        value: Number(value),
-      },
-      { onConflict: 'key_result_id,reporting_month' }
-    )
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: value === '' ? null : Number(value),
+    target_value: localTarget === '' ? null : Number(localTarget),
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
   }
 
   const getScoreColor = () => {
@@ -552,16 +578,6 @@ return
     return num >= 100 ? '#22c55e' : '#c2410c'
   }
 
-let finalTarget = dbTarget
-
-if (label !== "Total Whitening Kits") {
-  finalTarget =
-    (derivedTarget && Number(derivedTarget) > 0)
-      ? derivedTarget
-      : (Number(target) > 0
-          ? target
-          : dbTarget)
-}
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
@@ -581,13 +597,8 @@ if (label !== "Total Whitening Kits") {
 
         <input
           style={cell}
-          value={
-  isCurrency && finalTarget
-    ? '$' + Number(finalTarget).toLocaleString()
-    : isPercentage && finalTarget
-    ? Number(finalTarget) + '%'
-    : finalTarget
-}
+          value={localTarget}
+
           disabled={
   !isEditing && label !== "Total Whitening Kits"
 }
@@ -607,7 +618,7 @@ if (label !== "Total Whitening Kits") {
     val = e.target.value.replace(/[^0-9]/g, '')
   }
 
-  setTarget?.(val)
+  setLocalTarget(val)
 }}
           onKeyDown={handleEnter}
         />
