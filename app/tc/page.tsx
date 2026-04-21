@@ -577,7 +577,11 @@ const saveTarget = async (
 // STYLES
 // =========================
 
-const container : React.CSSProperties = { background: '#000', minHeight: '100vh', color: '#fff' }
+const container : React.CSSProperties = { 
+  background: '#F9FAFB', // light gray
+  minHeight: '100vh', 
+  color: '#111827' // dark text
+}
 const headerBar : React.CSSProperties = { 
   background: '#E4572E', 
   padding: 20,
@@ -591,24 +595,33 @@ const backButton : React.CSSProperties = { background: '#000', color: '#fff', bo
 
 const headerMeta : React.CSSProperties = { display: 'flex', gap: 20, marginTop: 15 }
 const metaBlock : React.CSSProperties = { display: 'flex', flexDirection: 'column' }
-const metaInput : React.CSSProperties = { background: '#000', color: '#fff', border: '1px solid #1F2937', padding: 6 }
-
+const metaInput : React.CSSProperties = { 
+  background: '#FFFFFF',
+  color: '#111827',
+  border: '1px solid #E5E7EB',
+  padding: 6
+}
 const monthSelector : React.CSSProperties = { display: 'flex', gap: 10 }
 
 const grid : React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, padding: 20 }
 
-const card : React.CSSProperties = { background: '#0A0A0A', border: '1px solid #1F2937', borderRadius: 12, padding: 20 }
+const card : React.CSSProperties = { 
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 12,
+  padding: 20
+}
 const cardTitle : React.CSSProperties = { fontSize: 16, marginBottom: 10 }
 const cardValue : React.CSSProperties = { fontSize: 40, fontWeight: 800, marginBottom: 20 }
 
 const bottomRow : React.CSSProperties = { display: 'flex', gap: 20 }
 const smallLabel : React.CSSProperties = { fontSize: 10, color: '#9CA3AF' }
 const smallBox : React.CSSProperties = { 
-  border: '1px solid #1F2937',
+  border: '1px solid #E5E7EB',
   padding: 6,
   marginTop: 4,
-  backgroundColor: '#0A0A0A',
-  color: '#fff'
+  backgroundColor: '#FFFFFF',
+  color: '#111827'
 }
 const notesSection : React.CSSProperties = { padding: 20 }
 const notesInput : React.CSSProperties = { width: '100%', height: 100, background: '#0A0A0A', border: '1px solid #1F2937', color: '#fff' }
