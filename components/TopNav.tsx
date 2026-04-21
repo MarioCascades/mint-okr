@@ -37,9 +37,21 @@ export default function TopNav() {
           key={user.path}
           onClick={() => router.push(user.path)}
           style={{
-            ...button,
-            backgroundColor: isActive ? '#F97316' : '#111827'
-          }}
+  ...button,
+  backgroundColor: isActive ? '#F97316' : '#FFFFFF',
+  color: isActive ? '#000' : '#111827',
+  border: isActive ? '1px solid #F97316' : '1px solid #E5E7EB'
+}}
+onMouseEnter={(e) => {
+  if (!isActive) {
+    e.currentTarget.style.backgroundColor = '#F9FAFB'
+  }
+}}
+onMouseLeave={(e) => {
+  if (!isActive) {
+    e.currentTarget.style.backgroundColor = '#FFFFFF'
+  }
+}}
         >
           {user.name}
         </button>
@@ -61,8 +73,9 @@ const navContainer : React.CSSProperties = {
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '12px 20px',
-  backgroundColor: '#000',
-  borderBottom: '1px solid #1F2937'
+  backgroundColor: '#F3F4F6', // 👈 light grey
+  borderBottom: '1px solid #E5E7EB',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
 }
 
 const left : React.CSSProperties = {
@@ -85,7 +98,7 @@ const logo : React.CSSProperties = {
 
 const title : React.CSSProperties = {
   fontWeight: 600,
-  color: '#fff'
+  color: '#111827'
 }
 
 const right : React.CSSProperties = {
@@ -97,8 +110,9 @@ const right : React.CSSProperties = {
 const button : React.CSSProperties = {
   padding: '6px 10px',
   borderRadius: 6,
-  border: '1px solid #1F2937',
-  color: '#fff',
+  border: '1px solid #E5E7EB',
+  color: '#111827',
+  backgroundColor: '#FFFFFF',
   cursor: 'pointer'
 }
 

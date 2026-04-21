@@ -605,11 +605,18 @@ const monthSelector : React.CSSProperties = { display: 'flex', gap: 10 }
 
 const grid : React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, padding: 20 }
 
+
 const card : React.CSSProperties = { 
   background: '#FFFFFF',
-  border: '1px solid #E5E7EB',
-  borderRadius: 12,
-  padding: 20
+  border: '1px solid #F1F5F9', // lighter border
+  borderRadius: 16,
+  padding: 20,
+
+  // THIS CREATES FLOAT EFFECT
+  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.05)',
+
+  //subtle lift feeling
+  transition: 'all 0.2s ease'
 }
 const cardTitle : React.CSSProperties = { fontSize: 16, marginBottom: 10 }
 const cardValue : React.CSSProperties = { fontSize: 40, fontWeight: 800, marginBottom: 20 }
