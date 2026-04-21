@@ -384,7 +384,19 @@ if (loadedMonth !== currentMonthKey) {
 
       const currentValue = current?.value ?? base.current_value ?? ''
         
+// =========================
+// PREVIOUS MONTH (NORMAL KRs)
+// =========================
+const { data: prevValueRow } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', prevDate)
+  .maybeSingle()
 
+const prevValue = prevValueRow?.value ?? ''
+
+setLastMonth(prevValue !== '' && prevValue !== null ? prevValue.toString() : '')
 // =========================
 //  GLOBAL TOTALS (JORDYN + OLIVIA)
 // =========================
