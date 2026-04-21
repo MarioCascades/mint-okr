@@ -574,9 +574,9 @@ const reportingDate = `${y}-${m}-01`
           style={cell}
           value={
   isCurrency && localTarget
-    ? '$' + Number(localTarget).toLocaleString()
+    ? '$' + localTarget
   : isPercentage && localTarget
-    ? Number(localTarget) + '%'
+    ? localTarget + '%'
   : localTarget
 }
           disabled={!isEditing}
