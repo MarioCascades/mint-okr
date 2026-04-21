@@ -289,9 +289,11 @@ useEffect(() => {
   const isPercentage =
   metricType === 'percentage' ||
   label === 'Conversion Rate'
-  const isCurrency =
+ const isCurrency =
   metricType === 'currency' ||
-  label === 'Collections from Starts'
+  label === 'Collections from Starts' ||
+  label === 'Total Production (Individual)' ||
+  label === 'Total Production'
   const isComputed = computedLabels.includes(label)
 
   const formatCurrency = (val: string | number) => {
@@ -661,18 +663,18 @@ return
        onChange={(e) => {
   let val = ''
 
-  if (isCurrency || isPercentage) {
-    const raw = e.target.value.replace(/[^0-9.]/g, '')
-    const parts = raw.split('.')
+  const raw = e.target.value.replace(/[^0-9.]/g, '')
 
-    val = parts[0]
+// allow only ONE decimal point
+const parts = raw.split('.')
 
-    if (parts.length > 1) {
-      val += '.' + parts[1].slice(0, 2)
-    }
-  } else {
-    val = e.target.value.replace(/[^0-9]/g, '')
-  }
+if (parts.length > 2) return
+
+val = parts[0]
+
+if (parts.length === 2) {
+  val += '.' + parts[1].slice(0, 2)
+}
 
   setLocalTarget(val)
   setIsDirty(true)
