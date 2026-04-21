@@ -371,8 +371,9 @@ setMetricType(kr?.metric_type ?? '')
 if (loadedMonth !== currentMonthKey) {
   setLocalTarget(resolvedTarget ? resolvedTarget.toString() : '')
   setLoadedMonth(currentMonthKey)
+} else if (!isDirty && !localTarget) {
+  setLocalTarget(resolvedTarget ? resolvedTarget.toString() : '')
 }
-     
       const { data: current } = await supabase
         .from('key_result_updates')
         .select('value')
@@ -447,7 +448,7 @@ setLoadedMonth(currentMonthKey)
 // =========================
 // SCORE CALCULATION (ADD THIS)
 // =========================
-const t = Number(kr?.target_value ?? 0)
+const t = Number(localTarget || dbTarget || kr?.target_value || 0)
 
 if (t > 0) {
   setScore(Math.round((total / t) * 100) + '%')
@@ -507,59 +508,6 @@ setLastMonth(prevTotal.toString())
 // ✅ NOW EXIT
 return
 }
-// =========================
-// ✅ PREVIOUS MONTH FOR TOTALS
-// =========================
-
-const prevDateObj = new Date(selectedMonth)
-prevDateObj.setMonth(prevDateObj.getMonth() - 1)
-
-const prevY = prevDateObj.getFullYear()
-const prevM = String(prevDateObj.getMonth() + 1).padStart(2, '0')
-const prevReportingDate = `${prevY}-${prevM}-01`
-
-const getPrevValue = async (user: string, krTitle: string) => {
-
-  const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', user)
-    .eq('key_result_title', krTitle)
-    .maybeSingle()
-
-  if (!row) return 0
-
-  const { data: update } = await supabase
-    .from('key_result_updates')
-    .select('value')
-    .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', prevReportingDate)
-    .maybeSingle()
-
-  return Number(update?.value ?? 0)
-}
-
-let prevJordyn = 0
-let prevOlivia = 0
-
-if (label === "Total Starts") {
-  prevJordyn = await getPrevValue("Jordyn", "Total Starts (Individual)")
-  prevOlivia = await getPrevValue("Olivia", "Total Starts (Individual)")
-}
-
-if (label === "Total Production") {
-  prevJordyn = await getPrevValue("Jordyn", "Total Production (Individual)")
-  prevOlivia = await getPrevValue("Olivia", "Total Production (Individual)")
-}
-
-if (label === "Total Whitening Kits") {
-  prevJordyn = await getPrevValue("Jordyn", "Whitening Kits")
-  prevOlivia = await getPrevValue("Olivia", "Whitening Kits")
-}
-
-const prevTotal = prevJordyn + prevOlivia
-
-setLastMonth(prevTotal.toString())
 
 
         if (loadedMonth !== currentMonthKey && !isDirty) {
@@ -571,16 +519,6 @@ setLastMonth(prevTotal.toString())
   
 }
 
-      const { data: prevData } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', formatDate(prev))
-        .maybeSingle()
-
-      if (loadedMonth !== currentMonthKey) {
-  setLastMonth(prevData?.value ?? '')
-}
 
 const c = Number(currentValue)
 const t = Number(localTarget || dbTarget || 0)
@@ -602,7 +540,7 @@ const y = selectedMonth.getFullYear()
 const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
 const reportingDate = `${y}-${m}-01`
 
-    await supabase.from('key_result_updates').upsert(
+ await supabase.from('key_result_updates').upsert(
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
