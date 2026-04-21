@@ -329,6 +329,9 @@ if (label === "Total Whitening Kits") {
     .maybeSingle()
 
   base = data
+
+  console.log('BASE RESULT:', base)
+  console.log('DB LABEL:', dbLabel)
 }
 
       if (!base) return
