@@ -563,6 +563,9 @@ const saveTarget = async (
   selectedMonth: Date
 ) => {
 
+  const reportingMonth = formatDate(selectedMonth)
+
+  // get key_result_id
   const { data: row } = await supabase
     .from('dashboard_okr_data')
     .select('key_result_id')
@@ -570,17 +573,37 @@ const saveTarget = async (
     .eq('key_result_title', krTitle)
     .maybeSingle()
 
-  if (!row) return
+  if (!row) {
+    console.log('no key_result_id found')
+    return
+  }
 
-  await supabase
+  // check if record exists
+  const { data: existing } = await supabase
     .from('key_result_updates')
-    .upsert({
-      key_result_id: row.key_result_id,
-      reporting_month: formatDate(selectedMonth),
-      target_value: targetValue
-    }, {
-      onConflict: 'key_result_id,reporting_month'
-    })
+    .select('id')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingMonth)
+    .maybeSingle()
+
+  if (existing) {
+    await supabase
+      .from('key_result_updates')
+      .update({
+        target_value: targetValue
+      })
+      .eq('id', existing.id)
+  } else {
+    await supabase
+      .from('key_result_updates')
+      .insert({
+        key_result_id: row.key_result_id,
+        reporting_month: reportingMonth,
+        target_value: targetValue
+      })
+  }
+
+  console.log('saved target', { user, krTitle, targetValue, reportingMonth })
 }
 
 // =========================
