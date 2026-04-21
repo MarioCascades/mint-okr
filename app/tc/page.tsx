@@ -121,6 +121,42 @@ export default function Page() {
   const fetchData = async () => {
 
     const reportingDate = formatDate(selectedMonth)
+
+    // ✅ ADD THIS HERE (TOP OF fetchData)
+const getTargetWithCarryForward = async (user: string, krTitle: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', user)
+    .eq('key_result_title', krTitle)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data: current } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', formatDate(selectedMonth))
+    .maybeSingle()
+
+  if (current?.target_value !== null && current?.target_value !== undefined) {
+    return Number(current.target_value)
+  }
+
+  const { data: prev } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .lt('reporting_month', formatDate(selectedMonth))
+    .not('target_value', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  return Number(prev?.target_value ?? 0)
+}
    
 
     // =========================
@@ -201,15 +237,17 @@ const { data: row } = await supabase
   .eq('key_result_title', labelMap["Total Starts (Individual)"])
   .maybeSingle()
 
-if (row) {
-  const { data: kr } = await supabase
-    .from('key_results')
-    .select('target_value')
-    .eq('id', row.key_result_id)
-    .maybeSingle()
+const jordynStartsTarget = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Total Starts (Individual)"]
+)
 
-  setStartsTarget(Number(kr?.target_value ?? 0) * 2)
-}
+const oliviaStartsTarget = await getTargetWithCarryForward(
+  'Olivia',
+  labelMap["Total Starts (Individual)"]
+)
+
+setStartsTarget(jordynStartsTarget + oliviaStartsTarget)
     // =========================
     // TOTAL PRODUCTION
     // =========================
@@ -223,27 +261,10 @@ if (row) {
 
     setPrevProduction(prevJProduction + prevOProduction)
 
-    const getTarget = async (user: string, krTitle: string) => {
-    const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', user)
-    .eq('key_result_title', krTitle)
-    .maybeSingle()
+  
 
-  if (!row) return 0
-
-    const { data: kr } = await supabase
-    .from('key_results')
-    .select('target_value')
-    .eq('id', row.key_result_id)
-    .maybeSingle()
-
-  return Number(kr?.target_value ?? 0)
-}
-
-const jordynProdTarget = await getTarget('Jordyn', 'Total Production (Individual)')
-const oliviaProdTarget = await getTarget('Olivia', 'Total Production (Individual)')
+const jordynProdTarget = await getTargetWithCarryForward('Jordyn', 'Total Production (Individual)')
+const oliviaProdTarget = await getTargetWithCarryForward('Olivia', 'Total Production (Individual)')
 
 setProductionTarget(jordynProdTarget + oliviaProdTarget)
 
@@ -261,7 +282,10 @@ const prevOScheduled = await getPrevValue('Olivia', labelMap["Scheduled New Pati
 
     setPrevScheduled(prevJScheduled + prevOScheduled)
 
-    const scheduledTargetValue = await getTarget('Jordyn', labelMap["Scheduled New Patients"])
+    const scheduledTargetValue = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Scheduled New Patients"]
+)
 
 setScheduledTarget(scheduledTargetValue)
 
@@ -279,8 +303,8 @@ setScheduledTarget(scheduledTargetValue)
 
     setPrevKept(prevJKept + prevOKept)
 
-    const jordynKeptTarget = await getTarget('Jordyn', labelMap["Kept New Patients"])
-    const oliviaKeptTarget = await getTarget('Olivia', labelMap["Kept New Patients"])
+    const jordynKeptTarget = await getTargetWithCarryForward('Jordyn', labelMap["Kept New Patients"])
+    const oliviaKeptTarget = await getTargetWithCarryForward('Olivia', labelMap["Kept New Patients"])
 
     setKeptTarget(jordynKeptTarget + oliviaKeptTarget)
 
@@ -293,7 +317,10 @@ setScheduledTarget(scheduledTargetValue)
   : 0
       setPrevConversion(prevConversionValue)
 
-      const conversionTargetValue = await getTarget('Jordyn', labelMap["Conversion Rate"])
+      const conversionTargetValue = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Conversion Rate"]
+)
     setConversionTarget(conversionTargetValue)
 
 
@@ -302,41 +329,7 @@ setScheduledTarget(scheduledTargetValue)
 
     setKits(jordynKits + oliviaKits)
 
-    const getTargetWithCarryForward = async (user: string, krTitle: string) => {
-
-  const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', user)
-    .eq('key_result_title', krTitle)
-    .maybeSingle()
-
-  if (!row) return 0
-
-  const { data: current } = await supabase
-    .from('key_result_updates')
-    .select('target_value')
-    .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', formatDate(selectedMonth))
-    .maybeSingle()
-
-  if (current?.target_value !== null && current?.target_value !== undefined) {
-    return Number(current.target_value)
-  }
-
-  const { data: prev } = await supabase
-    .from('key_result_updates')
-    .select('target_value')
-    .eq('key_result_id', row.key_result_id)
-    .lt('reporting_month', formatDate(selectedMonth))
-    .not('target_value', 'is', null)
-    .order('reporting_month', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  return Number(prev?.target_value ?? 0)
-}
-   
+     
 
      // =========================
     // TOTAL WHITENING KITS
