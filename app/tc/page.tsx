@@ -533,30 +533,15 @@ const Card = ({ title, value, prev = 0, target = 0, setTarget, onSave }: any) =>
       <div>
         <span style={smallLabel}>Target</span>
 
-        <div style={{ display: 'flex', gap: 6 }}>
-  <input
-    style={{ ...smallBox, flex: 1 }}
-    value={target}
-    onChange={(e) => {
-      const val = e.target.value.replace(/[^0-9]/g, '')
-      setTarget(Number(val))
-    }}
-  />
-
-  <button
-    style={{
-      background: '#00AEEF',
-      border: 'none',
-      padding: '4px 6px',
-      cursor: 'pointer',
-      color: '#000',
-      borderRadius: 4
-    }}
-    onClick={onSave}
-  >
-    ✓
-  </button>
-</div>
+        <input
+          style={smallBox}
+          value={target}
+          onChange={(e) => {
+            const val = e.target.value.replace(/[^0-9]/g, '')
+            setTarget(Number(val))
+          }}
+          onBlur={onSave}
+        />
       </div>
     </div>
   </div>
@@ -618,7 +603,12 @@ const cardValue : React.CSSProperties = { fontSize: 40, fontWeight: 800, marginB
 
 const bottomRow : React.CSSProperties = { display: 'flex', gap: 20 }
 const smallLabel : React.CSSProperties = { fontSize: 10, color: '#9CA3AF' }
-const smallBox : React.CSSProperties = { border: '1px solid #1F2937', padding: 6, marginTop: 4 }
-
+const smallBox : React.CSSProperties = { 
+  border: '1px solid #1F2937',
+  padding: 6,
+  marginTop: 4,
+  backgroundColor: '#0A0A0A',
+  color: '#fff'
+}
 const notesSection : React.CSSProperties = { padding: 20 }
 const notesInput : React.CSSProperties = { width: '100%', height: 100, background: '#0A0A0A', border: '1px solid #1F2937', color: '#fff' }
