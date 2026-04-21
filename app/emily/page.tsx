@@ -317,11 +317,7 @@ if (
       <div style={row}>
         <span>{label}</span>
 
-        <input style={cell} value={
-  isPercentage && lastMonth
-    ? lastMonth + '%'
-    : lastMonth
-} readOnly />
+        <input style={cell} value={lastMonth} readOnly />
 
         <input
   style={cell}

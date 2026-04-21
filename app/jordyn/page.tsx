@@ -325,8 +325,55 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
         console.log("BASE:", base)
         console.log("KR:", kr)
-setDbTarget(kr?.target_value ?? '')
+
+// =======================
+// DATE SETUP
+// =======================
+const formatDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+
+const currentDate = formatDate(selectedMonth)
+
+const prev = new Date(selectedMonth)
+prev.setMonth(prev.getMonth() - 1)
+const prevDate = formatDate(prev)
+
+
+// =======================
+// TARGET (MONTHLY SYSTEM)
+// =======================
+const { data: currentRow } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
+const { data: prevRow } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', prevDate)
+  .maybeSingle()
+
+const resolvedTarget =
+  currentRow?.target_value ??
+  prevRow?.target_value ??
+  kr?.target_value ??
+  null
+
+setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
+
+if (!currentRow && resolvedTarget !== null) {
+  await supabase.from('key_result_updates').upsert({
+    key_result_id: base.key_result_id,
+    reporting_month: currentDate,
+    target_value: resolvedTarget,
+  }, {
+    onConflict: 'key_result_id,reporting_month'
+  })
+}
 
 let finalTarget = dbTarget
 
@@ -339,14 +386,6 @@ if (label !== "Total Whitening Kits") {
           : dbTarget)
 }
       
-
-      const formatDate = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-
-      const currentDate = formatDate(selectedMonth)
-
-      const prev = new Date(selectedMonth)
-      prev.setMonth(prev.getMonth() - 1)
 
       const { data: current } = await supabase
         .from('key_result_updates')
