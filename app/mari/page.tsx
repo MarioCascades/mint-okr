@@ -212,21 +212,59 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
 
       setKeyResultId(base.key_result_id)
 
-      const { data: kr } = await supabase
-        .from('key_results')
-        .select('target_value')
-        .eq('id', base.key_result_id)
-        .maybeSingle()
+    // ------------------------
+// FETCH CURRENT TARGET
+// ------------------------
 
-      setTarget(kr?.target_value ?? '')
+const formatDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
-      const formatDate = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+const currentDate = formatDate(selectedMonth)
 
-      const currentDate = formatDate(selectedMonth)
+const prev = new Date(selectedMonth)
+prev.setMonth(prev.getMonth() - 1)
+const prevDate = formatDate(prev)
 
-      const prev = new Date(selectedMonth)
-      prev.setMonth(prev.getMonth() - 1)
+// CURRENT ROW
+const { data: currentRow } = await supabase
+  .from('key_result_updates')
+  .select('value, target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
+// PREVIOUS TARGET (carry forward)
+const { data: prevRow } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .lt('reporting_month', currentDate)
+  .not('target_value', 'is', null)
+  .order('reporting_month', { ascending: false })
+  .limit(1)
+  .maybeSingle()
+
+// RESOLVE TARGET
+const resolvedTarget =
+  currentRow?.target_value ??
+  prevRow?.target_value ??
+  ''
+
+// AUTO CREATE ROW FOR MONTH (carry forward target)
+if (!currentRow && resolvedTarget !== '') {
+  await supabase
+    .from('key_result_updates')
+    .upsert({
+      key_result_id: base.key_result_id,
+      reporting_month: currentDate,
+      target_value: Number(resolvedTarget),
+    }, {
+      onConflict: 'key_result_id,reporting_month'
+    })
+}
+
+// SET TARGET
+setTarget(resolvedTarget.toString())
 
       const { data: current } = await supabase
         .from('key_result_updates')
@@ -235,10 +273,14 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
-      const currentValue = current?.value ?? base.current_value ?? ''
-      setValue(currentValue)
+      const currentValue =
+  currentRow && currentRow.value !== null
+    ? currentRow.value
+    : ''
 
-      const { data: prevData } = await supabase
+setValue(currentValue.toString())
+
+const { data: prevData } = await supabase
         .from('key_result_updates')
         .select('value')
         .eq('key_result_id', base.key_result_id)
@@ -273,14 +315,15 @@ setScore(percent + '%')
     const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
     const reportingDate = `${y}-${m}-01`
 
-    await supabase.from('key_result_updates').upsert(
-      {
-        key_result_id: keyResultId,
-        reporting_month: reportingDate,
-        value: Number(value),
-      },
-      { onConflict: 'key_result_id,reporting_month' }
-    )
+   await supabase.from('key_result_updates').upsert(
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: value === '' ? null : Number(value),
+    target_value: target === '' ? null : Number(target),
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
   }
 const isLowerBetter = (label: string) => {
   const l = label.toLowerCase()
