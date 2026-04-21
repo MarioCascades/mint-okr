@@ -276,9 +276,8 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [metricType, setMetricType] = useState('')
   const [showInitiatives, setShowInitiatives] = useState(false)
-  const [loadedMonth, setLoadedMonth] = useState('')
   const [isDirty, setIsDirty] = useState(false)
-  
+  const [loadedMonth, setLoadedMonth] = useState('')
 
   const isPercentage =
   metricType === 'percentage' ||
@@ -374,8 +373,8 @@ setMetricType(kr?.metric_type ?? '')
 if (loadedMonth !== currentMonthKey) {
   setLocalTarget(resolvedTarget ? String(resolvedTarget) : '')
   setLoadedMonth(currentMonthKey)
-  setIsDirty(false)
 }
+
       const { data: current } = await supabase
         .from('key_result_updates')
         .select('value')
@@ -445,7 +444,6 @@ const total = jordyn + olivia
 // CURRENT VALUE
 // =========================
 setValue(total.toString())
-setLoadedMonth(currentMonthKey)
 
 // =========================
 // SCORE CALCULATION (ADD THIS)
@@ -507,18 +505,14 @@ const prevTotal = prevJordyn + prevOlivia
 
 setLastMonth(prevTotal.toString())
 
-// ✅ NOW EXIT
 return
 }
-
-
-        if (loadedMonth !== currentMonthKey && !isDirty) {
+if (!isDirty) {
   setValue(currentValue || '')
+
   if (setParentValue && currentValue !== undefined) {
-  setParentValue(Number(currentValue))
-}
-  setLoadedMonth(currentMonthKey)
-  
+    setParentValue(Number(currentValue))
+  }
 }
 
 
@@ -546,9 +540,10 @@ const reportingDate = `${y}-${m}-01`
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: Number(value),
-  
+    value: Number(value) || 0,
+    target_value: localTarget ? Number(localTarget) : null,
   },
+  
   { onConflict: 'key_result_id,reporting_month' }
 )
   }
@@ -609,14 +604,15 @@ onChange={async (e) => {
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-  await supabase.from('key_result_updates').upsert(
-    {
-      key_result_id: keyResultId,
-      reporting_month: reportingDate,
-      target_value: val ? Number(val) : null,
-    },
-    { onConflict: 'key_result_id,reporting_month' }
-  )
+ await supabase.from('key_result_updates').upsert(
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: Number(value) || 0,
+    target_value: val ? Number(val) : null,
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
 }}
 onKeyDown={handleEnter}
 />
