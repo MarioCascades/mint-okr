@@ -251,7 +251,7 @@ const resolvedTarget =
   ''
 
 // AUTO CREATE ROW FOR MONTH (carry forward target)
-if (!currentRow && resolvedTarget !== '') {
+if (currentRow?.target_value === null && resolvedTarget !== '') {
   await supabase
     .from('key_result_updates')
     .upsert({
@@ -264,16 +264,11 @@ if (!currentRow && resolvedTarget !== '') {
 }
 
 // SET TARGET
-setTarget(resolvedTarget.toString())
+if (!isEditing) {
+  setTarget(resolvedTarget.toString())
+}
 
-      const { data: current } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', currentDate)
-        .maybeSingle()
-
-      const currentValue =
+         const currentValue =
   currentRow && currentRow.value !== null
     ? currentRow.value
     : ''
@@ -290,7 +285,7 @@ const { data: prevData } = await supabase
       setLastMonth(prevData?.value ?? '')
 
      const c = Number(currentValue || 0)
-const t = Number(target || 0)
+    const t = Number(resolvedTarget || 0)
 
 if (!t || t <= 0) {
   setScore('')
