@@ -337,67 +337,114 @@ if (label === "Total Whitening Kits") {
 
         console.log("BASE OBJECT:", base)
 
-    
-      const formatDate = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+    const formatDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
-const currentDate2 = formatDate(selectedMonth)
+const currentMonthKey = selectedMonth.toISOString()
 
-const prev2 = new Date(selectedMonth)
-prev2.setMonth(prev2.getMonth() - 1)
+const currentDate = formatDate(selectedMonth)
 
-const prevDate2 = formatDate(prev2)
+const prevDateObj = new Date(selectedMonth)
+prevDateObj.setMonth(prevDateObj.getMonth() - 1)
+const prevDate = formatDate(prevDateObj)
 
+// ------------------------
+// FETCH CURRENT ROW
+// ------------------------
 
-// current month (value + target)
 const { data: currentRow } = await supabase
   .from('key_result_updates')
   .select('value, target_value')
   .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', currentDate2)
+  .eq('reporting_month', currentDate)
   .maybeSingle()
 
-// previous month target
+// ------------------------
+// FETCH PREVIOUS TARGET
+// ------------------------
+
 const { data: prevRow } = await supabase
   .from('key_result_updates')
   .select('target_value')
   .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', prevDate2)
+  .eq('reporting_month', prevDate)
   .maybeSingle()
 
-let resolvedTarget =
+// ------------------------
+// RESOLVE TARGET
+// ------------------------
+
+const resolvedTarget =
   currentRow?.target_value ??
   prevRow?.target_value ??
   null
 
-// carry forward if missing
+// ------------------------
+// CARRY FORWARD TARGET
+// ------------------------
+
 if (!currentRow?.target_value && resolvedTarget !== null) {
   await supabase
     .from('key_result_updates')
     .upsert({
       key_result_id: base.key_result_id,
-      reporting_month: currentDate2,
+      reporting_month: currentDate,
       target_value: resolvedTarget,
     }, {
       onConflict: 'key_result_id,reporting_month'
     })
 }
-const currentMonthKey = selectedMonth.toISOString()    
-// set target state
+
+// ------------------------
+// SET TARGET (SAFE)
+// ------------------------
+
 if (loadedMonth !== currentMonthKey && !isDirty) {
   setLocalTarget(
     resolvedTarget !== null ? resolvedTarget.toString() : ''
   )
 }
 
-      const { data: current } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', currentDate2)
-        .maybeSingle()
+// ------------------------
+// SET VALUE
+// ------------------------
 
-      const currentValue = current?.value ?? ''
+const currentValue = currentRow?.value ?? ''
+
+if (loadedMonth !== currentMonthKey && !isDirty) {
+  setValue(currentValue)
+  if (setParentValue && currentValue !== undefined) {
+    setParentValue(Number(currentValue))
+  }
+  setLoadedMonth(currentMonthKey)
+}
+
+// ------------------------
+// PREVIOUS MONTH VALUE
+// ------------------------
+
+const { data: prevData } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', prevDate)
+  .maybeSingle()
+
+if (loadedMonth !== currentMonthKey) {
+  setLastMonth(prevData?.value ?? '')
+}
+
+// ------------------------
+// SCORE
+// ------------------------
+
+const c = Number(currentValue)
+const t = Number(resolvedTarget ?? 0)
+
+if (t > 0) {
+  setScore(Math.round((c / t) * 100) + '%')
+}
+ 
         
       // =========================
 // GLOBAL TOTALS (JORDYN + OLIVIA)
@@ -533,21 +580,7 @@ return
   setLoadedMonth(currentMonthKey)
 }
 
-      const { data: prevData } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', prevDate2)
-        .maybeSingle()
-
-      if (loadedMonth !== currentMonthKey) {
-  setLastMonth(prevData?.value ?? '')
-}
-
-      const c = Number(currentValue)
-      const t = Number(localTarget || 0)
-
-      if (t > 0) {
+         if (t > 0) {
         setScore(Math.round((c / t) * 100) + '%')
       }
     }
