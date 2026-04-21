@@ -183,6 +183,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [showInitiatives, setShowInitiatives] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
@@ -251,7 +252,7 @@ const resolvedTarget =
   ''
 
 // AUTO CREATE ROW FOR MONTH (carry forward target)
-if (currentRow?.target_value === null && resolvedTarget !== '') {
+if (!currentRow && resolvedTarget !== '') {
   await supabase
     .from('key_result_updates')
     .upsert({
@@ -264,16 +265,25 @@ if (currentRow?.target_value === null && resolvedTarget !== '') {
 }
 
 // SET TARGET
-if (!isEditing) {
-  setTarget(resolvedTarget.toString())
-}
+setTarget(prev => {
+  // only set if empty (prevents overwrite)
+  if (prev === '') {
+    return resolvedTarget.toString()
+  }
+  return prev
+})
 
          const currentValue =
   currentRow && currentRow.value !== null
     ? currentRow.value
     : ''
 
-setValue(currentValue.toString())
+setValue(prev => {
+  if (prev === '') {
+    return currentValue.toString()
+  }
+  return prev
+})
 
 const { data: prevData } = await supabase
         .from('key_result_updates')
@@ -352,7 +362,11 @@ const isLowerBetter = (label: string) => {
           style={cell}
           value={target}
           disabled={!isEditing}
-          onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ''))}
+          onChange={(e) => {
+  const val = e.target.value.replace(/[^0-9]/g, '')
+  setTarget(val)
+  setIsDirty(true)
+}}
           onKeyDown={handleEnter}
         />
 
@@ -360,7 +374,11 @@ const isLowerBetter = (label: string) => {
           style={cell}
           value={value}
           disabled={!isEditing}
-          onChange={(e) => setValue(e.target.value.replace(/[^0-9]/g, ''))}
+          onChange={(e) => {
+  const val = e.target.value.replace(/[^0-9]/g, '')
+  setValue(val)
+  setIsDirty(true)
+}}
           onBlur={handleSave}
           onKeyDown={handleEnter}
         />
