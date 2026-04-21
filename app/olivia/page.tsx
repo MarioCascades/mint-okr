@@ -279,6 +279,12 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   const [showInitiatives, setShowInitiatives] = useState(false)
   const [loadedMonth, setLoadedMonth] = useState('')
   const [isDirty, setIsDirty] = useState(false)
+  // SYNC MASTER TARGET PROP INTO LOCAL STATE
+useEffect(() => {
+  if (target !== undefined) {
+    setLocalTarget(target)
+  }
+}, [target])
 
   const isPercentage =
   metricType === 'percentage' ||
@@ -302,8 +308,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   useEffect(() => {
 
     const fetchData = async () => {
-      setIsDirty(false)
-
+      
       const dbLabel = labelMap[label]
       console.log("LABEL:", label)
       console.log("DB LABEL:", dbLabel)
@@ -402,7 +407,7 @@ if (!currentRow?.target_value && resolvedTarget !== null) {
 // SET TARGET (SAFE)
 // ------------------------
 
-if (loadedMonth !== currentMonthKey) {
+if (loadedMonth !== currentMonthKey && !isDirty) {
   setLocalTarget(
     resolvedTarget !== null ? resolvedTarget.toString() : ''
   )
@@ -442,7 +447,11 @@ if (loadedMonth !== currentMonthKey) {
 // ------------------------
 
 const c = Number(currentValue)
-const t = Number(resolvedTarget ?? 0)
+const t = Number(localTarget || 0)
+
+if (t > 0) {
+  setScore(Math.round((c / t) * 100) + '%')
+}
 
         
       // =========================
@@ -508,7 +517,7 @@ setLoadedMonth(currentMonthKey)
 // =========================
 // SCORE CALCULATION 
 // =========================
-const t = Number(resolvedTarget ?? 0)
+const t = Number(localTarget || 0)
 
 if (t > 0) {
   setScore(Math.round((total / t) * 100) + '%')
