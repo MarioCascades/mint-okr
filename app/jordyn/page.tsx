@@ -345,12 +345,13 @@ const prevDate = formatDate(prev)
 // =======================
 // TARGET (MONTHLY SYSTEM)
 // =======================
-const { data: currentRow } = await supabase
+const { data: currentRows } = await supabase
   .from('key_result_updates')
   .select('target_value')
   .eq('key_result_id', base.key_result_id)
   .eq('reporting_month', currentDate)
-  .maybeSingle()
+
+const currentRow = currentRows?.[0] ?? null
 
   const { data: prevRows } = await supabase
   .from('key_result_updates')
@@ -363,16 +364,17 @@ const prevRow = prevRows?.[0] ?? null
 const resolvedTarget =
   currentRow?.target_value ??
   prevRow?.target_value ??
-  null
-
+  kr?.target_value ??
+  ''
   console.log("TARGET ROWS:", { currentRow, prevRow, kr })
 
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
 
 if (loadedMonth !== currentMonthKey) {
-  setLocalTarget(resolvedTarget ? resolvedTarget.toString() : '')
+  setLocalTarget(resolvedTarget ? String(resolvedTarget) : '')
   setLoadedMonth(currentMonthKey)
+  setIsDirty(false)
 }
       const { data: current } = await supabase
         .from('key_result_updates')
