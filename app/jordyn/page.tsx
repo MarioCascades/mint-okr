@@ -352,17 +352,17 @@ const { data: currentRow } = await supabase
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
-const { data: prevRow } = await supabase
+  const { data: prevRows } = await supabase
   .from('key_result_updates')
   .select('target_value')
   .eq('key_result_id', base.key_result_id)
   .eq('reporting_month', prevDate)
-  .maybeSingle()
+
+const prevRow = prevRows?.[0] ?? null
 
 const resolvedTarget =
   currentRow?.target_value ??
   prevRow?.target_value ??
-  kr?.target_value ??
   null
 
   console.log("TARGET ROWS:", { currentRow, prevRow, kr })
@@ -373,7 +373,6 @@ setMetricType(kr?.metric_type ?? '')
 if (loadedMonth !== currentMonthKey) {
   setLocalTarget(resolvedTarget ? resolvedTarget.toString() : '')
   setLoadedMonth(currentMonthKey)
-  setIsDirty(false)
 }
       const { data: current } = await supabase
         .from('key_result_updates')
@@ -584,7 +583,7 @@ const reportingDate = `${y}-${m}-01`
   : localTarget
 }
           disabled={!isEditing}
-         onChange={async (e) => {
+onChange={async (e) => {
   let val = ''
 
   if (isCurrency || isPercentage) {
@@ -601,9 +600,9 @@ const reportingDate = `${y}-${m}-01`
   }
 
   setLocalTarget(val)
-  setIsDirty(true)
 
-  if (keyResultId) {
+  if (!keyResultId) return
+
   const y = selectedMonth.getFullYear()
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
@@ -616,7 +615,6 @@ const reportingDate = `${y}-${m}-01`
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
-}
 }}
 onKeyDown={handleEnter}
 />
