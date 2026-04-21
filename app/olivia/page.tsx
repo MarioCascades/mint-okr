@@ -399,7 +399,7 @@ if (!currentRow?.target_value && resolvedTarget !== null) {
 // SET TARGET (SAFE)
 // ------------------------
 
-if (loadedMonth !== currentMonthKey && !isDirty) {
+if (loadedMonth !== currentMonthKey) {
   setLocalTarget(
     resolvedTarget !== null ? resolvedTarget.toString() : ''
   )
@@ -412,7 +412,7 @@ if (loadedMonth !== currentMonthKey && !isDirty) {
 const currentValue = currentRow?.value ?? ''
 
 if (loadedMonth !== currentMonthKey && !isDirty) {
-  setValue(currentValue)
+ setValue(currentValue.toString())
   if (setParentValue && currentValue !== undefined) {
     setParentValue(Number(currentValue))
   }
@@ -441,10 +441,6 @@ if (loadedMonth !== currentMonthKey) {
 const c = Number(currentValue)
 const t = Number(resolvedTarget ?? 0)
 
-if (t > 0) {
-  setScore(Math.round((c / t) * 100) + '%')
-}
- 
         
       // =========================
 // GLOBAL TOTALS (JORDYN + OLIVIA)
@@ -509,7 +505,7 @@ setLoadedMonth(currentMonthKey)
 // =========================
 // SCORE CALCULATION 
 // =========================
-const t = Number(localTarget || 0)
+const t = Number(resolvedTarget ?? 0)
 
 if (t > 0) {
   setScore(Math.round((total / t) * 100) + '%')
@@ -572,13 +568,7 @@ setLastMonth(prevTotal.toString())
 return
 }
 
-        if (loadedMonth !== currentMonthKey && !isDirty) {
-  setValue(currentValue || '')
-  if (setParentValue && currentValue !== undefined) {
-    setParentValue(Number(currentValue))
-  }
-  setLoadedMonth(currentMonthKey)
-}
+
 
          if (t > 0) {
         setScore(Math.round((c / t) * 100) + '%')
