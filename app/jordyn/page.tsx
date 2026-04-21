@@ -546,7 +546,7 @@ const reportingDate = `${y}-${m}-01`
     key_result_id: keyResultId,
     reporting_month: reportingDate,
     value: Number(value),
-    target_value: localTarget ? Number(localTarget) : null,
+  
   },
   { onConflict: 'key_result_id,reporting_month' }
 )
@@ -584,7 +584,7 @@ const reportingDate = `${y}-${m}-01`
   : localTarget
 }
           disabled={!isEditing}
-          onChange={(e) => {
+         onChange={async (e) => {
   let val = ''
 
   if (isCurrency || isPercentage) {
@@ -601,9 +601,25 @@ const reportingDate = `${y}-${m}-01`
   }
 
   setLocalTarget(val)
+  setIsDirty(true)
+
+  if (keyResultId) {
+  const y = selectedMonth.getFullYear()
+  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+  const reportingDate = `${y}-${m}-01`
+
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      target_value: val ? Number(val) : null,
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
+}
 }}
-          onKeyDown={handleEnter}
-        />
+onKeyDown={handleEnter}
+/>
 
         <input
           style={cell}
