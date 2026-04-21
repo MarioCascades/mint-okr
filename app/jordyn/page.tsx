@@ -365,14 +365,15 @@ const resolvedTarget =
   kr?.target_value ??
   null
 
+  console.log("TARGET ROWS:", { currentRow, prevRow, kr })
+
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
 
 if (loadedMonth !== currentMonthKey) {
   setLocalTarget(resolvedTarget ? resolvedTarget.toString() : '')
   setLoadedMonth(currentMonthKey)
-} else if (!isDirty && !localTarget) {
-  setLocalTarget(resolvedTarget ? resolvedTarget.toString() : '')
+  setIsDirty(false)
 }
       const { data: current } = await supabase
         .from('key_result_updates')
