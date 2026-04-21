@@ -271,12 +271,14 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
   const [dbTarget, setDbTarget] = useState('')
+  const [localTarget, setLocalTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [metricType, setMetricType] = useState('')
   const [showInitiatives, setShowInitiatives] = useState(false)
   const [loadedMonth, setLoadedMonth] = useState('')
   const [isDirty, setIsDirty] = useState(false)
+  
 
   const isPercentage =
   metricType === 'percentage' ||
@@ -333,6 +335,7 @@ const formatDate = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
 
 const currentDate = formatDate(selectedMonth)
+const currentMonthKey = selectedMonth.toISOString()    
 
 const prev = new Date(selectedMonth)
 prev.setMonth(prev.getMonth() - 1)
@@ -365,28 +368,11 @@ const resolvedTarget =
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
 
-if (!currentRow && resolvedTarget !== null) {
-  await supabase.from('key_result_updates').upsert({
-    key_result_id: base.key_result_id,
-    reporting_month: currentDate,
-    target_value: resolvedTarget,
-  }, {
-    onConflict: 'key_result_id,reporting_month'
-  })
+if (loadedMonth !== currentMonthKey) {
+  setLocalTarget(resolvedTarget ? resolvedTarget.toString() : '')
+  setLoadedMonth(currentMonthKey)
 }
-
-let finalTarget = dbTarget
-
-if (label !== "Total Whitening Kits") {
-  finalTarget =
-    (derivedTarget && Number(derivedTarget) > 0)
-      ? derivedTarget
-      : (Number(target) > 0
-          ? target
-          : dbTarget)
-}
-      
-
+     
       const { data: current } = await supabase
         .from('key_result_updates')
         .select('value')
@@ -395,8 +381,9 @@ if (label !== "Total Whitening Kits") {
         .maybeSingle()
 
       const currentValue = current?.value ?? base.current_value ?? ''
-      const currentMonthKey = selectedMonth.toISOString()      
-      // =========================
+        
+
+// =========================
 //  GLOBAL TOTALS (JORDYN + OLIVIA)
 // =========================
 
@@ -595,12 +582,12 @@ setLastMonth(prevTotal.toString())
   setLastMonth(prevData?.value ?? '')
 }
 
-      const c = Number(currentValue)
-      const t = Number(finalTarget)
+const c = Number(currentValue)
+const t = Number(localTarget || dbTarget || 0)
 
-      if (t > 0) {
-        setScore(Math.round((c / t) * 100) + '%')
-      }
+if (t > 0) {
+  setScore(Math.round((c / t) * 100) + '%')
+}
     }
 
     fetchData()
@@ -610,36 +597,26 @@ setLastMonth(prevTotal.toString())
   const handleSave = async () => {
 
     if (!keyResultId) return
-
-    const y = selectedMonth.getFullYear()
-    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
-    const reportingDate = `${y}-${m}-01`
+    
+const y = selectedMonth.getFullYear()
+const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+const reportingDate = `${y}-${m}-01`
 
     await supabase.from('key_result_updates').upsert(
-      {
-        key_result_id: keyResultId,
-        reporting_month: reportingDate,
-        value: Number(value),
-      },
-      { onConflict: 'key_result_id,reporting_month' }
-    )
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: Number(value),
+    target_value: localTarget ? Number(localTarget) : null,
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
   }
 
   const getScoreColor = () => {
     const num = Number(score.replace('%', ''))
     return num >= 100 ? '#22c55e' : '#c2410c'
   }
-
-let finalTarget = dbTarget
-
-if (label !== "Total Whitening Kits") {
-  finalTarget =
-    (derivedTarget && Number(derivedTarget) > 0)
-      ? derivedTarget
-      : (Number(target) > 0
-          ? target
-          : dbTarget)
-}
 
   return (
     <div style={{ marginBottom: 10 }}>
@@ -661,13 +638,13 @@ if (label !== "Total Whitening Kits") {
         <input
           style={cell}
           value={
-          isCurrency && finalTarget
-          ? '$' + Number(finalTarget).toLocaleString()
-            : isPercentage && finalTarget
-  ? Number(finalTarget) + '%'
-          : finalTarget
+  isCurrency && localTarget
+    ? '$' + Number(localTarget).toLocaleString()
+  : isPercentage && localTarget
+    ? Number(localTarget) + '%'
+  : localTarget
 }
-          disabled={!isEditing || derivedTarget !== undefined}
+          disabled={!isEditing}
           onChange={(e) => {
   let val = ''
 
@@ -684,7 +661,7 @@ if (label !== "Total Whitening Kits") {
     val = e.target.value.replace(/[^0-9]/g, '')
   }
 
-  setTarget?.(val)
+  setLocalTarget(val)
 }}
           onKeyDown={handleEnter}
         />
