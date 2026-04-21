@@ -294,6 +294,14 @@ useEffect(() => {
   label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
 
+  const formatCurrency = (val: string | number) => {
+  if (val === '' || val === null || val === undefined) return ''
+  return '$' + Number(val).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
+}
+
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
       e.preventDefault()
@@ -627,7 +635,7 @@ return
           style={cell}
           value={
   isCurrency && lastMonth
-    ? '$' + Number(lastMonth).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  ? formatCurrency(lastMonth)
    : isPercentage && lastMonth
   ? Number(lastMonth) + '%'
     : lastMonth
@@ -637,7 +645,15 @@ return
 
         <input
           style={cell}
-          value={localTarget}
+          value={
+  isEditing
+    ? localTarget
+    : isCurrency && localTarget
+    ? formatCurrency(localTarget)
+    : isPercentage && localTarget
+    ? localTarget + '%'
+    : localTarget
+}
 
           disabled={
   !isEditing && !target
@@ -672,20 +688,20 @@ return
         <input
   style={cell}
   value={
-    forcedValue !== undefined
-      ? (label === "Total Production"
-          ? '$' + Number(forcedValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : forcedValue)
-      : (
-          isEditing
-            ? value
-            : isCurrency && value
-            ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : isPercentage && value
-            ? value + '%'
-            : value
-        )
-  }
+  forcedValue !== undefined
+    ? (isCurrency
+        ? formatCurrency(forcedValue)
+        : forcedValue)
+    : (
+        isEditing
+          ? value
+          : isCurrency && value
+          ? formatCurrency(value)
+          : isPercentage && value
+          ? value + '%'
+          : value
+      )
+}
   disabled={!isEditing || (isComputed && label !== "Total Whitening Kits")}
   onChange={(e) => {
     let val = ''
@@ -700,7 +716,14 @@ return
     val += '.' + parts[1].slice(0, 2)
   }
 } else {
-  val = e.target.value.replace(/[^0-9]/g, '')
+  const raw = e.target.value.replace(/[^0-9.]/g, '')
+  const parts = raw.split('.')
+
+  val = parts[0]
+
+  if (parts.length > 1) {
+    val += '.' + parts[1].slice(0, 2)
+  }
 }
     setValue(val)
     setIsDirty(true)
