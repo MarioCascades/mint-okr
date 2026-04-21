@@ -317,12 +317,19 @@ setScheduledTarget(scheduledTargetValue)
   : 0
       setPrevConversion(prevConversionValue)
 
-      const conversionTargetValue = await getTargetWithCarryForward(
+     const jordynConversionTarget = await getTargetWithCarryForward(
   'Jordyn',
   labelMap["Conversion Rate"]
 )
-    setConversionTarget(conversionTargetValue)
 
+const oliviaConversionTarget = await getTargetWithCarryForward(
+  'Olivia',
+  labelMap["Conversion Rate"]
+)
+
+setConversionTarget(
+  (jordynConversionTarget + oliviaConversionTarget) / 2
+)
 
       const jordynKits = await getValue('Jordyn', labelMap["Whitening Kits"])
       const oliviaKits = await getValue('Olivia', labelMap["Whitening Kits"])
@@ -426,10 +433,7 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
   prev={prevStarts}
   target={startsTarget}
   setTarget={setStartsTarget}
-  onSave={() => {
-  saveTarget('Jordyn', 'Total Starts (Individual)', startsTarget / 2, selectedMonth)
-  saveTarget('Olivia', 'Total Starts (Individual)', startsTarget / 2, selectedMonth)
-}}
+ 
 />
         <Card
   title="Total Production"
@@ -437,10 +441,8 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
   prev={`$${Number(prevProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
   target={productionTarget}
   setTarget={setProductionTarget}
-  onSave={() => {
-    saveTarget('Jordyn', 'Total Production (Individual)', productionTarget / 2, selectedMonth)
-    saveTarget('Olivia', 'Total Production (Individual)', productionTarget / 2, selectedMonth)
-  }}
+ 
+
 />
         <Card 
   title="Scheduled New Patients" 
@@ -448,14 +450,8 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
   prev={prevScheduled}
   target={scheduledTarget}
   setTarget={setScheduledTarget}
- onSave={() => {
-  saveTarget(
-    'Jordyn',
-    labelMap["Scheduled New Patients"],
-    scheduledTarget,
-    selectedMonth
-  )
-}}
+  
+
 />
         <Card 
   title="Kept New Patients" 
@@ -463,10 +459,8 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
   prev={prevKept}
   target={keptTarget}
   setTarget={setKeptTarget}
-  onSave={() => {
-    saveTarget('Jordyn', labelMap["Kept New Patients"], keptTarget / 2, selectedMonth)
-    saveTarget('Olivia', labelMap["Kept New Patients"], keptTarget / 2, selectedMonth)
-  }}
+  
+
 />
 
         <Card 
@@ -475,14 +469,7 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
   prev={`${prevConversion.toFixed(0)}%`}
   target={conversionTarget}
   setTarget={setConversionTarget}
-  onSave={() => {
-  saveTarget(
-    'Jordyn',
-    labelMap["Conversion Rate"],
-    conversionTarget,
-    selectedMonth
-  )
-}}
+  
 />
         <Card 
   title="Total Whitening Kits" 
@@ -490,10 +477,7 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
   prev={prevKits}
   target={kitsTarget}
   setTarget={setKitsTarget}
-  onSave={() => {
-    saveTarget('Jordyn', labelMap["Whitening Kits"], kitsTarget / 2, selectedMonth)
-    saveTarget('Olivia', labelMap["Whitening Kits"], kitsTarget / 2, selectedMonth)
-  }}
+
 />
 
       </div>
@@ -512,7 +496,7 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
 // CARD
 // =========================
 
-const Card = ({ title, value, prev = 0, target = 0, setTarget, onSave }: any) => (
+const Card = ({ title, value, prev = 0, target = 0 }: any) =>
   <div style={card}>
     <div style={cardTitle}>{title}</div>
     <div style={cardValue}>{value}</div>
@@ -526,85 +510,13 @@ const Card = ({ title, value, prev = 0, target = 0, setTarget, onSave }: any) =>
   <div>
     <span style={smallLabel}>Target</span>
 
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <input
-        style={{ ...smallBox, width: 100 }}
-        value={target}
-        onChange={(e) => {
-          const val = e.target.value.replace(/[^0-9]/g, '')
-          setTarget(Number(val))
-        }}
-      />
-
-      {/* ✅ SAVE BUTTON */}
-      <button
-        style={{
-          background: '#0F766E',
-          border: 'none',
-          padding: '6px 10px',
-          cursor: 'pointer',
-          color: '#fff',
-          borderRadius: 6,
-          fontWeight: 600
-        }}
-        onClick={onSave}
-      >
-        ✓
-      </button>
-    </div>
+  <div style={{ ...smallBox, width: 100 }}>
+  {target}
+</div>
   </div>
 </div>
   </div>
-)
-const saveTarget = async (
-  user: string,
-  krTitle: string,
-  targetValue: number,
-  selectedMonth: Date
-) => {
 
-  const reportingMonth = formatDate(selectedMonth)
-
-  // get key_result_id
-  const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', user)
-    .eq('key_result_title', krTitle)
-    .maybeSingle()
-
-  if (!row) {
-    console.log('no key_result_id found')
-    return
-  }
-
-  // check if record exists
-  const { data: existing } = await supabase
-    .from('key_result_updates')
-    .select('id')
-    .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', reportingMonth)
-    .maybeSingle()
-
-  if (existing) {
-    await supabase
-      .from('key_result_updates')
-      .update({
-        target_value: targetValue
-      })
-      .eq('id', existing.id)
-  } else {
-    await supabase
-      .from('key_result_updates')
-      .insert({
-        key_result_id: row.key_result_id,
-        reporting_month: reportingMonth,
-        target_value: targetValue
-      })
-  }
-
-  console.log('saved target', { user, krTitle, targetValue, reportingMonth })
-}
 
 // =========================
 // STYLES
