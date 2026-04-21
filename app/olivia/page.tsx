@@ -640,9 +640,9 @@ return
           value={localTarget}
 
           disabled={
-  !isEditing && label !== "Total Whitening Kits"
+  !isEditing && !target
 }
-         onChange={(e) => {
+       onChange={(e) => {
   let val = ''
 
   if (isCurrency || isPercentage) {
@@ -659,6 +659,12 @@ return
   }
 
   setLocalTarget(val)
+  setIsDirty(true)
+
+  // 🔥 THIS IS THE FIX
+  if (setTarget) {
+    setTarget(val)
+  }
 }}
           onKeyDown={handleEnter}
         />
