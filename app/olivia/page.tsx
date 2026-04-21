@@ -370,7 +370,7 @@ if (label === "Total Whitening Kits") {
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
-      const currentValue = current?.value ?? base.current_value ?? ''
+      const currentValue = current?.value ?? ''
       const currentMonthKey = selectedMonth.toISOString()      
       // =========================
 // GLOBAL TOTALS (JORDYN + OLIVIA)
@@ -497,66 +497,12 @@ setLastMonth(prevTotal.toString())
 
 return
 }
-// =========================
-//  PREVIOUS MONTH FOR TOTALS
-// =========================
-
-const prevDateObj = new Date(selectedMonth)
-prevDateObj.setMonth(prevDateObj.getMonth() - 1)
-
-const prevY = prevDateObj.getFullYear()
-const prevM = String(prevDateObj.getMonth() + 1).padStart(2, '0')
-const prevReportingDate = `${prevY}-${prevM}-01`
-
-const getPrevValue = async (user: string, krTitle: string) => {
-
-  const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', user)
-    .eq('key_result_title', krTitle)
-    .maybeSingle()
-
-  if (!row) return 0
-
-  const { data: update } = await supabase
-    .from('key_result_updates')
-    .select('value')
-    .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', prevReportingDate)
-    .maybeSingle()
-
-  return Number(update?.value ?? 0)
-}
-
-let prevJordyn = 0
-let prevOlivia = 0
-
-if (label === "Total Starts") {
-  prevJordyn = await getPrevValue("Jordyn", "Total Starts (Individual)")
-  prevOlivia = await getPrevValue("Olivia", "Total Starts (Individual)")
-}
-
-if (label === "Total Production") {
-  prevJordyn = await getPrevValue("Jordyn", "Total Production (Individual)")
-  prevOlivia = await getPrevValue("Olivia", "Total Production (Individual)")
-}
-
-if (label === "Total Whitening Kits") {
-  prevJordyn = await getPrevValue("Jordyn", "Whitening Kits")
-  prevOlivia = await getPrevValue("Olivia", "Whitening Kits")
-}
-
-const prevTotal = prevJordyn + prevOlivia
-
-setLastMonth(prevTotal.toString())
-
 
         if (loadedMonth !== currentMonthKey && !isDirty) {
   setValue(currentValue || '')
   if (setParentValue && currentValue !== undefined) {
-  setParentValue(Number(currentValue))
-}
+    setParentValue(Number(currentValue))
+  }
   setLoadedMonth(currentMonthKey)
 }
 
@@ -572,7 +518,7 @@ setLastMonth(prevTotal.toString())
 }
 
       const c = Number(currentValue)
-      const t = Number(finalTarget)
+      const t = Number(kr?.target_value ?? 0)
 
       if (t > 0) {
         setScore(Math.round((c / t) * 100) + '%')
