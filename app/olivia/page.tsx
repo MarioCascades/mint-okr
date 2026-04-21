@@ -382,11 +382,13 @@ if (!currentRow?.target_value && resolvedTarget !== null) {
       onConflict: 'key_result_id,reporting_month'
     })
 }
-
+const currentMonthKey = selectedMonth.toISOString()    
 // set target state
-setLocalTarget(
-  resolvedTarget !== null ? resolvedTarget.toString() : ''
-)
+if (loadedMonth !== currentMonthKey && !isDirty) {
+  setLocalTarget(
+    resolvedTarget !== null ? resolvedTarget.toString() : ''
+  )
+}
 
       const { data: current } = await supabase
         .from('key_result_updates')
@@ -396,7 +398,7 @@ setLocalTarget(
         .maybeSingle()
 
       const currentValue = current?.value ?? ''
-      const currentMonthKey = selectedMonth.toISOString()      
+        
       // =========================
 // GLOBAL TOTALS (JORDYN + OLIVIA)
 // =========================
