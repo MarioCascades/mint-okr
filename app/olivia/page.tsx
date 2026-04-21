@@ -375,7 +375,10 @@ const { data: prevRow } = await supabase
   .from('key_result_updates')
   .select('target_value')
   .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', prevDate)
+  .lt('reporting_month', currentDate)
+  .not('target_value', 'is', null)
+  .order('reporting_month', { ascending: false })
+  .limit(1)
   .maybeSingle()
 
 // ------------------------
@@ -391,7 +394,7 @@ const resolvedTarget =
 // CARRY FORWARD TARGET
 // ------------------------
 
-if (!currentRow?.target_value && resolvedTarget !== null) {
+if (currentRow?.target_value === null && resolvedTarget !== null) {
   await supabase
     .from('key_result_updates')
     .upsert({
