@@ -524,26 +524,43 @@ const Card = ({ title, value, prev = 0, target = 0, setTarget, onSave }: any) =>
     <div style={cardTitle}>{title}</div>
     <div style={cardValue}>{value}</div>
 
-    <div style={bottomRow}>
-      <div>
-        <span style={smallLabel}>Previous</span>
-        <div style={smallBox}>{prev}</div>
-      </div>
+   <div style={bottomRow}>
+  <div>
+    <span style={smallLabel}>Previous</span>
+    <div style={smallBox}>{prev}</div>
+  </div>
 
-      <div>
-        <span style={smallLabel}>Target</span>
+  <div>
+    <span style={smallLabel}>Target</span>
 
-        <input
-          style={smallBox}
-          value={target}
-          onChange={(e) => {
-            const val = e.target.value.replace(/[^0-9]/g, '')
-            setTarget(Number(val))
-          }}
-          onBlur={onSave}
-        />
-      </div>
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <input
+        style={{ ...smallBox, width: 100 }}
+        value={target}
+        onChange={(e) => {
+          const val = e.target.value.replace(/[^0-9]/g, '')
+          setTarget(Number(val))
+        }}
+      />
+
+      {/* ✅ SAVE BUTTON */}
+      <button
+        style={{
+          background: '#0F766E',
+          border: 'none',
+          padding: '6px 10px',
+          cursor: 'pointer',
+          color: '#fff',
+          borderRadius: 6,
+          fontWeight: 600
+        }}
+        onClick={onSave}
+      >
+        ✓
+      </button>
     </div>
+  </div>
+</div>
   </div>
 )
 const saveTarget = async (
@@ -608,16 +625,15 @@ const grid : React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 
 
 const card : React.CSSProperties = { 
   background: '#FFFFFF',
-  border: '1px solid #F1F5F9', // lighter border
+  border: '1px solid #E5E7EB',
   borderRadius: 16,
   padding: 20,
 
-  // THIS CREATES FLOAT EFFECT
   boxShadow: '0 10px 25px rgba(0, 0, 0, 0.05)',
 
-  //subtle lift feeling
   transition: 'all 0.2s ease'
 }
+
 const cardTitle : React.CSSProperties = { fontSize: 16, marginBottom: 10 }
 const cardValue : React.CSSProperties = { fontSize: 40, fontWeight: 800, marginBottom: 20 }
 
