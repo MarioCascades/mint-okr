@@ -430,13 +430,22 @@ if (loadedMonth !== currentMonthKey && !isDirty) {
 // SET VALUE
 // ------------------------
 
-const currentValue = currentRow?.value ?? ''
+const currentValue =
+  currentRow && currentRow.value !== null
+    ? currentRow.value
+    : ''
 
 if (loadedMonth !== currentMonthKey && !isDirty) {
- setValue(currentValue.toString())
-  if (setParentValue && currentValue !== undefined) {
-    setParentValue(Number(currentValue))
+  setValue(
+    currentRow && currentRow.value !== null
+      ? currentRow.value.toString()
+      : ''
+  )
+
+  if (setParentValue && currentRow?.value !== undefined) {
+    setParentValue(Number(currentRow.value ?? 0))
   }
+
   setLoadedMonth(currentMonthKey)
 }
 
