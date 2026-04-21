@@ -533,15 +533,30 @@ const Card = ({ title, value, prev = 0, target = 0, setTarget, onSave }: any) =>
       <div>
         <span style={smallLabel}>Target</span>
 
-        <input
-          style={smallBox}
-          value={target}
-          onChange={(e) => {
-            const val = e.target.value.replace(/[^0-9]/g, '')
-            setTarget(Number(val))
-          }}
-          onBlur={onSave}
-        />
+        <div style={{ display: 'flex', gap: 6 }}>
+  <input
+    style={{ ...smallBox, flex: 1 }}
+    value={target}
+    onChange={(e) => {
+      const val = e.target.value.replace(/[^0-9]/g, '')
+      setTarget(Number(val))
+    }}
+  />
+
+  <button
+    style={{
+      background: '#00AEEF',
+      border: 'none',
+      padding: '4px 6px',
+      cursor: 'pointer',
+      color: '#000',
+      borderRadius: 4
+    }}
+    onClick={onSave}
+  >
+    ✓
+  </button>
+</div>
       </div>
     </div>
   </div>
