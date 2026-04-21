@@ -11,8 +11,8 @@ import { supabase } from '../lib/supabase'
 // ================= LABEL MAP =================
 
 const labelMap: Record<string, string> = {
-  "Total Starts (Individual)": "Total Starts (Individual)",
-  "Total Production (Individual)": "Total Production (Individual)",
+  "Total Starts": "TC Total Starts",
+  "Total Production": "TC Total Production after Discounts",
   "Kept New Patients": "TC Kept New Patients"
 }
 
@@ -155,26 +155,41 @@ export default function Home() {
 
       return Number(update?.value ?? 0)
     }
+const getTargetWithCarryForward = async (user: string, krTitle: string) => {
 
-    const getTarget = async (user: string, krTitle: string) => {
-      const { data: row } = await supabase
-        .from('dashboard_okr_data')
-        .select('key_result_id')
-        .eq('user_name', user)
-        .eq('key_result_title', krTitle)
-        .maybeSingle()
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', user)
+    .eq('key_result_title', krTitle)
+    .maybeSingle()
 
-      if (!row) return 0
+  if (!row) return 0
 
-      const { data: kr } = await supabase
-        .from('key_results')
-        .select('target_value')
-        .eq('id', row.key_result_id)
-        .maybeSingle()
+  const { data: current } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingDate)
+    .maybeSingle()
 
-      return Number(kr?.target_value ?? 0)
-    }
-    // =========================
+  if (current?.target_value !== null && current?.target_value !== undefined) {
+    return Number(current.target_value)
+  }
+
+  const { data: prev } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .lt('reporting_month', reportingDate)
+    .not('target_value', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  return Number(prev?.target_value ?? 0)
+}
+    //=======
     // LAST UPDATED (GLOBAL)
     // =========================
 
@@ -198,8 +213,8 @@ export default function Home() {
     const poStarts = await getPrevValue('Olivia', 'Total Starts (Individual)')
     setPrevStarts(pjStarts + poStarts)
 
-    const jt = await getTarget('Jordyn', 'Total Starts (Individual)')
-    const ot = await getTarget('Olivia', 'Total Starts (Individual)')
+    const jt = await getTargetWithCarryForward('Jordyn', 'Total Starts')
+    const ot = await getTargetWithCarryForward('Olivia', 'Total Starts')
 
     setStartsTarget(jt + ot)
 
@@ -212,8 +227,8 @@ export default function Home() {
     const poProd = await getPrevValue('Olivia', 'Total Production (Individual)')
     setPrevProduction(pjProd + poProd)
 
-    const jtProd = await getTarget('Jordyn', 'Total Production (Individual)')
-    const otProd = await getTarget('Olivia', 'Total Production (Individual)')
+    const jtProd = await getTargetWithCarryForward('Jordyn', 'TC Total Production after Discounts')
+    const otProd = await getTargetWithCarryForward('Olivia', 'TC Total Production after Discounts')
     setProductionTarget(jtProd + otProd)
 
     // SCHEDULED
@@ -225,6 +240,11 @@ export default function Home() {
     const poScheduled = await getPrevValue('Olivia', 'TC Scheduled New Patients')
     setPrevScheduled(pjScheduled + poScheduled)
 
+     const scheduledTarget = await getTargetWithCarryForward(
+  'Jordyn',
+  'TC Scheduled New Patients'
+)
+
     // KEPT
     const jKept = await getValue('Jordyn', labelMap["Kept New Patients"])
     const oKept = await getValue('Olivia', labelMap["Kept New Patients"])
@@ -234,19 +254,21 @@ export default function Home() {
     const poKept = await getPrevValue('Olivia', labelMap["Kept New Patients"])
     setPrevKept(pjKept + poKept)
 
-    const jtKept = await getTarget('Jordyn', labelMap["Kept New Patients"])
-    const otKept = await getTarget('Olivia', labelMap["Kept New Patients"])
+    const jtKept = await getTargetWithCarryForward('Jordyn', labelMap["Kept New Patients"])
+    const otKept = await getTargetWithCarryForward('Olivia', labelMap["Kept New Patients"])
     setKeptTarget(jtKept + otKept)
+
+  
   }
 
 const macroConversion =
-  kept > 0 ? (starts / kept) * 100 : 0
+  starts > 0 ? (kept / starts) * 100 : 0
 
 const prevConversion =
-  prevKept > 0 ? (prevStarts / prevKept) * 100 : 0
+  prevStarts > 0 ? (prevKept / prevStarts) * 100 : 0
 
 const conversionTarget =
-  keptTarget > 0 ? (startsTarget / keptTarget) * 100 : 0
+  keptTarget > 0 ? (keptTarget / startsTarget) * 100 : 0 
 
   return (
     <div style={container}>

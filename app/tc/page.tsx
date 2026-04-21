@@ -122,8 +122,7 @@ export default function Page() {
 
     const reportingDate = formatDate(selectedMonth)
 
-    // ✅ ADD THIS HERE (TOP OF fetchData)
-const getTargetWithCarryForward = async (user: string, krTitle: string) => {
+  const getTargetWithCarryForward = async (user: string, krTitle: string) => {
 
   const { data: row } = await supabase
     .from('dashboard_okr_data')
@@ -230,12 +229,6 @@ const getPrevValue = async (user: string, krTitle: string) => {
 
     setPrevStarts(prevJStarts + prevOStarts)
 
-const { data: row } = await supabase
-  .from('dashboard_okr_data')
-  .select('key_result_id')
-  .eq('user_name', 'Jordyn')
-  .eq('key_result_title', labelMap["Total Starts (Individual)"])
-  .maybeSingle()
 
 const jordynStartsTarget = await getTargetWithCarryForward(
   'Jordyn',
