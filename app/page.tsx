@@ -166,25 +166,29 @@ const getTargetWithCarryForward = async (user: string, krTitle: string) => {
 
   if (!row) return 0
 
+  const start = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1)
+  const end = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 1)
+
   const { data: current } = await supabase
     .from('key_result_updates')
     .select('target_value')
     .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', reportingDate)
+    .gte('reporting_month', start.toISOString())
+    .lt('reporting_month', end.toISOString())
     .maybeSingle()
 
   if (current?.target_value !== null && current?.target_value !== undefined) {
     return Number(current.target_value)
   }
 
+  const prevStart = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1, 1)
+
   const { data: prev } = await supabase
     .from('key_result_updates')
     .select('target_value')
     .eq('key_result_id', row.key_result_id)
-    .lt('reporting_month', reportingDate)
-    .not('target_value', 'is', null)
-    .order('reporting_month', { ascending: false })
-    .limit(1)
+    .gte('reporting_month', prevStart.toISOString())
+    .lt('reporting_month', start.toISOString())
     .maybeSingle()
 
   return Number(prev?.target_value ?? 0)
@@ -213,8 +217,8 @@ const getTargetWithCarryForward = async (user: string, krTitle: string) => {
     const poStarts = await getPrevValue('Olivia', 'Total Starts (Individual)')
     setPrevStarts(pjStarts + poStarts)
 
-    const jt = await getTargetWithCarryForward('Jordyn', 'Total Starts')
-    const ot = await getTargetWithCarryForward('Olivia', 'Total Starts')
+    const jt = await getTargetWithCarryForward('Jordyn', 'Total Starts (Individual)')
+    const ot = await getTargetWithCarryForward('Olivia', 'Total Starts (Individual)')
 
     setStartsTarget(jt + ot)
 
@@ -227,8 +231,8 @@ const getTargetWithCarryForward = async (user: string, krTitle: string) => {
     const poProd = await getPrevValue('Olivia', 'Total Production (Individual)')
     setPrevProduction(pjProd + poProd)
 
-    const jtProd = await getTargetWithCarryForward('Jordyn', 'TC Total Production after Discounts')
-    const otProd = await getTargetWithCarryForward('Olivia', 'TC Total Production after Discounts')
+    const jtProd = await getTargetWithCarryForward('Jordyn', 'Total Production (Individual)')
+    const otProd = await getTargetWithCarryForward('Olivia', 'Total Production (Individual)')
     setProductionTarget(jtProd + otProd)
 
     // SCHEDULED
@@ -239,11 +243,7 @@ const getTargetWithCarryForward = async (user: string, krTitle: string) => {
     const pjScheduled = await getPrevValue('Jordyn', 'TC Scheduled New Patients')
     const poScheduled = await getPrevValue('Olivia', 'TC Scheduled New Patients')
     setPrevScheduled(pjScheduled + poScheduled)
-
-     const scheduledTarget = await getTargetWithCarryForward(
-  'Jordyn',
-  'TC Scheduled New Patients'
-)
+    const scheduledTarget = await getTargetWithCarryForward('Jordyn','TC Scheduled New Patients')
 
     // KEPT
     const jKept = await getValue('Jordyn', labelMap["Kept New Patients"])
@@ -268,7 +268,7 @@ const prevConversion =
   prevStarts > 0 ? (prevKept / prevStarts) * 100 : 0
 
 const conversionTarget =
-  keptTarget > 0 ? (keptTarget / startsTarget) * 100 : 0 
+  keptTarget > 0 ? ( startsTarget / keptTarget) * 100 : 0 
 
   return (
     <div style={container}>
