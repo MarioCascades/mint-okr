@@ -376,7 +376,7 @@ const { data: prevData } = await supabase
 
   const handleSave = async () => {
 
-  if (!keyResultId) return
+ if (!keyResultId) return
 
   const y = selectedMonth.getFullYear()
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
@@ -400,26 +400,37 @@ const handleInitiativeSave = async (
   index: number,
   text: string
 ) => {
-  if (!keyResultId) return
+  if (!keyResultId) {
+  console.log('NO keyResultId')
+  return
+}
 
+console.log('Saving initiative:', {
+  keyResultId,
+  index,
+  text
+})
   const reportingDate = `${selectedMonth.getFullYear()}-${String(
     selectedMonth.getMonth() + 1
   ).padStart(2, '0')}-01`
 
-  await supabase
-    .from('initiatives')
-    .upsert(
-      {
-        key_result_id: keyResultId,
-        reporting_month: reportingDate,
-        initiative_index: index + 1,
-        text
-      },
-      {
-        onConflict:
-          'key_result_id,reporting_month,initiative_index'
-      }
-    )
+  const { data, error } = await supabase
+  .from('initiatives')
+  .upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      initiative_index: index + 1,
+      text
+    },
+    {
+      onConflict:
+        'key_result_id,reporting_month,initiative_index'
+    }
+  )
+
+console.log('initiative save result:', data)
+console.log('initiative save error:', error)
 }
 
   return (
