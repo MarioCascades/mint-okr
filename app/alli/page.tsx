@@ -400,16 +400,7 @@ const handleInitiativeSave = async (
   index: number,
   text: string
 ) => {
-  if (!keyResultId) {
-  console.log('NO keyResultId')
-  return
-}
-
-console.log('Saving initiative:', {
-  keyResultId,
-  index,
-  text
-})
+  if (!keyResultId) return
   const reportingDate = `${selectedMonth.getFullYear()}-${String(
     selectedMonth.getMonth() + 1
   ).padStart(2, '0')}-01`
