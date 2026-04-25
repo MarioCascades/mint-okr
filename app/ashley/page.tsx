@@ -465,6 +465,11 @@ const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [showInitiatives, setShowInitiatives] = useState(false)
+  const [initiatives, setInitiatives] = useState([
+  '',
+  '',
+  ''
+])
 
 
   const rowRef = useRef<HTMLDivElement | null>(null)
@@ -490,12 +495,6 @@ if (!baseData || baseData.length === 0) {
 
 setKeyResultId(baseData[0].key_result_id)
 
-  const formatDate = (d: Date) => {
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  return `${year}-${month}-01`
-}
-    const currentDate = formatDate(selectedMonth)
 
 const currentStart = new Date(
   selectedMonth.getFullYear(),
@@ -511,6 +510,72 @@ const currentEnd = new Date(
   nextMonth.getMonth(),
   1
 )
+
+const initiativeDate = `${selectedMonth.getFullYear()}-${String(
+  selectedMonth.getMonth() + 1
+).padStart(2, '0')}-01`
+
+const initiativeNextMonth = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() + 1,
+  1
+)
+
+const { data: currentInitiatives } = await supabase
+  .from('initiatives')
+  .select('initiative_index, text')
+  .eq('key_result_id', baseData[0].key_result_id)
+  .gte('reporting_month', currentStart.toISOString())
+  .lt('reporting_month', initiativeNextMonth.toISOString())
+  .order('initiative_index', { ascending: true })
+
+let loaded = ['', '', '']
+
+if (currentInitiatives && currentInitiatives.length > 0) {
+  currentInitiatives.forEach((row) => {
+    if (
+      row.initiative_index >= 1 &&
+      row.initiative_index <= 3
+    ) {
+      loaded[row.initiative_index - 1] = row.text || ''
+    }
+  })
+} else {
+  const { data: previousInitiatives } = await supabase
+    .from('initiatives')
+    .select('initiative_index, text, reporting_month')
+    .eq('key_result_id', baseData[0].key_result_id)
+    .lt('reporting_month', initiativeDate)
+    .order('reporting_month', { ascending: false })
+    .order('initiative_index', { ascending: true })
+
+  if (previousInitiatives && previousInitiatives.length > 0) {
+    const latestMonth =
+      previousInitiatives[0].reporting_month
+
+    previousInitiatives
+      .filter((row) => row.reporting_month === latestMonth)
+      .forEach((row) => {
+        if (
+          row.initiative_index >= 1 &&
+          row.initiative_index <= 3
+        ) {
+          loaded[row.initiative_index - 1] =
+            row.text || ''
+        }
+      })
+  }
+}
+
+setInitiatives(loaded)
+
+  const formatDate = (d: Date) => {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  return `${year}-${month}-01`
+}
+    const currentDate = formatDate(selectedMonth)
+
 
 const { data: currentData } = await supabase
   .from('key_result_updates')
@@ -663,6 +728,7 @@ console.log('GLOBAL SAVE USING ID:', keyResultId, 'LABEL:', label)
 }, [keyResultId, value, target, selectedMonth])
 
 const handleSave = async (monthOverride?: Date, passedId?: string | null) => {
+  
 console.log('HANDLE SAVE FIRED:', label, value, target, passedId, keyResultId)
   const finalId = passedId || keyResultId
   console.log('FINAL ID USED:', finalId)
@@ -717,6 +783,31 @@ const { data, error } = await supabase
   .select()
 
 console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reportingDate })
+}
+const handleInitiativeSave = async (
+  index: number,
+  text: string
+) => {
+  if (!keyResultId) return
+
+  const reportingDate = `${selectedMonth.getFullYear()}-${String(
+    selectedMonth.getMonth() + 1
+  ).padStart(2, '0')}-01`
+
+  await supabase
+    .from('initiatives')
+    .upsert(
+      {
+        key_result_id: keyResultId,
+        reporting_month: reportingDate,
+        initiative_index: index + 1,
+        text
+      },
+      {
+        onConflict:
+          'key_result_id,reporting_month,initiative_index'
+      }
+    )
 }
 
   return (
@@ -778,6 +869,30 @@ console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reporting
           {showInitiatives ? 'Hide' : '+ Initiatives'}
         </button>
       </div>
+      {showInitiatives && (
+  <div style={initiativeRow}>
+    {initiatives.map((item, index) => (
+      <input
+        key={index}
+        style={cell}
+        placeholder={`Initiative ${index + 1}`}
+        value={item}
+        disabled={!isEditing}
+        onChange={(e) => {
+          const updated = [...initiatives]
+          updated[index] = e.target.value
+          setInitiatives(updated)
+        }}
+        onBlur={() =>
+          handleInitiativeSave(
+            index,
+            initiatives[index]
+          )
+        }
+      />
+    ))}
+  </div>
+)}
     </div>
   )
 }
@@ -815,3 +930,8 @@ const headerRow : React.CSSProperties = { display: 'grid', gridTemplateColumns: 
 const row : React.CSSProperties = { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', gap: 8, marginBottom: 6 }
 const cell : React.CSSProperties = { background: '#0A0A0A', border: '1px solid #1F2937', borderRadius: 6, color: '#fff' }
 const button : React.CSSProperties = { backgroundColor: '#00AEEF', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', color: '#000', fontSize: 12 }
+const initiativeRow : React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr 1fr',
+  gap: 8
+}

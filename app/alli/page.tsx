@@ -234,14 +234,26 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any)
       const initiativeDate = `${selectedMonth.getFullYear()}-${String(
   selectedMonth.getMonth() + 1
 ).padStart(2, '0')}-01`
+const currentStart = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+)
+
+const nextMonth = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() + 1,
+  1
+)
 
 const { data: currentInitiatives } = await supabase
   .from('initiatives')
   .select('initiative_index, text')
   .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', initiativeDate)
+  .gte('reporting_month', currentStart.toISOString())
+  .lt('reporting_month', nextMonth.toISOString())
   .order('initiative_index', { ascending: true })
-
+  
 let loaded = ['', '', '']
 
 // STEP A — current month initiatives
@@ -420,8 +432,6 @@ const handleInitiativeSave = async (
     }
   )
 
-console.log('initiative save result:', data)
-console.log('initiative save error:', error)
 }
 
   return (
