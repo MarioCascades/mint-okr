@@ -277,6 +277,13 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
+  const [showInitiatives, setShowInitiatives] = useState(false)
+
+const [initiatives, setInitiatives] = useState([
+  '',
+  '',
+  ''
+])
   const percentLabels = [
   "Call Answer Rate",
   "Reception Rate (inquiry to booked) for DM Engage",
@@ -313,6 +320,31 @@ const isPercent = percentLabels.includes(label)
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
+}
+const handleInitiativeSave = async (
+  index: number,
+  text: string
+) => {
+  if (!keyResultId) return
+
+  const reportingDate = `${selectedMonth.getFullYear()}-${String(
+    selectedMonth.getMonth() + 1
+  ).padStart(2, '0')}-01`
+
+  await supabase
+    .from('initiatives')
+    .upsert(
+      {
+        key_result_id: keyResultId,
+        reporting_month: reportingDate,
+        initiative_index: index + 1,
+        text
+      },
+      {
+        onConflict:
+          'key_result_id,reporting_month,initiative_index'
+      }
+    )
 }
 useEffect(() => {
 
@@ -353,6 +385,56 @@ base = baseData
     if (!base) return
 
     setKeyResultId(base.key_result_id)
+    const initiativeDate = `${selectedMonth.getFullYear()}-${String(
+  selectedMonth.getMonth() + 1
+).padStart(2, '0')}-01`
+
+const { data: currentInitiatives } = await supabase
+  .from('initiatives')
+  .select('initiative_index, text')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', initiativeDate)
+  .order('initiative_index', { ascending: true })
+
+let loaded = ['', '', '']
+
+if (currentInitiatives && currentInitiatives.length > 0) {
+  currentInitiatives.forEach((row) => {
+    if (
+      row.initiative_index >= 1 &&
+      row.initiative_index <= 3
+    ) {
+      loaded[row.initiative_index - 1] = row.text || ''
+    }
+  })
+} else {
+  const { data: previousInitiatives } = await supabase
+    .from('initiatives')
+    .select('initiative_index, text, reporting_month')
+    .eq('key_result_id', base.key_result_id)
+    .lt('reporting_month', initiativeDate)
+    .order('reporting_month', { ascending: false })
+    .order('initiative_index', { ascending: true })
+
+  if (previousInitiatives && previousInitiatives.length > 0) {
+    const latestMonth =
+      previousInitiatives[0].reporting_month
+
+    previousInitiatives
+      .filter((row) => row.reporting_month === latestMonth)
+      .forEach((row) => {
+        if (
+          row.initiative_index >= 1 &&
+          row.initiative_index <= 3
+        ) {
+          loaded[row.initiative_index - 1] =
+            row.text || ''
+        }
+      })
+  }
+}
+
+setInitiatives(loaded)
 
 const prevStart = new Date(
   selectedMonth.getFullYear(),
@@ -484,10 +566,41 @@ if (finalTarget > 0) {
   readOnly
 />
 
-        <button style={button}>+ Initiatives</button>
-      </div>
-    </div>
-  )
+<button
+  style={button}
+  onClick={() => setShowInitiatives(!showInitiatives)}
+>
+  {showInitiatives ? 'Hide' : '+ Initiatives'}
+</button>
+</div>
+
+{showInitiatives && (
+  <div style={initiativeRow}>
+    {initiatives.map((item, index) => (
+      <input
+        key={index}
+        style={cell}
+        placeholder={`Initiative ${index + 1}`}
+        value={item}
+        disabled={!isEditing}
+        onChange={(e) => {
+          const updated = [...initiatives]
+          updated[index] = e.target.value
+          setInitiatives(updated)
+        }}
+        onBlur={() =>
+          handleInitiativeSave(
+            index,
+            initiatives[index]
+          )
+        }
+      />
+    ))}
+  </div>
+)}
+
+</div>
+)
 }
 
 // =========================
@@ -523,3 +636,9 @@ const headerRow : React.CSSProperties = { display: 'grid', gridTemplateColumns: 
 const row : React.CSSProperties = { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', gap: 8 }
 const cell : React.CSSProperties = { background: '#0A0A0A', border: '1px solid #1F2937', borderRadius: 6, color: '#fff' }
 const button : React.CSSProperties = { backgroundColor: '#00AEEF', border: 'none', borderRadius: 6, padding: '4px 8px', color: '#000' }
+const initiativeRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr 1fr',
+  gap: 8,
+  marginTop: 8
+}
