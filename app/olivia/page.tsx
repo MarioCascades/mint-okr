@@ -277,6 +277,11 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [metricType, setMetricType] = useState('')
   const [showInitiatives, setShowInitiatives] = useState(false)
+  const [initiatives, setInitiatives] = useState([
+  '',
+  '',
+  ''
+])
   const [loadedMonth, setLoadedMonth] = useState('')
   const [isDirty, setIsDirty] = useState(false)
   // SYNC MASTER TARGET PROP INTO LOCAL STATE
@@ -365,6 +370,58 @@ const currentDate = formatDate(selectedMonth)
 const prevDateObj = new Date(selectedMonth)
 prevDateObj.setMonth(prevDateObj.getMonth() - 1)
 const prevDate = formatDate(prevDateObj)
+
+const initiativeDate = `${selectedMonth.getFullYear()}-${String(
+  selectedMonth.getMonth() + 1
+).padStart(2, '0')}-01`
+
+const { data: currentInitiatives } = await supabase
+  .from('initiatives')
+  .select('initiative_index, text')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', initiativeDate)
+  .order('initiative_index', { ascending: true })
+
+let loaded = ['', '', '']
+
+if (currentInitiatives && currentInitiatives.length > 0) {
+  currentInitiatives.forEach((row) => {
+    if (
+      row.initiative_index >= 1 &&
+      row.initiative_index <= 3
+    ) {
+      loaded[row.initiative_index - 1] = row.text || ''
+    }
+  })
+} else {
+  const previousMonth = new Date(selectedMonth)
+  previousMonth.setMonth(previousMonth.getMonth() - 1)
+
+  const previousMonthDate = `${previousMonth.getFullYear()}-${String(
+    previousMonth.getMonth() + 1
+  ).padStart(2, '0')}-01`
+
+  const { data: previousInitiatives } = await supabase
+    .from('initiatives')
+    .select('initiative_index, text')
+    .eq('key_result_id', base.key_result_id)
+    .eq('reporting_month', previousMonthDate)
+    .order('initiative_index', { ascending: true })
+
+  if (previousInitiatives && previousInitiatives.length > 0) {
+    previousInitiatives.forEach((row) => {
+      if (
+        row.initiative_index >= 1 &&
+        row.initiative_index <= 3
+      ) {
+        loaded[row.initiative_index - 1] =
+          row.text || ''
+      }
+    })
+  }
+}
+
+setInitiatives(loaded)
 
 // ------------------------
 // FETCH CURRENT ROW
@@ -631,6 +688,31 @@ return
   { onConflict: 'key_result_id,reporting_month' }
 )
   }
+  const handleInitiativeSave = async (
+  index: number,
+  text: string
+) => {
+  if (!keyResultId) return
+
+  const reportingDate = `${selectedMonth.getFullYear()}-${String(
+    selectedMonth.getMonth() + 1
+  ).padStart(2, '0')}-01`
+
+  await supabase
+    .from('initiatives')
+    .upsert(
+      {
+        key_result_id: keyResultId,
+        reporting_month: reportingDate,
+        initiative_index: index + 1,
+        text
+      },
+      {
+        onConflict:
+          'key_result_id,reporting_month,initiative_index'
+      }
+    )
+}
 
   const getScoreColor = () => {
     const num = Number(score.replace('%', ''))
@@ -754,13 +836,30 @@ if (parts.length === 2) {
         </button>
       </div>
 
-      {showInitiatives && (
-        <div style={initiativeRow}>
-          <input style={cell} placeholder="Initiative 1..." />
-          <input style={cell} placeholder="Initiative 2..." />
-          <input style={cell} placeholder="Initiative 3..." />
-        </div>
-      )}
+    {showInitiatives && (
+  <div style={initiativeRow}>
+    {initiatives.map((item, index) => (
+      <input
+        key={index}
+        style={cell}
+        placeholder={`Initiative ${index + 1}`}
+        value={item}
+        disabled={!isEditing}
+        onChange={(e) => {
+          const updated = [...initiatives]
+          updated[index] = e.target.value
+          setInitiatives(updated)
+        }}
+        onBlur={() =>
+          handleInitiativeSave(
+            index,
+            initiatives[index]
+          )
+        }
+      />
+    ))}
+  </div>
+)}
     </div>
   )
 }
@@ -881,6 +980,7 @@ const button : React.CSSProperties = {
 const initiativeRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr 1fr',
-  gap: 8
+  gap: 8,
+  marginTop: 8
 }
 
