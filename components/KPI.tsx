@@ -41,24 +41,26 @@ export default function KPI({
   // KPI CONFIG (YOUR SYSTEM)
   // =========================
 
-  const config: any = {
-    'Total Starts': {
-  type: 'combined',
-  db: ['Total TC Starts']
-},
-    'Total Production': {
-      type: 'combined',
-      db: ['TC Total Production after Discounts']
-    },
-    'Consults Kept': {
-      type: 'combined',
-      db: ['Kept New Patients']
-    },
-    'Macro Conversion Rate': {
-      type: 'calculated'
-    }
-  }
+ const config: any = {
+  'Total TC Starts': {
+    type: 'combined',
+    db: ['Total TC Starts']
+  },
 
+  'Total Production': {
+    type: 'combined',
+    db: ['TC Total Production after Discounts']
+  },
+
+  'Consults Kept': {
+    type: 'combined',
+    db: ['Kept New Patients']
+  },
+
+  'Macro Conversion Rate': {
+    type: 'calculated'
+  }
+}
   useEffect(() => {
     if (label !== 'Macro Conversion Rate') {
       fetchData()
