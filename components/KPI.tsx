@@ -12,9 +12,27 @@ type Props = {
   target?: number
   isCurrency?: boolean
   isPercent?: boolean
-}
 
-export default function KPI({ label, user, value, prev, target, isCurrency, isPercent }: Props) {
+  initiatives?: string[]
+  setInitiatives?: (vals: string[]) => void
+  saveInitiative?: (
+    metricName: string,
+    initiativeNumber: number,
+    content: string
+  ) => Promise<void>
+}
+export default function KPI({
+  label,
+  user,
+  value,
+  prev,
+  target,
+  isCurrency,
+  isPercent,
+  initiatives = ['', '', ''],
+  setInitiatives,
+  saveInitiative
+}: Props) {
 
   const [data, setData] = useState<any[]>([])
   const [showInit, setShowInit] = useState(false)
@@ -231,12 +249,34 @@ export default function KPI({ label, user, value, prev, target, isCurrency, isPe
       </button>
 
       {showInit && (
-        <div style={initRow}>
-          <input style={cellWide} placeholder="Initiative 1" />
-          <input style={cellWide} placeholder="Initiative 2" />
-          <input style={cellWide} placeholder="Initiative 3" />
-        </div>
-      )}
+  <div style={initRow}>
+    {[0, 1, 2].map((index) => (
+      <input
+        key={index}
+        style={cellWide}
+        placeholder={`Initiative ${index + 1}`}
+        value={initiatives[index] || ''}
+        onChange={(e) => {
+          if (!setInitiatives) return
+
+          const updated = [...initiatives]
+          updated[index] = e.target.value
+
+          setInitiatives(updated)
+        }}
+        onBlur={(e) => {
+          if (!saveInitiative) return
+
+          saveInitiative(
+            label,
+            index + 1,
+            e.target.value
+          )
+        }}
+      />
+    ))}
+  </div>
+)}
 
     </div>
   )

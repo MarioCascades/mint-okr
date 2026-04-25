@@ -101,6 +101,14 @@ export default function Home() {
   const [prevScheduled, setPrevScheduled] = useState(0)
 const [announcements, setAnnouncements] = useState('')
 const [remarks, setRemarks] = useState('')
+const [kpiInitiatives, setKpiInitiatives] = useState<
+  Record<string, string[]>
+>({
+  'Total TC Starts': ['', '', ''],
+  'Total Production': ['', '', ''],
+  'Consults Kept': ['', '', ''],
+  'Macro Conversion Rate': ['', '', '']
+})
  
 const fetchMainPageNote = async (
   noteType: string
@@ -168,7 +176,104 @@ const saveMainPageNote = async (
       }
     )
 }
+const fetchKpiInitiatives = async (
+  metricName: string
+) => {
+  const reportingDate = formatDate(selectedMonth)
 
+  const { data: current } = await supabase
+    .from('main_page_initiatives')
+    .select('initiative_index, text')
+    .eq('reporting_month', reportingDate)
+    .eq('metric_name', metricName)
+    .order('initiative_index', { ascending: true })
+
+  let loaded = ['', '', '']
+
+  if (current && current.length > 0) {
+    current.forEach((row) => {
+      if (
+        row.initiative_index >= 1 &&
+        row.initiative_index <= 3
+      ) {
+        loaded[row.initiative_index - 1] =
+          row.text || ''
+      }
+    })
+
+    return loaded
+  }
+
+  const { data: previous } = await supabase
+    .from('main_page_initiatives')
+    .select('initiative_index, text, reporting_month')
+    .eq('metric_name', metricName)
+    .lt('reporting_month', reportingDate)
+    .order('reporting_month', {
+      ascending: false
+    })
+
+  if (previous && previous.length > 0) {
+    const latestMonth =
+      previous[0].reporting_month
+
+    previous
+      .filter(
+        (row) =>
+          row.reporting_month === latestMonth
+      )
+      .forEach((row) => {
+        if (
+          row.initiative_index >= 1 &&
+          row.initiative_index <= 3
+        ) {
+          loaded[row.initiative_index - 1] =
+            row.text || ''
+        }
+      })
+
+    for (let i = 0; i < 3; i++) {
+      await supabase
+        .from('main_page_initiatives')
+        .upsert(
+          {
+            reporting_month: reportingDate,
+            metric_name: metricName,
+            initiative_index: i + 1,
+            text: loaded[i]
+          },
+          {
+            onConflict:
+              'reporting_month,metric_name,initiative_index'
+          }
+        )
+    }
+  }
+
+  return loaded
+}
+const saveKpiInitiative = async (
+  metricName: string,
+  index: number,
+  text: string
+) => {
+  const reportingDate = formatDate(selectedMonth)
+
+  await supabase
+    .from('main_page_initiatives')
+    .upsert(
+      {
+        reporting_month: reportingDate,
+        metric_name: metricName,
+        initiative_index: index + 1,
+        text
+      },
+      {
+        onConflict:
+          'reporting_month,metric_name,initiative_index'
+      }
+    )
+}
 
   useEffect(() => {
     fetchData()
@@ -177,6 +282,22 @@ const saveMainPageNote = async (
   const fetchData = async () => {
 
     const reportingDate = formatDate(selectedMonth)
+    const metricNames = [
+  'Total TC Starts',
+  'Total Production',
+  'Consults Kept',
+  'Macro Conversion Rate'
+]
+
+for (const metric of metricNames) {
+  const loaded =
+    await fetchKpiInitiatives(metric)
+
+  setKpiInitiatives(prev => ({
+    ...prev,
+    [metric]: loaded
+  }))
+}
     const loadedAnnouncements =
   await fetchMainPageNote('announcements')
 
@@ -401,18 +522,79 @@ const conversionTarget =
       </div>
 
       {/* KPI */}
-      <div style={kpiGrid}>
-        <KPI label="Total TC Starts" value={starts} prev={prevStarts} target={startsTarget} />
-        <KPI label="Total Production" value={production} prev={prevProduction} target={productionTarget} isCurrency />
-        <KPI label="Consults Kept" value={kept} prev={prevKept} target={keptTarget} />
-        <KPI
-            label="Macro Conversion Rate"
-            value={macroConversion}
-            prev={prevConversion}
-            target={conversionTarget}
-            isPercent
-/>
-      </div>
+   <div style={kpiGrid}>
+
+  <KPI
+    label="Total TC Starts"
+    value={starts}
+    prev={prevStarts}
+    target={startsTarget}
+    initiatives={
+      kpiInitiatives['Total TC Starts']
+    }
+    setInitiatives={(vals: string[]) =>
+      setKpiInitiatives(prev => ({
+        ...prev,
+        'Total TC Starts': vals
+      }))
+    }
+    saveInitiative={saveKpiInitiative}
+  />
+
+  <KPI
+    label="Total Production"
+    value={production}
+    prev={prevProduction}
+    target={productionTarget}
+    isCurrency
+    initiatives={
+      kpiInitiatives['Total Production']
+    }
+    setInitiatives={(vals: string[]) =>
+      setKpiInitiatives(prev => ({
+        ...prev,
+        'Total Production': vals
+      }))
+    }
+    saveInitiative={saveKpiInitiative}
+  />
+
+  <KPI
+    label="Consults Kept"
+    value={kept}
+    prev={prevKept}
+    target={keptTarget}
+    initiatives={
+      kpiInitiatives['Consults Kept']
+    }
+    setInitiatives={(vals: string[]) =>
+      setKpiInitiatives(prev => ({
+        ...prev,
+        'Consults Kept': vals
+      }))
+    }
+    saveInitiative={saveKpiInitiative}
+  />
+
+  <KPI
+    label="Macro Conversion Rate"
+    value={macroConversion}
+    prev={prevConversion}
+    target={conversionTarget}
+    isPercent
+    initiatives={
+      kpiInitiatives['Macro Conversion Rate']
+    }
+    setInitiatives={(vals: string[]) =>
+      setKpiInitiatives(prev => ({
+        ...prev,
+        'Macro Conversion Rate': vals
+      }))
+    }
+    saveInitiative={saveKpiInitiative}
+  />
+
+</div>
       {/* ================= ANNOUNCEMENTS ================= */}
 <div style={notesBlock}>
   <div style={notesTitle}>Announcements</div>
