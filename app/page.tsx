@@ -107,6 +107,7 @@ const fetchMainPageNote = async (
 ) => {
   const reportingDate = formatDate(selectedMonth)
 
+  // STEP 1: current month first
   const { data: current } = await supabase
     .from('main_page_notes')
     .select('content')
@@ -118,16 +119,15 @@ const fetchMainPageNote = async (
     return current.content
   }
 
-  const prevDate = new Date(selectedMonth)
-  prevDate.setMonth(prevDate.getMonth() - 1)
-
-  const prevReportingDate = formatDate(prevDate)
-
+  // STEP 2: latest previous note (not just last month)
   const { data: previous } = await supabase
     .from('main_page_notes')
-    .select('content')
-    .eq('reporting_month', prevReportingDate)
+    .select('content, reporting_month')
     .eq('note_type', noteType)
+    .lt('reporting_month', reportingDate)
+    .not('content', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
     .maybeSingle()
 
   if (previous?.content) {
@@ -423,12 +423,12 @@ const conversionTarget =
   onChange={(e) =>
     setAnnouncements(e.target.value)
   }
-  onBlur={() =>
-    saveMainPageNote(
-      'announcements',
-      announcements
-    )
-  }
+  onBlur={(e) =>
+  saveMainPageNote(
+    'announcements',
+    e.target.value
+  )
+}
 />
 </div>
 
@@ -442,12 +442,12 @@ const conversionTarget =
   onChange={(e) =>
     setRemarks(e.target.value)
   }
-  onBlur={() =>
-    saveMainPageNote(
-      'remarks',
-      remarks
-    )
-  }
+onBlur={(e) =>
+  saveMainPageNote(
+    'remarks',
+    e.target.value
+  )
+}
 />
 </div>
 
