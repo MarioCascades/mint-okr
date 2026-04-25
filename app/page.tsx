@@ -265,7 +265,7 @@ const saveKpiInitiative = async (
       {
         reporting_month: reportingDate,
         metric_name: metricName,
-        initiative_index: index + 1,
+        initiative_index: index,
         text
       },
       {
