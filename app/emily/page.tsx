@@ -442,7 +442,10 @@ if (
           {initiatives.map((item, index) => (
             <input
               key={index}
-              style={cell}
+           style={{  ...cell,
+            minHeight: 42,
+            padding: '8px 10px'
+          }}
               placeholder={`Initiative ${index + 1}`}
               value={item}
               disabled={!isEditing}
@@ -581,5 +584,7 @@ const button : React.CSSProperties = {
 const initiativeRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr 1fr',
-  gap: 8
+  gap: 8,
+  marginTop: 10,
+  marginBottom: 12
 }
