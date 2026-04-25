@@ -408,18 +408,24 @@ if (currentInitiatives && currentInitiatives.length > 0) {
     }
   })
 } else {
-const previousMonth = new Date(selectedMonth)
-previousMonth.setMonth(previousMonth.getMonth() - 1)
+const previousMonthStart = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() - 1,
+  1
+)
 
-const previousMonthDate = `${previousMonth.getFullYear()}-${String(
-  previousMonth.getMonth() + 1
-).padStart(2, '0')}-01`
+const previousMonthEnd = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+)
 
 const { data: previousInitiatives } = await supabase
   .from('initiatives')
   .select('initiative_index, text')
   .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', previousMonthDate)
+  .gte('reporting_month', previousMonthStart.toISOString())
+  .lt('reporting_month', previousMonthEnd.toISOString())
   .order('initiative_index', { ascending: true })
 
 if (previousInitiatives && previousInitiatives.length > 0) {
