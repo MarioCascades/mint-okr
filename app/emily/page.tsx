@@ -180,6 +180,11 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [metricType, setMetricType] = useState('')
   const [showInitiatives, setShowInitiatives] = useState(false)
+  const [initiatives, setInitiatives] = useState([
+  '',
+  '',
+  ''
+])
 
   const isPercentage = metricType === 'percentage'
 
@@ -207,6 +212,58 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
       if (!base) return
 
       setKeyResultId(base.key_result_id)
+      const initiativeDate = `${selectedMonth.getFullYear()}-${String(
+  selectedMonth.getMonth() + 1
+).padStart(2, '0')}-01`
+
+const { data: currentInitiatives } = await supabase
+  .from('initiatives')
+  .select('initiative_index, text')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', initiativeDate)
+  .order('initiative_index', { ascending: true })
+
+let loaded = ['', '', '']
+
+// Current month initiatives
+if (currentInitiatives && currentInitiatives.length > 0) {
+  currentInitiatives.forEach((row) => {
+    if (
+      row.initiative_index >= 1 &&
+      row.initiative_index <= 3
+    ) {
+      loaded[row.initiative_index - 1] = row.text || ''
+    }
+  })
+} else {
+  // fallback to latest previous month
+  const { data: previousInitiatives } = await supabase
+    .from('initiatives')
+    .select('initiative_index, text, reporting_month')
+    .eq('key_result_id', base.key_result_id)
+    .lt('reporting_month', initiativeDate)
+    .order('reporting_month', { ascending: false })
+    .order('initiative_index', { ascending: true })
+
+  if (previousInitiatives && previousInitiatives.length > 0) {
+    const latestMonth =
+      previousInitiatives[0].reporting_month
+
+    previousInitiatives
+      .filter((row) => row.reporting_month === latestMonth)
+      .forEach((row) => {
+        if (
+          row.initiative_index >= 1 &&
+          row.initiative_index <= 3
+        ) {
+          loaded[row.initiative_index - 1] =
+            row.text || ''
+        }
+      })
+  }
+}
+
+setInitiatives(loaded)
 
       const { data: kr } = await supabase
         .from('key_results')
@@ -298,6 +355,31 @@ if (
       { onConflict: 'key_result_id,reporting_month' }
     )
   }
+  const handleInitiativeSave = async (
+  index: number,
+  text: string
+) => {
+  if (!keyResultId) return
+
+  const reportingDate = `${selectedMonth.getFullYear()}-${String(
+    selectedMonth.getMonth() + 1
+  ).padStart(2, '0')}-01`
+
+  await supabase
+    .from('initiatives')
+    .upsert(
+      {
+        key_result_id: keyResultId,
+        reporting_month: reportingDate,
+        initiative_index: index + 1,
+        text
+      },
+      {
+        onConflict:
+          'key_result_id,reporting_month,initiative_index'
+      }
+    )
+}
 
   const isLowerBetter = (label: string) => {
     const l = label.toLowerCase()
@@ -351,9 +433,35 @@ if (
         <input style={{ ...cell, color: getScoreColor() }} value={score} readOnly />
 
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
-          {showInitiatives ? 'Hide' : '+ Initiatives'}
-        </button>
+  {showInitiatives ? 'Hide' : '+ Initiatives'}
+</button>
       </div>
+
+      {showInitiatives && (
+        <div style={initiativeRow}>
+          {initiatives.map((item, index) => (
+            <input
+              key={index}
+              style={cell}
+              placeholder={`Initiative ${index + 1}`}
+              value={item}
+              disabled={!isEditing}
+              onChange={(e) => {
+                const updated = [...initiatives]
+                updated[index] = e.target.value
+                setInitiatives(updated)
+              }}
+              onBlur={() =>
+                handleInitiativeSave(
+                  index,
+                  initiatives[index]
+                )
+              }
+            />
+          ))}
+        </div>
+      )}
+
     </div>
   )
 }
