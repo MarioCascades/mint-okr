@@ -408,30 +408,31 @@ if (currentInitiatives && currentInitiatives.length > 0) {
     }
   })
 } else {
-  const { data: previousInitiatives } = await supabase
-    .from('initiatives')
-    .select('initiative_index, text, reporting_month')
-    .eq('key_result_id', base.key_result_id)
-    .lt('reporting_month', initiativeDate)
-    .order('reporting_month', { ascending: false })
-    .order('initiative_index', { ascending: true })
+const previousMonth = new Date(selectedMonth)
+previousMonth.setMonth(previousMonth.getMonth() - 1)
 
-  if (previousInitiatives && previousInitiatives.length > 0) {
-    const latestMonth =
-      previousInitiatives[0].reporting_month
+const previousMonthDate = `${previousMonth.getFullYear()}-${String(
+  previousMonth.getMonth() + 1
+).padStart(2, '0')}-01`
 
-    previousInitiatives
-      .filter((row) => row.reporting_month === latestMonth)
-      .forEach((row) => {
-        if (
-          row.initiative_index >= 1 &&
-          row.initiative_index <= 3
-        ) {
-          loaded[row.initiative_index - 1] =
-            row.text || ''
-        }
-      })
-  }
+const { data: previousInitiatives } = await supabase
+  .from('initiatives')
+  .select('initiative_index, text')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', previousMonthDate)
+  .order('initiative_index', { ascending: true })
+
+if (previousInitiatives && previousInitiatives.length > 0) {
+  previousInitiatives.forEach((row) => {
+    if (
+      row.initiative_index >= 1 &&
+      row.initiative_index <= 3
+    ) {
+      loaded[row.initiative_index - 1] =
+        row.text || ''
+    }
+  })
+}
 }
 
 setInitiatives(loaded)
