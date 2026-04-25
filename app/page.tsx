@@ -99,8 +99,76 @@ export default function Home() {
 
   const [scheduled, setScheduled] = useState(0)
   const [prevScheduled, setPrevScheduled] = useState(0)
-
+const [announcements, setAnnouncements] = useState('')
+const [remarks, setRemarks] = useState('')
  
+const fetchMainPageNote = async (
+  noteType: string
+) => {
+  const reportingDate = formatDate(selectedMonth)
+
+  const { data: current } = await supabase
+    .from('main_page_notes')
+    .select('content')
+    .eq('reporting_month', reportingDate)
+    .eq('note_type', noteType)
+    .maybeSingle()
+
+  if (current?.content) {
+    return current.content
+  }
+
+  const prevDate = new Date(selectedMonth)
+  prevDate.setMonth(prevDate.getMonth() - 1)
+
+  const prevReportingDate = formatDate(prevDate)
+
+  const { data: previous } = await supabase
+    .from('main_page_notes')
+    .select('content')
+    .eq('reporting_month', prevReportingDate)
+    .eq('note_type', noteType)
+    .maybeSingle()
+
+  if (previous?.content) {
+    await supabase
+      .from('main_page_notes')
+      .upsert(
+        {
+          reporting_month: reportingDate,
+          note_type: noteType,
+          content: previous.content
+        },
+        {
+          onConflict: 'reporting_month,note_type'
+        }
+      )
+
+    return previous.content
+  }
+
+  return ''
+}
+const saveMainPageNote = async (
+  noteType: string,
+  content: string
+) => {
+  const reportingDate = formatDate(selectedMonth)
+
+  await supabase
+    .from('main_page_notes')
+    .upsert(
+      {
+        reporting_month: reportingDate,
+        note_type: noteType,
+        content
+      },
+      {
+        onConflict: 'reporting_month,note_type'
+      }
+    )
+}
+
 
   useEffect(() => {
     fetchData()
@@ -109,6 +177,14 @@ export default function Home() {
   const fetchData = async () => {
 
     const reportingDate = formatDate(selectedMonth)
+    const loadedAnnouncements =
+  await fetchMainPageNote('announcements')
+
+const loadedRemarks =
+  await fetchMainPageNote('remarks')
+
+setAnnouncements(loadedAnnouncements)
+setRemarks(loadedRemarks)
 
     const getValue = async (user: string, krTitle: string) => {
       const { data: row } = await supabase
@@ -341,18 +417,38 @@ const conversionTarget =
 <div style={notesBlock}>
   <div style={notesTitle}>Announcements</div>
   <textarea
-    style={textarea}
-    placeholder="Enter announcements..."
-  />
+  style={textarea}
+  placeholder="Enter announcements..."
+  value={announcements}
+  onChange={(e) =>
+    setAnnouncements(e.target.value)
+  }
+  onBlur={() =>
+    saveMainPageNote(
+      'announcements',
+      announcements
+    )
+  }
+/>
 </div>
 
 {/* ================= REMARKS ================= */}
 <div style={notesBlock}>
   <div style={notesTitle}>Remarks / Notes</div>
-  <textarea
-    style={textarea}
-    placeholder="Enter notes..."
-  />
+ <textarea
+  style={textarea}
+  placeholder="Enter notes..."
+  value={remarks}
+  onChange={(e) =>
+    setRemarks(e.target.value)
+  }
+  onBlur={() =>
+    saveMainPageNote(
+      'remarks',
+      remarks
+    )
+  }
+/>
 </div>
 
     </div>
