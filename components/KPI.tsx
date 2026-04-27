@@ -301,11 +301,12 @@ const KPI_COLORS = {
 }
 
 const kpiCard: React.CSSProperties = {
-  backgroundColor: KPI_COLORS.white,
+  backgroundColor: '#E5E5E5',
   padding: 20,
-  borderRadius: 14,
-  border: `1px solid ${KPI_COLORS.border}`,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.04)'
+  borderRadius: 18,
+  border: '1px solid rgba(255,255,255,0.6)',
+  boxShadow: '0 12px 30px rgba(0,0,0,0.10)',
+  backdropFilter: 'blur(4px)'
 }
 
 const kpiLabel: React.CSSProperties = {

@@ -824,10 +824,11 @@ const kpiGrid: React.CSSProperties = {
 }
 
 const notesBlock: React.CSSProperties = {
-  marginTop: 28,
-  padding: '18px 20px',
-  backgroundColor: COLORS.gray,
-  borderRadius: 12
+  backgroundColor: '#E5E5E5',
+  padding: 24,
+  borderRadius: 18,
+  border: '1px solid rgba(255,255,255,0.6)',
+  boxShadow: '0 10px 24px rgba(0,0,0,0.08)'
 }
 
 const notesTitle: React.CSSProperties = {
@@ -840,11 +841,14 @@ const notesTitle: React.CSSProperties = {
 const textarea: React.CSSProperties = {
   width: '100%',
   minHeight: 120,
-  backgroundColor: COLORS.lightGray,
-  color: COLORS.text,
-  border: `1px solid ${COLORS.border}`,
-  borderRadius: 10,
-  padding: 14,
-  fontSize: 14,
-  resize: 'vertical'
+  padding: 18,
+  fontSize: 16,
+  fontWeight: 500,
+  color: '#1E266D',
+  backgroundColor: '#F8FAFC',
+  border: '1px solid #D6DCE5',
+  borderRadius: 14,
+  outline: 'none',
+  resize: 'vertical',
+  fontFamily: 'inherit'
 }
