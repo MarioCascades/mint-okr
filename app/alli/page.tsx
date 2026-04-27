@@ -508,7 +508,7 @@ const handleInitiativeSave = async (
 // =========================
 
 const container: React.CSSProperties = {
-  backgroundColor: '#F8FAFC',
+  backgroundColor: '#ecececd5',
   minHeight: '100vh',
   color: '#1E266D'
 }
