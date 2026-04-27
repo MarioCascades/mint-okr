@@ -643,20 +643,25 @@ onBlur={(e) =>
 
 // ================= STYLES =================
 
+// ================= STYLES =================
+
 const COLORS = {
   navy: '#1E266D',
   blue: '#A9C9D8',
   orange: '#F26C2F',
-  peach: '#F6A27A',
+  softOrange: '#F6A27A',
+  lightOrange: '#FFD2B8',
+  paleOrange: '#FFE6D8',
   white: '#FFFFFF',
-  lightGray: '#F7F8FA',
-  border: '#D9DEE8',
+  lightGray: '#F5F5F5',
+  gray: '#E5E5E5',
+  border: '#D1D5DB',
   text: '#1F2937',
   muted: '#6B7280'
 }
 
 const container: React.CSSProperties = {
-  backgroundColor: COLORS.lightGray,
+  backgroundColor: COLORS.white,
   color: COLORS.text,
   minHeight: '100vh'
 }
@@ -703,8 +708,7 @@ const selectorButton: React.CSSProperties = {
   backgroundColor: COLORS.white,
   color: COLORS.navy,
   fontWeight: 600,
-  cursor: 'pointer',
-  transition: '0.2s'
+  cursor: 'pointer'
 }
 
 const activeTab: React.CSSProperties = {
@@ -714,18 +718,17 @@ const activeTab: React.CSSProperties = {
 }
 
 const headerBox: React.CSSProperties = {
-  backgroundColor: COLORS.white,
+  backgroundColor: COLORS.orange,
   padding: 24,
   margin: 20,
   borderRadius: 14,
-  border: `1px solid ${COLORS.border}`,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.04)'
+  boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
 }
 
 const mainTitle: React.CSSProperties = {
   fontSize: 34,
   fontWeight: 800,
-  color: COLORS.navy,
+  color: COLORS.white,
   marginBottom: 18
 }
 
@@ -738,7 +741,7 @@ const metaRow: React.CSSProperties = {
 const label: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: COLORS.muted,
+  color: COLORS.white,
   marginBottom: 6
 }
 
@@ -766,7 +769,9 @@ const kpiGrid: React.CSSProperties = {
 
 const notesBlock: React.CSSProperties = {
   marginTop: 28,
-  padding: '0 20px'
+  padding: '18px 20px',
+  backgroundColor: COLORS.gray,
+  borderRadius: 12
 }
 
 const notesTitle: React.CSSProperties = {
@@ -779,7 +784,7 @@ const notesTitle: React.CSSProperties = {
 const textarea: React.CSSProperties = {
   width: '100%',
   minHeight: 120,
-  backgroundColor: COLORS.white,
+  backgroundColor: COLORS.lightGray,
   color: COLORS.text,
   border: `1px solid ${COLORS.border}`,
   borderRadius: 10,
