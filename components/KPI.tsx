@@ -238,11 +238,16 @@ export default function KPI({
   disabled={config[label]?.type !== 'single'}
 />
 
-        <input
-          style={cell}
-          value={percent ? `${Math.round(percent * 100)}%` : ''}
-          disabled
-        />
+       <input
+  style={{
+    ...cell,
+    fontWeight: 800,
+    fontSize: 16,
+    color: '#F26C2F'
+  }}
+  value={percent ? `${Math.round(percent * 100)}%` : ''}
+  disabled
+/>
 
       </div>
 
@@ -311,20 +316,21 @@ const kpiCard: React.CSSProperties = {
 
 const kpiLabel: React.CSSProperties = {
   textAlign: 'center',
-  marginBottom: 16,
-  fontWeight: 700,
-  fontSize: 16,
-  color: KPI_COLORS.navy
+  marginBottom: 18,
+  fontWeight: 800,
+  fontSize: 28,
+  color: KPI_COLORS.navy,
+  letterSpacing: '-0.3px'
 }
 
 const kpiHeader: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(4, 1fr)',
   gap: 8,
-  fontSize: 12,
-  fontWeight: 600,
+  fontSize: 13,
+  fontWeight: 700,
   color: KPI_COLORS.muted,
-  marginBottom: 8,
+  marginBottom: 10,
   textAlign: 'center'
 }
 
@@ -336,15 +342,15 @@ const kpiRow: React.CSSProperties = {
 
 const cell: React.CSSProperties = {
   width: '100%',
-  padding: 10,
-  backgroundColor: KPI_COLORS.lightGray,
+  padding: 12,
+  backgroundColor: '#F8FAFC',
   color: KPI_COLORS.text,
   border: `1px solid ${KPI_COLORS.border}`,
-  borderRadius: 8,
-  fontSize: 14,
+  borderRadius: 10,
+  fontSize: 15,
+  fontWeight: 600,
   textAlign: 'center'
 }
-
 const cellWide: React.CSSProperties = {
   ...cell,
   textAlign: 'left'
