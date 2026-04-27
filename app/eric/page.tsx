@@ -175,11 +175,20 @@ export default function Page() {
     </button>
 
     <button
-      style={editButton}
-      onClick={() => setIsEditing(!isEditing)}
-    >
-      {isEditing ? 'Save' : 'Edit'}
-    </button>
+  style={editButton}
+  onClick={async () => {
+    if (isEditing) {
+      const event = new CustomEvent('save-all', {
+        detail: { selectedMonth }
+      })
+      window.dispatchEvent(event)
+    }
+
+    setIsEditing(!isEditing)
+  }}
+>
+  {isEditing ? 'Save' : 'Edit'}
+</button>
 
   </div>
 
@@ -644,12 +653,12 @@ const label: React.CSSProperties = {
 }
 
 const inputSmall: React.CSSProperties = {
-  height: 36,
   padding: '6px 10px',
   borderRadius: 6,
   border: '1px solid #1F2937',
   backgroundColor: '#0A0A0A',
-  color: '#fff'
+  color: '#fff',
+  minHeight: 36
 }
 
 const monthSelector: React.CSSProperties = {
