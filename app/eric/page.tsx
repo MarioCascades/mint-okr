@@ -114,43 +114,76 @@ export default function Page() {
           Provide insurance guidance to Mint Orthodontics team members and patients, ensure OrthoFi is properly leveraged and managed, and maximize insurance benefit utilization.
         </p>
 
-        <div style={topSection}>
+       <div style={topSection}>
 
-          <div style={leftMeta}>
-            <div style={metaItem}>
-              <label style={label}>Date Updated</label>
-              <div style={inputSmall}>{lastUpdated || '—'}</div>
-            </div>
+  <div style={leftMeta}>
+    <div style={metaItem}>
+      <label style={label}>Date Updated</label>
+      <div style={inputSmall}>{lastUpdated || '—'}</div>
+      <input
+        type="text"
+        placeholder="10 State"
+        style={inputSmall}
+      />
+    </div>
 
-            <div style={metaItem}>
-              <label style={label}>% Into Period</label>
-              <input style={inputSmall} value={percentIntoPeriod} readOnly />
-            </div>
-          </div>
+    <div style={metaItem}>
+      <label style={label}>% Into Period</label>
+      <input
+        style={inputSmall}
+        value={percentIntoPeriod}
+        readOnly
+      />
+    </div>
 
-          <div style={rightMeta}>
-            <button style={backButton} onClick={() => router.push('/')}>
-              ← Back to Main
-            </button>
+    <div style={metaItem}>
+      <label style={label}>OKR Time Frame</label>
 
-            <label style={label}>OKR Time Frame</label>
+      <div style={monthSelector}>
+        <button
+          style={arrowButton}
+          onClick={() => changeMonth(-1)}
+        >
+          ←
+        </button>
 
-            <div style={monthSelector}>
-  <button style={arrowButton} onClick={() => changeMonth(-1)}>←</button>
+        <span style={monthText}>
+          {formatMonth(selectedMonth)}
+        </span>
 
-  <span style={monthText}>{formatMonth(selectedMonth)}</span>
+        <button
+          style={{
+            ...arrowButton,
+            opacity: isFutureMonth() ? 0.3 : 1
+          }}
+          disabled={isFutureMonth()}
+          onClick={() => changeMonth(1)}
+        >
+          →
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <button
-    style={{ ...arrowButton, opacity: isFutureMonth() ? 0.3 : 1 }}
-    disabled={isFutureMonth()}
-    onClick={() => changeMonth(1)}
-  >
-    →
-  </button>
+  <div style={rightMeta}>
+
+    <button
+      style={backButton}
+      onClick={() => router.push('/')}
+    >
+      ← Back to Main
+    </button>
+
+    <button
+      style={editButton}
+      onClick={() => setIsEditing(!isEditing)}
+    >
+      {isEditing ? 'Save' : 'Edit'}
+    </button>
+
+  </div>
+
 </div>
-            <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? 'Save' : 'Edit'}
-            </button>
           </div>
         </div>
       </div>
@@ -552,13 +585,13 @@ if (!currentRow && resolvedTarget !== null) {
 // STYLES
 // =========================
 
-const container : React.CSSProperties = {
+const container: React.CSSProperties = {
   backgroundColor: '#000',
   minHeight: '100vh',
   color: '#fff'
 }
 
-const stickyHeader : React.CSSProperties = {
+const stickyHeader: React.CSSProperties = {
   position: 'sticky',
   top: 60,
   zIndex: 10,
@@ -567,51 +600,51 @@ const stickyHeader : React.CSSProperties = {
   borderBottom: '1px solid #1F2937'
 }
 
-const content : React.CSSProperties = {
+const content: React.CSSProperties = {
   padding: 20
 }
 
-const title : React.CSSProperties = {
+const title: React.CSSProperties = {
   fontSize: 24,
   fontWeight: 700
 }
 
-const description : React.CSSProperties = {
-  fontSize: 13,
+const description: React.CSSProperties = {
+  fontSize: 14,
   color: '#9CA3AF',
-  marginTop: 6,
-  maxWidth: 700
+  marginBottom: 20,
+  maxWidth: 800
 }
 
-const topSection : React.CSSProperties = {
+const topSection: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   gap: 20
 }
 
-const leftMeta : React.CSSProperties = {
+const leftMeta: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 10
 }
 
-const rightMeta : React.CSSProperties = {
+const rightMeta: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 10
 }
 
-const metaItem : React.CSSProperties = {
+const metaItem: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column'
 }
 
-const label : React.CSSProperties = {
+const label: React.CSSProperties = {
   fontSize: 12,
   color: '#9CA3AF'
 }
 
-const inputSmall : React.CSSProperties = {
+const inputSmall: React.CSSProperties = {
   height: 36,
   padding: '6px 10px',
   borderRadius: 6,
@@ -620,79 +653,12 @@ const inputSmall : React.CSSProperties = {
   color: '#fff'
 }
 
-const monthSelector : React.CSSProperties = {
+const monthSelector: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 10
 }
 
-const editButton : React.CSSProperties = {
-  backgroundColor: '#00AEEF',
-  border: 'none',
-  padding: '6px 12px',
-  borderRadius: 6,
-  color: '#000',
-  fontWeight: 600,
-  cursor: 'pointer'
-}
-
-const backButton : React.CSSProperties = {
-  backgroundColor: '#1F2937',
-  border: 'none',
-  padding: '6px 12px',
-  borderRadius: 6,
-  color: '#fff',
-  cursor: 'pointer',
-  fontSize: 12
-}
-
-const objective : React.CSSProperties = {
-  marginBottom: 40
-}
-
-const objectiveTitle : React.CSSProperties = {
-  color: '#00AEEF'
-}
-
-const headerRow : React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
-  gap: 8,
-  marginBottom: 10,
-  fontSize: 12,
-  color: '#9CA3AF'
-}
-
-const row : React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
-  gap: 8,
-  marginBottom: 6
-}
-
-const cell : React.CSSProperties = {
-  background: '#0A0A0A',
-  border: '1px solid #1F2937',
-  borderRadius: 6,
-  color: '#fff'
-}
-const button : React.CSSProperties  = {
-  backgroundColor: '#00AEEF',
-  border: 'none',
-  borderRadius: 6,
-  padding: '4px 8px',
-  cursor: 'pointer',
-  color: '#000',
-  fontSize: 12
-}
-
-const initiativeRow : React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr 1fr',
-  gap: 8,
-  marginTop: 10,
-  marginBottom: 12
-}
 const arrowButton: React.CSSProperties = {
   backgroundColor: '#1F2937',
   border: 'none',
@@ -702,7 +668,74 @@ const arrowButton: React.CSSProperties = {
   cursor: 'pointer'
 }
 
+const editButton: React.CSSProperties = {
+  backgroundColor: '#00AEEF',
+  border: 'none',
+  padding: '6px 12px',
+  borderRadius: 6,
+  color: '#000',
+  fontWeight: 600,
+  cursor: 'pointer'
+}
+
+const backButton: React.CSSProperties = {
+  backgroundColor: '#1F2937',
+  border: 'none',
+  padding: '6px 12px',
+  borderRadius: 6,
+  color: '#fff',
+  cursor: 'pointer',
+  fontSize: 12
+}
+
 const monthText: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 600
+}
+
+const objective: React.CSSProperties = {
+  marginBottom: 40
+}
+
+const objectiveTitle: React.CSSProperties = {
+  color: '#00AEEF'
+}
+
+const headerRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
+  gap: 8,
+  marginBottom: 10
+}
+
+const row: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
+  gap: 8,
+  marginBottom: 6
+}
+
+const cell: React.CSSProperties = {
+  background: '#0A0A0A',
+  border: '1px solid #1F2937',
+  borderRadius: 6,
+  color: '#fff'
+}
+
+const button: React.CSSProperties = {
+  backgroundColor: '#00AEEF',
+  border: 'none',
+  borderRadius: 6,
+  padding: '4px 8px',
+  cursor: 'pointer',
+  color: '#000',
+  fontSize: 12
+}
+
+const initiativeRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr 1fr',
+  gap: 8,
+  marginTop: 10,
+  marginBottom: 12
 }
