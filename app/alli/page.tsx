@@ -99,29 +99,57 @@ export default function Page() {
 
           <div style={rightMeta}>
 
-            <button style={backButton} onClick={() => router.push('/')}>
-              ← Back to Main
-            </button>
+  <button
+    style={backButton}
+    onClick={() => router.push('/')}
+  >
+    ← Back to Main
+  </button>
 
-            <label style={label}>OKR Time Frame</label>
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'flex-end',
+      gap: 16
+    }}
+  >
+    <div>
+      <label style={label}>OKR Time Frame</label>
 
-            <div style={monthSelector}>
-              <button style={arrowButton} onClick={() => changeMonth(-1)}>←</button>
-              <span style={monthText}>{formatMonth(selectedMonth)}</span>
-              <button
-                style={{ ...arrowButton, opacity: isFutureMonth() ? 0.3 : 1 }}
-                disabled={isFutureMonth()}
-                onClick={() => changeMonth(1)}
-              >
-                →
-              </button>
-            </div>
+      <div style={monthSelector}>
+        <button
+          style={arrowButton}
+          onClick={() => changeMonth(-1)}
+        >
+          ←
+        </button>
 
-            <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? 'Save' : 'Edit'}
-            </button>
+        <span style={monthText}>
+          {formatMonth(selectedMonth)}
+        </span>
 
-          </div>
+        <button
+          style={{
+            ...arrowButton,
+            opacity: isFutureMonth() ? 0.3 : 1
+          }}
+          disabled={isFutureMonth()}
+          onClick={() => changeMonth(1)}
+        >
+          →
+        </button>
+      </div>
+    </div>
+
+    <button
+      style={editButton}
+      onClick={() => setIsEditing(!isEditing)}
+    >
+      {isEditing ? 'Save' : 'Edit'}
+    </button>
+  </div>
+
+</div>
         </div>
       </div>
 
@@ -562,8 +590,8 @@ const leftMeta: React.CSSProperties = {
 const rightMeta: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 12,
-  alignItems: 'flex-start'
+  gap: 14,
+  alignItems: 'flex-end'
 }
 
 const metaItem: React.CSSProperties = {
