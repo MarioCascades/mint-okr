@@ -95,6 +95,33 @@ export default function Page() {
               <label style={label}>% Into Period</label>
               <input style={inputSmall} value={percentIntoPeriod} readOnly />
             </div>
+            <div style={metaItem}>
+  <label style={label}>OKR Time Frame</label>
+
+  <div style={monthSelector}>
+    <button
+      style={arrowButton}
+      onClick={() => changeMonth(-1)}
+    >
+      ←
+    </button>
+
+    <span style={monthText}>
+      {formatMonth(selectedMonth)}
+    </span>
+
+    <button
+      style={{
+        ...arrowButton,
+        opacity: isFutureMonth() ? 0.3 : 1
+      }}
+      disabled={isFutureMonth()}
+      onClick={() => changeMonth(1)}
+    >
+      →
+    </button>
+  </div>
+</div>
           </div>
 
           <div style={rightMeta}>
@@ -105,49 +132,14 @@ export default function Page() {
   >
     ← Back to Main
   </button>
+  <button
+  style={editButton}
+  onClick={() => setIsEditing(!isEditing)}
+>
+  {isEditing ? 'Save' : 'Edit'}
+</button>
 
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'flex-end',
-      gap: 16
-    }}
-  >
-    <div>
-      <label style={label}>OKR Time Frame</label>
-
-      <div style={monthSelector}>
-        <button
-          style={arrowButton}
-          onClick={() => changeMonth(-1)}
-        >
-          ←
-        </button>
-
-        <span style={monthText}>
-          {formatMonth(selectedMonth)}
-        </span>
-
-        <button
-          style={{
-            ...arrowButton,
-            opacity: isFutureMonth() ? 0.3 : 1
-          }}
-          disabled={isFutureMonth()}
-          onClick={() => changeMonth(1)}
-        >
-          →
-        </button>
-      </div>
-    </div>
-
-    <button
-      style={editButton}
-      onClick={() => setIsEditing(!isEditing)}
-    >
-      {isEditing ? 'Save' : 'Edit'}
-    </button>
-  </div>
+  
 
 </div>
         </div>
@@ -584,14 +576,16 @@ const leftMeta: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'row',
   gap: 16,
-  flexWrap: 'wrap'
+  flexWrap: 'wrap',
+  alignItems: 'flex-end'
 }
 
 const rightMeta: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 14,
-  alignItems: 'flex-end'
+  alignItems: 'stretch',
+  minWidth: 220
 }
 
 const metaItem: React.CSSProperties = {
@@ -646,11 +640,8 @@ const editButton: React.CSSProperties = {
   fontWeight: 600,
   cursor: 'pointer',
   fontSize: 15,
-  minWidth: 190,
-  height: 48,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
+  width: '100%',
+  height: 52
 }
 
 const backButton: React.CSSProperties = {
@@ -661,7 +652,9 @@ const backButton: React.CSSProperties = {
   color: '#FFFFFF',
   cursor: 'pointer',
   fontWeight: 600,
-  fontSize: 15
+  fontSize: 15,
+  width: '100%',
+  height: 52
 }
 
 const monthText: React.CSSProperties = {
