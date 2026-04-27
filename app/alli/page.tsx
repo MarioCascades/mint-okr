@@ -640,19 +640,22 @@ const monthText: React.CSSProperties = {
 }
 
 const objective: React.CSSProperties = {
-  marginBottom: 28,
+  marginBottom: 32,
   backgroundColor: '#FFFFFF',
-  border: '1px solid #E5E7EB',
-  borderRadius: 16,
-  padding: 20,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
+  border: '2px solid #F6A27A',
+  borderRadius: 18,
+  padding: 24,
+  boxShadow: '0 10px 24px rgba(0,0,0,0.06)',
+  overflow: 'hidden'
 }
 
 const objectiveTitle: React.CSSProperties = {
   color: '#1E266D',
   fontSize: 30,
-  fontWeight: 700,
-  marginBottom: 14
+  fontWeight: 800,
+  marginBottom: 18,
+  paddingBottom: 12,
+  borderBottom: '2px solid #F6A27A'
 }
 
 const headerRow: React.CSSProperties = {
