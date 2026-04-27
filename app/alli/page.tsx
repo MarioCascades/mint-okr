@@ -645,7 +645,12 @@ const editButton: React.CSSProperties = {
   color: '#FFFFFF',
   fontWeight: 600,
   cursor: 'pointer',
-  fontSize: 15
+  fontSize: 15,
+  minWidth: 190,
+  height: 48,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
 }
 
 const backButton: React.CSSProperties = {
