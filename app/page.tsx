@@ -689,15 +689,15 @@ const COLORS = {
   lightOrange: '#FFD2B8',
   paleOrange: '#FFE6D8',
   white: '#FFFFFF',
-  lightGray: '#F5F5F5',
-  gray: '#E5E5E5',
+  lightGray: '#f5f5f5d5',
+  gray: '#e5e5e5c4',
   border: '#D1D5DB',
   text: '#1F2937',
   muted: '#6B7280'
 }
 
 const container: React.CSSProperties = {
-  backgroundColor: COLORS.white,
+  backgroundColor: COLORS.lightGray,
   color: COLORS.text,
   minHeight: '100vh'
 }
