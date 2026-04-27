@@ -282,7 +282,6 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   ''
 ])
   const [isDirty, setIsDirty] = useState(false)
-  const [loadedMonth, setLoadedMonth] = useState('')
 
   const isPercentage =
   metricType === 'percentage' ||
@@ -416,10 +415,11 @@ const resolvedTarget =
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
 
-if (loadedMonth !== currentMonthKey) {
-  setLocalTarget(resolvedTarget ? String(resolvedTarget) : '')
-  setLoadedMonth(currentMonthKey)
-}
+setLocalTarget(
+  resolvedTarget !== null && resolvedTarget !== undefined
+    ? String(resolvedTarget)
+    : ''
+)
 
       const { data: current } = await supabase
         .from('key_result_updates')
@@ -774,7 +774,7 @@ setIsDirty(true)
 }
 
 // =========================
-// STYLES (UNCHANGED)
+// STYLES
 // =========================
 
 const container : React.CSSProperties = { backgroundColor: '#000', minHeight: '100vh', color: '#fff' }
