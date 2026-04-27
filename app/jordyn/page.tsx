@@ -125,93 +125,44 @@ export default function Page() {
         </p>
 
         <div style={topSection}>
+          <div style={leftMeta}>
+            <div style={metaItem}>
+              <label style={label}>Date Updated</label>
+              <div style={inputSmall}>{lastUpdated || '—'}</div>
+              <input type="text" placeholder="10 State" style={inputSmall} />
+            </div>
 
-  <div style={leftMeta}>
-    <div style={metaItem}>
-      <label style={label}>Date Updated</label>
-      <div style={inputSmall}>{lastUpdated || '—'}</div>
-      <input
-        type="text"
-        placeholder="10 State"
-        style={inputSmall}
-      />
-    </div>
+            <div style={metaItem}>
+              <label style={label}>% Into Period</label>
+              <input style={inputSmall} value={percentIntoPeriod} readOnly />
+            </div>
+          </div>
 
-    <div style={metaItem}>
-      <label style={label}>% Into Period</label>
-      <input
-        style={inputSmall}
-        value={percentIntoPeriod}
-        readOnly
-      />
-    </div>
+          <div style={rightMeta}>
+            <button style={backButton} onClick={() => router.push('/')}>
+              ← Back to Main
+            </button>
 
-    <div style={metaItem}>
-      <label style={label}>OKR Time Frame</label>
+            <label style={label}>OKR Time Frame</label>
 
-      <div style={monthSelector}>
-        <button
-          style={arrowButton}
-          onClick={() => changeMonth(-1)}
-        >
-          ←
-        </button>
+            <div style={monthSelector}>
+              <button style={arrowButton} onClick={() => changeMonth(-1)}>←</button>
+              <span style={monthText}>{formatMonth(selectedMonth)}</span>
+              <button
+                style={{ ...arrowButton, opacity: isFutureMonth() ? 0.3 : 1 }}
+                disabled={isFutureMonth()}
+                onClick={() => changeMonth(1)}
+              >
+                →
+              </button>
+            </div>
 
-        <span style={monthText}>
-          {formatMonth(selectedMonth)}
-        </span>
-
-        <button
-          style={{
-            ...arrowButton,
-            opacity: isFutureMonth() ? 0.3 : 1
-          }}
-          disabled={isFutureMonth()}
-          onClick={() => changeMonth(1)}
-        >
-          →
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div style={rightMeta}>
-
-    <button
-      style={backButton}
-      onClick={() => router.push('/')}
-    >
-      ← Back to Main
-    </button>
-
-    <button
-  style={editButton}
-  onClick={() => setIsEditing(!isEditing)}
->
-  {isEditing ? 'Save' : 'Edit'}
-</button>
-
-<button
-  style={editButton}
-  onClick={async () => {
-    if (isEditing) {
-      const event = new CustomEvent('save-all', {
-        detail: { selectedMonth }
-      })
-
-      window.dispatchEvent(event)
-    }
-
-    setIsEditing(!isEditing)
-  }}
->
-  {isEditing ? 'Save' : 'Edit'}
-</button>
-
-  </div>
-
-</div>
+            <button style={editButton} onClick={() => setIsEditing(!isEditing)}>
+              {isEditing ? 'Save' : 'Edit'}
+            </button>
+          </div>
         </div>
+      </div>
 
       <div style={content}>
 
@@ -636,17 +587,6 @@ if (t > 0) {
   }, [label, selectedMonth])
 
   const handleSave = async () => {
-    useEffect(() => {
-  const saveListener = () => {
-    handleSave()
-  }
-
-  window.addEventListener('save-all', saveListener)
-
-  return () => {
-    window.removeEventListener('save-all', saveListener)
-  }
-}, [value, localTarget, keyResultId, selectedMonth])
 
     if (!keyResultId) return
     
@@ -833,223 +773,122 @@ setIsDirty(true)
   )
 }
 
-
 // =========================
-// STYLES
+// STYLES (UNCHANGED)
 // =========================
 
-const container: React.CSSProperties = {
-  backgroundColor: '#ecececd5',
-  minHeight: '100vh',
-  color: '#1E266D'
-}
+const container : React.CSSProperties = { backgroundColor: '#000', minHeight: '100vh', color: '#fff' }
 
-const stickyHeader: React.CSSProperties = {
+const stickyHeader : React.CSSProperties = {
   position: 'sticky',
   top: 60,
   zIndex: 10,
-  background: 'linear-gradient(90deg, #00AEEF 0%, #38BDF8 100%)',
-  padding: 24,
-  borderBottom: '1px solid #7DD3FC',
-  borderRadius: 16,
-  margin: 16,
-  boxShadow: '0 8px 24px rgba(0,0,0,0.06)'
-}
-
-const content: React.CSSProperties = {
+  backgroundColor: '#000',
   padding: 20,
-  overflowX: 'auto'
+  borderBottom: '1px solid #1F2937'
 }
 
-const title: React.CSSProperties = {
-  fontSize: 38,
-  fontWeight: 700,
-  color: '#FFFFFF',
-  marginBottom: 8
+const content : React.CSSProperties = { padding: 20 }
+
+const title : React.CSSProperties = { fontSize: 24, fontWeight: 700 }
+
+const description : React.CSSProperties = {
+  fontSize: 14,
+  color: '#9CA3AF',
+  marginBottom: 20,
+  maxWidth: 800
 }
 
-const description: React.CSSProperties = {
-  fontSize: 16,
-  color: '#FFFFFF',
-  marginBottom: 24,
-  maxWidth: 900,
-  lineHeight: 1.5
+const topSection : React.CSSProperties = { display: 'flex', justifyContent: 'space-between', gap: 20 }
+
+const leftMeta : React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 10 }
+const rightMeta : React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 10 }
+
+const metaItem : React.CSSProperties = { display: 'flex', flexDirection: 'column' }
+
+const label : React.CSSProperties = { fontSize: 12, color: '#9CA3AF' }
+
+const inputSmall = {
+  height: 36,
+  padding: '6px 10px',
+  borderRadius: 6,
+  border: '1px solid #1F2937',
+  backgroundColor: '#0A0A0A',
+  color: '#fff'
 }
 
-const topSection: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  gap: 24,
-  alignItems: 'flex-start'
-}
+const monthSelector : React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10 }
 
-const leftMeta: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'row',
-  gap: 16,
-  flexWrap: 'wrap',
-  alignItems: 'flex-end'
-}
-
-const rightMeta: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 14,
-  alignItems: 'stretch',
-  minWidth: 220
-}
-
-const metaItem: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  minWidth: 220
-}
-
-const label: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: '#FFFFFF',
-  marginBottom: 6
-}
-
-const inputSmall: React.CSSProperties = {
-  height: 44,
-  padding: '10px 14px',
-  borderRadius: 10,
-  border: '1px solid #7DD3FC',
-  backgroundColor: '#FFFFFF',
-  color: '#1E266D',
-  fontSize: 15,
-  fontWeight: 500
-}
-
-const monthSelector: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 12,
-  padding: 8,
-  borderRadius: 12,
-  backgroundColor: '#BAE6FD'
-}
-
-const arrowButton: React.CSSProperties = {
-  backgroundColor: '#1E266D',
+const arrowButton : React.CSSProperties = {
+  backgroundColor: '#1F2937',
   border: 'none',
-  padding: '10px 14px',
-  borderRadius: 8,
-  color: '#FFFFFF',
+  padding: '6px 10px',
+  borderRadius: 6,
+  color: '#fff'
+}
+
+const editButton : React.CSSProperties = {
+  backgroundColor: '#00AEEF',
+  border: 'none',
+  padding: '6px 12px',
+  borderRadius: 6,
+  color: '#000',
+  fontWeight: 600,
+  cursor: 'pointer'
+}
+
+const backButton : React.CSSProperties = {
+  backgroundColor: '#1F2937',
+  border: 'none',
+  padding: '6px 12px',
+  borderRadius: 6,
+  color: '#fff',
   cursor: 'pointer',
+  fontSize: 12
+}
+
+const monthText : React.CSSProperties = {
+  fontSize: 14,
   fontWeight: 600
 }
 
-const editButton: React.CSSProperties = {
-  backgroundColor: '#1E266D',
-  border: 'none',
-  padding: '12px 20px',
-  borderRadius: 10,
-  color: '#FFFFFF',
-  fontWeight: 600,
-  cursor: 'pointer',
-  fontSize: 15,
-  width: '100%',
-  height: 52
-}
+const objective : React.CSSProperties = { marginBottom: 40 }
+const objectiveTitle = { color: '#00AEEF' }
 
-const backButton: React.CSSProperties = {
-  backgroundColor: '#1E266D',
-  border: 'none',
-  padding: '12px 20px',
-  borderRadius: 10,
-  color: '#FFFFFF',
-  cursor: 'pointer',
-  fontWeight: 600,
-  fontSize: 15,
-  width: '100%',
-  height: 52
-}
-
-const monthText: React.CSSProperties = {
-  fontSize: 18,
-  fontWeight: 700,
-  color: '#1E266D',
-  minWidth: 120,
-  textAlign: 'center'
-}
-
-const objective: React.CSSProperties = {
-  marginBottom: 32,
-  backgroundColor: '#FFFFFF',
-  border: '2px solid #7DD3FC',
-  borderRadius: 18,
-  padding: 24,
-  boxShadow: '0 10px 24px rgba(0,0,0,0.06)',
-  overflow: 'hidden'
-}
-
-const objectiveTitle: React.CSSProperties = {
-  color: '#1E266D',
-  fontSize: 30,
-  fontWeight: 800,
-  marginBottom: 18,
-  paddingBottom: 12,
-  borderBottom: '2px solid #7DD3FC'
-}
-
-const headerRow: React.CSSProperties = {
+const headerRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
-  gap: 10,
-  marginBottom: 14,
-  padding: '0 6px',
-  fontWeight: 600,
-  color: '#4B5563',
-  fontSize: 14
+  gap: 8,
+  marginBottom: 10
 }
 
-const row: React.CSSProperties = {
+const row : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
-  gap: 10,
-  marginBottom: 10,
-  padding: 12,
-  backgroundColor: '#FFFFFF',
-  border: '1px solid #7DD3FC',
-  borderRadius: 12,
-  alignItems: 'center',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+  gap: 8,
+  marginBottom: 6
 }
 
-const cell: React.CSSProperties = {
-  width: '100%',
-  padding: '10px 12px',
-  backgroundColor: '#FFFFFF',
-  border: '1px solid #7DD3FC',
-  borderRadius: 8,
-  color: '#1E266D',
-  fontSize: 14,
-  fontWeight: 500,
-  textAlign: 'center',
-  outline: 'none'
+const cell : React.CSSProperties = {
+  background: '#0A0A0A',
+  border: '1px solid #1F2937',
+  borderRadius: 6,
+  color: '#fff'
 }
 
-const button: React.CSSProperties = {
+const button : React.CSSProperties = {
   backgroundColor: '#00AEEF',
   border: 'none',
-  borderRadius: 8,
-  padding: '10px 14px',
+  borderRadius: 6,
+  padding: '4px 8px',
   cursor: 'pointer',
-  color: '#FFFFFF',
-  fontWeight: 600,
-  fontSize: 13
+  color: '#000',
+  fontSize: 12
 }
 
-const initiativeRow: React.CSSProperties = {
+const initiativeRow : React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr 1fr',
-  gap: 10,
-  marginTop: 10,
-  padding: 12,
-  backgroundColor: '#F0F9FF',
-  borderRadius: 12,
-  border: '1px solid #7DD3FC'
+  gap: 8
 }
+
