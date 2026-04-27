@@ -649,11 +649,11 @@ const editButton: React.CSSProperties = {
 }
 
 const backButton: React.CSSProperties = {
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '#1E266D',
   border: 'none',
   padding: '12px 20px',
   borderRadius: 10,
-  color: '#1E266D',
+  color: '#FFFFFF',
   cursor: 'pointer',
   fontWeight: 600,
   fontSize: 15
