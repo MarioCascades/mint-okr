@@ -500,47 +500,64 @@ const conversionTarget =
         <h1 style={mainTitle}>Overall Practice Performance</h1>
 
         <div style={metaRow}>
-          <div>
-            <div style={label}>OKR Timeframe</div>
-            <div style={monthSelector}>
-              <button
-  style={monthButton}
-  onClick={() => changeMonth(-1)}
->
-  ←
-</button>
 
-<span
-  style={{
-    fontWeight: 800,
-    fontSize: 18,
-    color: '#FFFFFF',
-    minWidth: 110,
-    textAlign: 'center'
-  }}
->
-  {formatMonth(selectedMonth)}
-</span>
+  {/* LEFT SIDE */}
+  <div
+    style={{
+      display: 'flex',
+      gap: 24,
+      alignItems: 'flex-start'
+    }}
+  >
+    <div>
+      <div style={label}>Last Updated</div>
+      <div style={input}>{lastUpdated || '—'}</div>
+    </div>
 
-<button
-  style={monthButton}
-  onClick={() => changeMonth(1)}
->
-  →
-</button>
-            </div>
-          </div>
+    <div>
+      <div style={label}>% Into Period</div>
+      <input
+        value={percentIntoPeriod}
+        readOnly
+        style={input}
+      />
+    </div>
+  </div>
 
-          <div>
-           <div style={label}>Last Updated</div>
-            <div style={input}>{lastUpdated || '—'}</div>
-            </div>
+  {/* RIGHT SIDE */}
+  <div>
+    <div style={label}>OKR Timeframe</div>
 
-          <div>
-            <div style={label}>% Into Period</div>
-            <input value={percentIntoPeriod} readOnly style={input} />
-          </div>
-        </div>
+    <div style={monthSelector}>
+      <button
+        style={monthButton}
+        onClick={() => changeMonth(-1)}
+      >
+        ←
+      </button>
+
+      <span
+        style={{
+          fontWeight: 800,
+          fontSize: 18,
+          color: '#FFFFFF',
+          minWidth: 110,
+          textAlign: 'center'
+        }}
+      >
+        {formatMonth(selectedMonth)}
+      </span>
+
+      <button
+        style={monthButton}
+        onClick={() => changeMonth(1)}
+      >
+        →
+      </button>
+    </div>
+  </div>
+
+</div>
       </div>
 
       {/* KPI */}
