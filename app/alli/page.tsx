@@ -507,58 +507,42 @@ const handleInitiativeSave = async (
 // STYLES
 // =========================
 
-// =========================
-// STYLES
-// =========================
-
-const COLORS = {
-  navy: '#1E266D',
-  blue: '#A9C9D8',
-  orange: '#F26C2F',
-  white: '#FFFFFF',
-  lightGray: '#F5F7FA',
-  grayCard: '#E5E5E5',
-  border: '#D1D5DB',
-  rowBorder: '#D6DCE5',
-  text: '#1F2937',
-  muted: '#6B7280'
-}
-
 const container: React.CSSProperties = {
-  backgroundColor: COLORS.lightGray,
+  backgroundColor: '#F8FAFC',
   minHeight: '100vh',
-  color: COLORS.text
+  color: '#1E266D'
 }
 
 const stickyHeader: React.CSSProperties = {
   position: 'sticky',
   top: 60,
   zIndex: 10,
-  backgroundColor: COLORS.orange,
-  padding: 28,
-  margin: 20,
-  borderRadius: 18,
-  boxShadow: '0 10px 24px rgba(0,0,0,0.08)'
+  background: 'linear-gradient(90deg, #F26C2F 0%, #F58220 100%)',
+  padding: 24,
+  borderBottom: '1px solid #F6A27A',
+  borderRadius: 16,
+  margin: 16,
+  boxShadow: '0 8px 24px rgba(0,0,0,0.06)'
 }
 
 const content: React.CSSProperties = {
-  padding: '0 20px 20px 20px',
+  padding: 20,
   overflowX: 'auto'
 }
 
 const title: React.CSSProperties = {
-  fontSize: 40,
-  fontWeight: 800,
-  color: COLORS.white,
-  marginBottom: 12
+  fontSize: 38,
+  fontWeight: 700,
+  color: '#FFFFFF',
+  marginBottom: 8
 }
 
 const description: React.CSSProperties = {
-  fontSize: 15,
-  color: COLORS.white,
+  fontSize: 16,
+  color: '#FFFFFF',
   marginBottom: 24,
-  maxWidth: 1000,
-  lineHeight: 1.6
+  maxWidth: 900,
+  lineHeight: 1.5
 }
 
 const topSection: React.CSSProperties = {
@@ -570,109 +554,105 @@ const topSection: React.CSSProperties = {
 
 const leftMeta: React.CSSProperties = {
   display: 'flex',
-  gap: 20,
-  alignItems: 'flex-start'
+  flexDirection: 'row',
+  gap: 16,
+  flexWrap: 'wrap'
 }
 
 const rightMeta: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 12,
-  alignItems: 'flex-end'
+  alignItems: 'flex-start'
 }
 
 const metaItem: React.CSSProperties = {
   display: 'flex',
-  flexDirection: 'column'
+  flexDirection: 'column',
+  minWidth: 220
 }
 
 const label: React.CSSProperties = {
   fontSize: 13,
-  fontWeight: 700,
-  color: COLORS.white,
+  fontWeight: 600,
+  color: '#FFFFFF',
   marginBottom: 6
 }
 
 const inputSmall: React.CSSProperties = {
-  height: 42,
-  padding: '8px 14px',
+  height: 44,
+  padding: '10px 14px',
   borderRadius: 10,
-  border: `1px solid ${COLORS.border}`,
-  backgroundColor: COLORS.white,
-  color: COLORS.text,
-  minWidth: 220,
-  fontSize: 14,
+  border: '1px solid #F6A27A',
+  backgroundColor: '#FFFFFF',
+  color: '#1E266D',
+  fontSize: 15,
   fontWeight: 500
 }
 
 const monthSelector: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 14,
-  backgroundColor: 'rgba(255,255,255,0.18)',
-  padding: '10px 18px',
-  borderRadius: 14
+  gap: 12,
+  padding: 8,
+  borderRadius: 12,
+  backgroundColor: '#F6A27A'
 }
 
 const arrowButton: React.CSSProperties = {
-  backgroundColor: COLORS.navy,
+  backgroundColor: '#1E266D',
   border: 'none',
-  width: 42,
-  height: 42,
-  borderRadius: 10,
-  color: COLORS.white,
-  fontWeight: 700,
-  fontSize: 18,
+  padding: '10px 14px',
+  borderRadius: 8,
+  color: '#FFFFFF',
   cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
+  fontWeight: 600
 }
 
 const editButton: React.CSSProperties = {
-  backgroundColor: COLORS.navy,
+  backgroundColor: '#1E266D',
   border: 'none',
-  padding: '10px 18px',
+  padding: '12px 20px',
   borderRadius: 10,
-  color: COLORS.white,
-  fontWeight: 700,
+  color: '#FFFFFF',
+  fontWeight: 600,
   cursor: 'pointer',
-  fontSize: 14
+  fontSize: 15
 }
 
 const backButton: React.CSSProperties = {
-  backgroundColor: COLORS.white,
+  backgroundColor: '#FFFFFF',
   border: 'none',
-  padding: '10px 18px',
+  padding: '12px 20px',
   borderRadius: 10,
-  color: COLORS.navy,
+  color: '#1E266D',
   cursor: 'pointer',
-  fontWeight: 700,
-  fontSize: 14
+  fontWeight: 600,
+  fontSize: 15
 }
 
 const monthText: React.CSSProperties = {
   fontSize: 18,
-  fontWeight: 800,
-  color: COLORS.white,
-  minWidth: 110,
+  fontWeight: 700,
+  color: '#1E266D',
+  minWidth: 120,
   textAlign: 'center'
 }
 
 const objective: React.CSSProperties = {
   marginBottom: 28,
-  backgroundColor: COLORS.grayCard,
-  padding: 24,
-  borderRadius: 18,
-  border: '1px solid rgba(255,255,255,0.6)',
-  boxShadow: '0 10px 24px rgba(0,0,0,0.06)'
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 16,
+  padding: 20,
+  boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
 }
 
 const objectiveTitle: React.CSSProperties = {
-  color: COLORS.navy,
-  fontSize: 24,
-  fontWeight: 800,
-  marginBottom: 18
+  color: '#1E266D',
+  fontSize: 30,
+  fontWeight: 700,
+  marginBottom: 14
 }
 
 const headerRow: React.CSSProperties = {
@@ -680,46 +660,47 @@ const headerRow: React.CSSProperties = {
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
   gap: 10,
   marginBottom: 14,
-  fontWeight: 700,
-  fontSize: 13,
-  color: COLORS.muted,
-  padding: '0 8px'
+  padding: '0 6px',
+  fontWeight: 600,
+  color: '#4B5563',
+  fontSize: 14
 }
 
 const row: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
   gap: 10,
-  marginBottom: 12,
-  alignItems: 'center',
-
-  backgroundColor: '#F8FAFC',
-  border: `1px solid ${COLORS.rowBorder}`,
-  borderRadius: 12,
+  marginBottom: 10,
   padding: 12,
-  boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #F6A27A',
+  borderRadius: 12,
+  alignItems: 'center',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
 }
 
 const cell: React.CSSProperties = {
-  background: '#FFFFFF',
-  border: `1px solid ${COLORS.border}`,
-  borderRadius: 10,
-  color: COLORS.text,
-  padding: 10,
+  width: '100%',
+  padding: '10px 12px',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #F6A27A',
+  borderRadius: 8,
+  color: '#1E266D',
   fontSize: 14,
-  fontWeight: 500
+  fontWeight: 500,
+  textAlign: 'center',
+  outline: 'none'
 }
 
 const button: React.CSSProperties = {
-  backgroundColor: COLORS.orange,
+  backgroundColor: '#F26C2F',
   border: 'none',
-  borderRadius: 10,
+  borderRadius: 8,
   padding: '10px 14px',
   cursor: 'pointer',
-  color: COLORS.white,
-  fontWeight: 700,
-  fontSize: 13,
-  width: '100%'
+  color: '#FFFFFF',
+  fontWeight: 600,
+  fontSize: 13
 }
 
 const initiativeRow: React.CSSProperties = {
@@ -727,5 +708,8 @@ const initiativeRow: React.CSSProperties = {
   gridTemplateColumns: '1fr 1fr 1fr',
   gap: 10,
   marginTop: 10,
-  marginBottom: 10
+  padding: 12,
+  backgroundColor: '#FFF7F3',
+  borderRadius: 12,
+  border: '1px solid #F6A27A'
 }
