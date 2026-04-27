@@ -439,9 +439,25 @@ if (!currentRow && resolvedTarget !== null) {
 
   }, [label, selectedMonth])
 
-  const handleSave = async () => {
+const handleSave = async () => {
+  if (!keyResultId) return
 
-    useEffect(() => {
+  const y = selectedMonth.getFullYear()
+  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+  const reportingDate = `${y}-${m}-01`
+
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      value: value === '' ? null : Number(value),
+      target_value: target === '' ? null : Number(target),
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
+}
+
+useEffect(() => {
   const saveListener = () => {
     handleSave()
   }
@@ -452,23 +468,8 @@ if (!currentRow && resolvedTarget !== null) {
     window.removeEventListener('save-all', saveListener)
   }
 }, [value, target, keyResultId, selectedMonth])
-    if (!keyResultId) return
 
-    const y = selectedMonth.getFullYear()
-    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
-    const reportingDate = `${y}-${m}-01`
-
- await supabase.from('key_result_updates').upsert(
-  {
-    key_result_id: keyResultId,
-    reporting_month: reportingDate,
-    value: value === '' ? null : Number(value),
-    target_value: target === '' ? null : Number(target),
-  },
-  { onConflict: 'key_result_id,reporting_month' }
-)
-  }
-
+ 
   const handleInitiativeSave = async (
   index: number,
   text: string
