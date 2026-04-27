@@ -641,69 +641,149 @@ onBlur={(e) =>
 
 // ================= STYLES =================
 
-const container : React.CSSProperties = { backgroundColor: '#000', color: '#fff', minHeight: '100vh' }
+// ================= STYLES =================
 
-const topBar : React.CSSProperties = {
+const COLORS = {
+  navy: '#1E266D',
+  blue: '#A9C9D8',
+  orange: '#F26C2F',
+  peach: '#F6A27A',
+  white: '#FFFFFF',
+  lightGray: '#F7F8FA',
+  border: '#D9DEE8',
+  text: '#1F2937',
+  muted: '#6B7280'
+}
+
+const container: React.CSSProperties = {
+  backgroundColor: COLORS.lightGray,
+  color: COLORS.text,
+  minHeight: '100vh'
+}
+
+const topBar: React.CSSProperties = {
   position: 'sticky',
   top: 0,
   zIndex: 100,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '12px 20px',
-  backgroundColor: '#f8f8f8',
-  borderBottom: '1px solid #1F2937'
+  padding: '14px 24px',
+  backgroundColor: COLORS.white,
+  borderBottom: `1px solid ${COLORS.border}`,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
 }
 
-const logoLeft : React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10 }
-const logoImg : React.CSSProperties = { height: 40 }
-const brandText : React.CSSProperties = { fontSize: 18, fontWeight: 700 }
-
-const selectorRow : React.CSSProperties = { display: 'flex', gap: 6, flexWrap: 'wrap' }
-
-const selectorButton : React.CSSProperties = {
-  padding: '6px 10px',
-  border: '1px solid #333',
-  borderRadius: 6,
-  color: '#fff',
-  backgroundColor: '#111'
+const logoLeft: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10
 }
 
-const activeTab : React.CSSProperties = { backgroundColor: '#E65A3C' }
+const logoImg: React.CSSProperties = {
+  height: 42
+}
 
-const headerBox : React.CSSProperties = { backgroundColor: '#E65A3C', padding: 20, marginBottom: 20 }
+const brandText: React.CSSProperties = {
+  fontSize: 18,
+  fontWeight: 700,
+  color: COLORS.navy
+}
 
-const mainTitle : React.CSSProperties = { fontSize: 36, fontWeight: 800, marginBottom: 10 }
+const selectorRow: React.CSSProperties = {
+  display: 'flex',
+  gap: 8,
+  flexWrap: 'wrap'
+}
 
-const metaRow : React.CSSProperties = { display: 'flex', gap: 20 }
+const selectorButton: React.CSSProperties = {
+  padding: '8px 14px',
+  border: `1px solid ${COLORS.border}`,
+  borderRadius: 8,
+  backgroundColor: COLORS.white,
+  color: COLORS.navy,
+  fontWeight: 600,
+  cursor: 'pointer',
+  transition: '0.2s'
+}
 
-const label : React.CSSProperties = { fontSize: 12 }
+const activeTab: React.CSSProperties = {
+  backgroundColor: COLORS.orange,
+  color: COLORS.white,
+  border: `1px solid ${COLORS.orange}`
+}
 
-const input : React.CSSProperties = { padding: 6, backgroundColor: '#f0f0f0', color: '#080808', border: '1px solid #333' }
+const headerBox: React.CSSProperties = {
+  backgroundColor: COLORS.white,
+  padding: 24,
+  margin: 20,
+  borderRadius: 14,
+  border: `1px solid ${COLORS.border}`,
+  boxShadow: '0 4px 14px rgba(0,0,0,0.04)'
+}
 
-const monthSelector : React.CSSProperties = { display: 'flex', gap: 10 }
+const mainTitle: React.CSSProperties = {
+  fontSize: 34,
+  fontWeight: 800,
+  color: COLORS.navy,
+  marginBottom: 18
+}
 
-const kpiGrid : React.CSSProperties = {
+const metaRow: React.CSSProperties = {
+  display: 'flex',
+  gap: 24,
+  flexWrap: 'wrap'
+}
+
+const label: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 600,
+  color: COLORS.muted,
+  marginBottom: 6
+}
+
+const input: React.CSSProperties = {
+  padding: 10,
+  backgroundColor: COLORS.white,
+  color: COLORS.text,
+  border: `1px solid ${COLORS.border}`,
+  borderRadius: 8,
+  minWidth: 160
+}
+
+const monthSelector: React.CSSProperties = {
+  display: 'flex',
+  gap: 12,
+  alignItems: 'center'
+}
+
+const kpiGrid: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(4, 1fr)',
   gap: 20,
   padding: '0 20px'
 }
-const notesBlock : React.CSSProperties = {
-  marginTop: 25,
+
+const notesBlock: React.CSSProperties = {
+  marginTop: 28,
   padding: '0 20px'
 }
 
-const notesTitle : React.CSSProperties = {
-  marginBottom: 5,
-  fontWeight: 600
+const notesTitle: React.CSSProperties = {
+  marginBottom: 8,
+  fontWeight: 700,
+  fontSize: 16,
+  color: COLORS.navy
 }
 
-const textarea : React.CSSProperties = {
+const textarea: React.CSSProperties = {
   width: '100%',
-  minHeight: 100,
-  backgroundColor: '#111',
-  color: '#fff',
-  border: '1px solid #333',
-  padding: 8
+  minHeight: 120,
+  backgroundColor: COLORS.white,
+  color: COLORS.text,
+  border: `1px solid ${COLORS.border}`,
+  borderRadius: 10,
+  padding: 14,
+  fontSize: 14,
+  resize: 'vertical'
 }

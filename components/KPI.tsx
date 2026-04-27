@@ -288,56 +288,82 @@ export default function KPI({
 // ================= STYLES =================
 //
 
-const kpiCard : React.CSSProperties = {
-  backgroundColor: '#1a1a1a',
-  padding: 10,
-  borderRadius: 6
+const KPI_COLORS = {
+  navy: '#1E266D',
+  blue: '#A9C9D8',
+  orange: '#F26C2F',
+  peach: '#F6A27A',
+  white: '#FFFFFF',
+  border: '#D9DEE8',
+  lightGray: '#F7F8FA',
+  text: '#1F2937',
+  muted: '#6B7280'
 }
 
-const kpiLabel : React.CSSProperties = {
+const kpiCard: React.CSSProperties = {
+  backgroundColor: KPI_COLORS.white,
+  padding: 20,
+  borderRadius: 14,
+  border: `1px solid ${KPI_COLORS.border}`,
+  boxShadow: '0 4px 14px rgba(0,0,0,0.04)'
+}
+
+const kpiLabel: React.CSSProperties = {
   textAlign: 'center',
-  marginBottom: 10,
+  marginBottom: 16,
+  fontWeight: 700,
+  fontSize: 16,
+  color: KPI_COLORS.navy
+}
+
+const kpiHeader: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gap: 8,
+  fontSize: 12,
+  fontWeight: 600,
+  color: KPI_COLORS.muted,
+  marginBottom: 8,
+  textAlign: 'center'
+}
+
+const kpiRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gap: 8
+}
+
+const cell: React.CSSProperties = {
+  width: '100%',
+  padding: 10,
+  backgroundColor: KPI_COLORS.lightGray,
+  color: KPI_COLORS.text,
+  border: `1px solid ${KPI_COLORS.border}`,
+  borderRadius: 8,
+  fontSize: 14,
+  textAlign: 'center'
+}
+
+const cellWide: React.CSSProperties = {
+  ...cell,
+  textAlign: 'left'
+}
+
+const button: React.CSSProperties = {
+  marginTop: 14,
+  width: '100%',
+  backgroundColor: KPI_COLORS.orange,
+  border: 'none',
+  padding: '10px 12px',
+  borderRadius: 8,
+  cursor: 'pointer',
+  color: KPI_COLORS.white,
+  fontSize: 13,
   fontWeight: 600
 }
 
-const kpiHeader : React.CSSProperties = {
+const initRow: React.CSSProperties = {
   display: 'flex',
-  justifyContent: 'space-between',
-  fontSize: 12,
-  marginBottom: 5
-}
-
-const kpiRow : React.CSSProperties = {
-  display: 'flex',
-  gap: 5
-}
-
-const cell : React.CSSProperties = {
-  width: '100%',
-  padding: 4,
-  backgroundColor: '#111',
-  color: '#fff',
-  border: '1px solid #333'
-}
-
-const cellWide : React.CSSProperties = {
-  ...cell
-}
-
-const button : React.CSSProperties = {
-  marginTop: 10,
-  width: '100%',
-  backgroundColor: '#00AEEF',
-  border: 'none',
-  padding: '4px 8px',
-  borderRadius: 6,
-  cursor: 'pointer',
-  color: '#000',
-  fontSize: 12
-}
-
-const initRow : React.CSSProperties = {
-  display: 'flex',
-  gap: 5,
-  marginTop: 10
+  gap: 8,
+  marginTop: 12
 }
