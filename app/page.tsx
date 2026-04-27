@@ -762,7 +762,7 @@ const headerBox: React.CSSProperties = {
 }
 
 const mainTitle: React.CSSProperties = {
-  fontSize: 34,
+  fontSize: 42,
   fontWeight: 800,
   color: COLORS.white,
   marginBottom: 18
@@ -777,7 +777,7 @@ const metaRow: React.CSSProperties = {
 }
 
 const label: React.CSSProperties = {
-  fontSize: 12,
+  fontSize: 14,
   fontWeight: 600,
   color: COLORS.white,
   marginBottom: 6
