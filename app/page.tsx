@@ -503,9 +503,31 @@ const conversionTarget =
           <div>
             <div style={label}>OKR Timeframe</div>
             <div style={monthSelector}>
-              <button onClick={() => changeMonth(-1)}>←</button>
-              <span>{formatMonth(selectedMonth)}</span>
-              <button onClick={() => changeMonth(1)}>→</button>
+              <button
+  style={monthButton}
+  onClick={() => changeMonth(-1)}
+>
+  ←
+</button>
+
+<span
+  style={{
+    fontWeight: 800,
+    fontSize: 18,
+    color: '#FFFFFF',
+    minWidth: 110,
+    textAlign: 'center'
+  }}
+>
+  {formatMonth(selectedMonth)}
+</span>
+
+<button
+  style={monthButton}
+  onClick={() => changeMonth(1)}
+>
+  →
+</button>
             </div>
           </div>
 
@@ -641,9 +663,6 @@ onBlur={(e) =>
 
 // ================= STYLES =================
 
-// ================= STYLES =================
-
-// ================= STYLES =================
 
 const COLORS = {
   navy: '#1E266D',
@@ -734,6 +753,8 @@ const mainTitle: React.CSSProperties = {
 
 const metaRow: React.CSSProperties = {
   display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
   gap: 24,
   flexWrap: 'wrap'
 }
@@ -756,8 +777,26 @@ const input: React.CSSProperties = {
 
 const monthSelector: React.CSSProperties = {
   display: 'flex',
-  gap: 12,
-  alignItems: 'center'
+  alignItems: 'center',
+  gap: 14,
+  backgroundColor: 'rgba(255,255,255,0.18)',
+  padding: '10px 18px',
+  borderRadius: 12,
+  width: 'fit-content'
+}
+const monthButton: React.CSSProperties = {
+  backgroundColor: '#1E266D',
+  border: 'none',
+  borderRadius: 10,
+  width: 40,
+  height: 40,
+  cursor: 'pointer',
+  fontWeight: 800,
+  fontSize: 18,
+  color: '#FFFFFF',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
 }
 
 const kpiGrid: React.CSSProperties = {
