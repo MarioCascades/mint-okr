@@ -440,6 +440,18 @@ if (!currentRow && resolvedTarget !== null) {
   }, [label, selectedMonth])
 
   const handleSave = async () => {
+
+    useEffect(() => {
+  const saveListener = () => {
+    handleSave()
+  }
+
+  window.addEventListener('save-all', saveListener)
+
+  return () => {
+    window.removeEventListener('save-all', saveListener)
+  }
+}, [value, target, keyResultId, selectedMonth])
     if (!keyResultId) return
 
     const y = selectedMonth.getFullYear()
