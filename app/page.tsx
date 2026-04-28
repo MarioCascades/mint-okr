@@ -680,7 +680,6 @@ onBlur={(e) =>
 
 // ================= STYLES =================
 
-
 const COLORS = {
   navy: '#1E266D',
   blue: '#A9C9D8',
@@ -691,7 +690,7 @@ const COLORS = {
   white: '#FFFFFF',
   lightGray: '#f5f5f5d5',
   gray: '#e5e5e5c4',
-  border: '#D1D5DB',
+  border: '#F6A27A',
   text: '#1F2937',
   muted: '#6B7280'
 }
@@ -758,6 +757,7 @@ const headerBox: React.CSSProperties = {
   padding: 24,
   margin: 20,
   borderRadius: 14,
+  border: `2px solid ${COLORS.softOrange}`,
   boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
 }
 
@@ -799,8 +799,10 @@ const monthSelector: React.CSSProperties = {
   backgroundColor: 'rgba(255,255,255,0.18)',
   padding: '10px 18px',
   borderRadius: 12,
+  border: `1px solid ${COLORS.softOrange}`,
   width: 'fit-content'
 }
+
 const monthButton: React.CSSProperties = {
   backgroundColor: '#1E266D',
   border: 'none',
@@ -824,11 +826,11 @@ const kpiGrid: React.CSSProperties = {
 }
 
 const notesBlock: React.CSSProperties = {
-  backgroundColor: '#E5E5E5',
+  backgroundColor: '#FFFFFF',
   padding: 28,
   marginTop: 24,
   borderRadius: 20,
-  border: '1px solid rgba(255,255,255,0.7)',
+  border: '2px solid #F6A27A',
   boxShadow: '0 14px 30px rgba(0,0,0,0.08)'
 }
 
@@ -847,7 +849,7 @@ const textarea: React.CSSProperties = {
   fontWeight: 500,
   color: '#1E266D',
   backgroundColor: '#F8FAFC',
-  border: '1px solid #D6DCE5',
+  border: '1px solid #F6A27A',
   borderRadius: 16,
   outline: 'none',
   resize: 'vertical',
