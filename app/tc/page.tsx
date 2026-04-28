@@ -510,6 +510,11 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) =>
 </div>
   </div>
 
+
+// =========================
+// STYLES
+// =========================
+
 const container: React.CSSProperties = {
   backgroundColor: '#ecececd5',
   minHeight: '100vh',
