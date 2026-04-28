@@ -63,10 +63,24 @@ const handleSave = async () => {
     }
   })
 
-  const allRows = [
-    ...productionRows,
-    ...collectionsRows
-  ]
+ const startsRows = Object.entries(startsData).map(([key, value]) => {
+  const [month, year] = key.split('-')
+
+  return {
+    metric_type: 'Starts',
+    month_name: month,
+    year_value: Number(year),
+    metric_value: Number(
+      value.replace(/,/g, '')
+    ) || 0
+  }
+})
+
+const allRows = [
+  ...productionRows,
+  ...collectionsRows,
+  ...startsRows
+]
 
   const { error } = await supabase
     .from('practice_trends_data')
@@ -296,11 +310,26 @@ useEffect(() => {
 
             {years.map((year) => (
               <td key={year} style={td}>
-                <input
-                  style={input}
-                  placeholder="0"
-                  readOnly={!isEditing}
-                />
+              <input
+  style={input}
+  placeholder="0"
+  readOnly={!isEditing}
+  value={startsData[`${month}-${year}`] || ''}
+  onChange={(e) => {
+    setStartsData({
+      ...startsData,
+      [`${month}-${year}`]: e.target.value
+    })
+  }}
+  onBlur={(e) => {
+    const cleanedValue = e.target.value.replace(/,/g, '')
+
+    setStartsData({
+      ...startsData,
+      [`${month}-${year}`]: Number(cleanedValue).toLocaleString()
+    })
+  }}
+/>
               </td>
             ))}
           </tr>
