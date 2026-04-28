@@ -379,43 +379,81 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
   return (
     <div style={container}>
       <TopNav />
+{/* HEADER */}
+<div style={headerBar}>
 
-      {/* HEADER */}
-      <div style={headerBar}>
+  <h1 style={headerTitle}>
+    Treatment Coordinator Team Overview
+  </h1>
 
-        <div style={headerTop}>
-          <h1 style={headerTitle}>
-            Treatment Coordinator Team Overview
-          </h1>
+  <div style={headerMeta}>
 
-          <button style={backButton} onClick={() => router.push('/')}>
-            ← Back to Main
+    {/* LEFT SIDE */}
+    <div
+      style={{
+        display: 'flex',
+        gap: 24,
+        alignItems: 'flex-start'
+      }}
+    >
+      <div>
+        <div style={headerLabel}>Date Updated</div>
+        <div style={metaInput}>{lastUpdated || '—'}</div>
+      </div>
+
+      <div>
+        <div style={headerLabel}>% Into Period</div>
+        <input
+          value={percentIntoPeriod}
+          readOnly
+          style={metaInput}
+        />
+      </div>
+    </div>
+
+    {/* RIGHT SIDE */}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        gap: 12
+      }}
+    >
+      <button
+        style={backButton}
+        onClick={() => router.push('/')}
+      >
+        ← Back to Main
+      </button>
+
+      <div>
+        <div style={headerLabel}>OKR Timeframe</div>
+
+        <div style={monthSelector}>
+          <button
+            style={monthButton}
+            onClick={() => changeMonth(-1)}
+          >
+            ←
+          </button>
+
+          <span style={monthText}>
+            {formatMonth(selectedMonth)}
+          </span>
+
+          <button
+            style={monthButton}
+            onClick={() => changeMonth(1)}
+          >
+            →
           </button>
         </div>
-
-        <div style={headerMeta}>
-
-          <div style={metaBlock}>
-            <label>Date Updated</label>
-            <div style={metaInput}>{lastUpdated || '—'}</div>
-          </div>
-
-          <div style={metaBlock}>
-            <label>% Into Period</label>
-            <input value={percentIntoPeriod} readOnly style={metaInput} />
-          </div>
-
-          <div style={metaBlock}>
-            <label>OKR Time Frame</label>
-            <div style={monthSelector}>
-              <button onClick={() => changeMonth(-1)}>←</button>
-              <span>{formatMonth(selectedMonth)}</span>
-              <button onClick={() => changeMonth(1)}>→</button>
-            </div>
-          </div>
-
-        </div>
       </div>
+    </div>
+
+  </div>
+</div>
 
       {/* CARDS */}
       <div style={grid}>
@@ -571,12 +609,6 @@ const headerBar: React.CSSProperties = {
   zIndex: 50
 }
 
-const headerTop: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 18
-}
 
 const headerTitle: React.CSSProperties = {
   fontSize: 42,
@@ -585,7 +617,7 @@ const headerTitle: React.CSSProperties = {
 }
 
 const backButton: React.CSSProperties = {
-  backgroundColor: COLORS.navy,
+  backgroundColor: '#1F2937',
   border: 'none',
   borderRadius: 10,
   padding: '10px 18px',
@@ -602,10 +634,6 @@ const headerMeta: React.CSSProperties = {
   flexWrap: 'wrap'
 }
 
-const metaBlock: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column'
-}
 
 const metaInput: React.CSSProperties = {
   padding: 10,
@@ -710,4 +738,33 @@ const notesInput: React.CSSProperties = {
   border: '1px solid #F6A27A',
   borderRadius: 16,
   resize: 'vertical'
+}
+const headerLabel: React.CSSProperties = {
+  fontSize: 14,
+  fontWeight: 600,
+  color: COLORS.white,
+  marginBottom: 6
+}
+
+const monthButton: React.CSSProperties = {
+  backgroundColor: '#1E266D',
+  border: 'none',
+  borderRadius: 10,
+  width: 40,
+  height: 40,
+  cursor: 'pointer',
+  fontWeight: 800,
+  fontSize: 18,
+  color: '#FFFFFF',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+}
+
+const monthText: React.CSSProperties = {
+  fontWeight: 800,
+  fontSize: 18,
+  color: '#FFFFFF',
+  minWidth: 110,
+  textAlign: 'center'
 }
