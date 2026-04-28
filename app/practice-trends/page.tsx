@@ -413,7 +413,11 @@ const headerBar: React.CSSProperties = {
   padding: 24,
   margin: 20,
   borderRadius: 14,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
+  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+  position: 'sticky',
+  top: 0,
+  zIndex: 100,
+  marginBottom: 24
 }
 
 const headerTitle: React.CSSProperties = {
