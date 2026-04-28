@@ -170,10 +170,9 @@ useEffect(() => {
 </button>
 </div>
 </div>
-
+<div style={topRowGrid}>
 <div style={sectionCard}>
   <div style={sectionTitle}>
-<div style={topRowGrid}>
     Production
   </div>
 </div>
@@ -285,6 +284,7 @@ useEffect(() => {
   </div>
 </div>
 </div>
+
 <div style={sectionCard}>
   <div style={sectionTitle}>
     Starts
