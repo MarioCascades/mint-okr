@@ -12,25 +12,28 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleLogin = async () => {
-    setLoading(true)
-    setError('')
+ const handleLogin = async () => {
+  setLoading(true)
+  setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    })
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  })
 
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
-    }
+  console.log('LOGIN DATA:', data)
+  console.log('LOGIN ERROR:', error)
 
+  if (error) {
+    setError(error.message)
     setLoading(false)
-    router.push('/')
-    router.refresh()
+    return
   }
+
+  setLoading(false)
+  router.push('/')
+  router.refresh()
+}
 
     return (
   <div style={container}>
