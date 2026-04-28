@@ -23,6 +23,12 @@ export default function Home() {
 
   const router = useRouter()
 
+  const handleLogout = async () => {
+  await supabase.auth.signOut()
+  router.push('/login')
+  router.refresh()
+}
+
   const [selectedUser, setSelectedUser] = useState('Jordyn')
 
   const users = [
@@ -492,7 +498,16 @@ const conversionTarget =
           ))}
         </div>
 
-        <img src="/ce.png" style={logoImg} />
+        <div style={logoutSection}>
+  <img src="/ce.png" style={logoImg} />
+
+  <button
+    onClick={handleLogout}
+    style={logoutButton}
+  >
+    Logout
+  </button>
+</div>
       </div>
 
       {/* HEADER */}
@@ -855,4 +870,19 @@ const textarea: React.CSSProperties = {
   resize: 'vertical',
   fontFamily: 'inherit',
   lineHeight: 1.6
+}
+const logoutSection: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12
+}
+
+const logoutButton: React.CSSProperties = {
+  padding: '8px 14px',
+  borderRadius: 8,
+  border: '1px solid #F26C2F',
+  backgroundColor: '#FFFFFF',
+  color: '#F26C2F',
+  fontWeight: 700,
+  cursor: 'pointer'
 }
