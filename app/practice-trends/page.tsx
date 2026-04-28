@@ -171,7 +171,7 @@ useEffect(() => {
 </div>
 </div>
 <div style={topRowGrid}>
-<div style={sectionCard}>
+<div style={sectionBlock}>
   <div style={sectionTitle}>
     Production
   </div>
@@ -228,7 +228,7 @@ useEffect(() => {
         </div>
       </div>
 
-      <div style={sectionCard}>
+      <div style={sectionBlock}>
   <div style={sectionTitle}>
     Collections
   </div>
@@ -285,7 +285,8 @@ useEffect(() => {
 </div>
 </div>
 
-<div style={sectionCard}>
+<div style={startsWrapper}>
+    <div style={sectionBlock}>
   <div style={sectionTitle}>
     Starts
   </div>
@@ -340,6 +341,7 @@ useEffect(() => {
     </table>
   </div>
 </div>
+    </div>
     </div>
   )
 }
@@ -475,4 +477,16 @@ const topRowGrid: React.CSSProperties = {
   gap: 24,
   margin: '0 20px 32px 20px',
   alignItems: 'start'
+}
+const sectionBlock: React.CSSProperties = {
+  backgroundColor: '#F3F4F6',
+  border: '2px solid #D1D5DB',
+  borderRadius: 16,
+  padding: 20,
+  boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+}
+
+const startsWrapper: React.CSSProperties = {
+  width: '70%',
+  margin: '0 auto 40px auto'
 }
