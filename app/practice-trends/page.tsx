@@ -124,7 +124,9 @@ const input: React.CSSProperties = {
   borderRadius: 8,
   textAlign: 'center',
   color: '#111827'
-}const headerBar: React.CSSProperties = {
+}
+
+const headerBar: React.CSSProperties = {
   backgroundColor: '#F26C2F',
   padding: 24,
   margin: 20,
