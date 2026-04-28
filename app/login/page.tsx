@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
 
  const handleLogin = async () => {
+    console.log('LOGIN BUTTON CLICKED')
   setLoading(true)
   setError('')
 
