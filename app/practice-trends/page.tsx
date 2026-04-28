@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import TopNav from '@/components/TopNav'
+import { supabase } from '../../lib/supabase'
 
 export default function PracticeTrendsPage() {
-    const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [tableData, setTableData] = useState<Record<string, string>>({})
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -28,6 +30,34 @@ export default function PracticeTrendsPage() {
     maximumFractionDigits: 2
   })}`
 }
+const handleSave = async () => {
+  const rows = Object.entries(tableData).map(([key, value]) => {
+    const [month, year] = key.split('-')
+
+    return {
+      metric_type: 'Production',
+      month_name: month,
+      year_value: Number(year),
+      metric_value: Number(
+        value
+          .replace(/\$/g, '')
+          .replace(/,/g, '')
+      ) || 0
+    }
+  })
+
+  const { error } = await supabase
+    .from('practice_trends_data')
+    .upsert(rows)
+
+  if (error) {
+    console.error('SAVE ERROR:', error)
+    return
+  }
+
+  setIsEditing(false)
+  console.log('Saved successfully')
+}
 
   return (
     <div style={container}>
@@ -44,13 +74,18 @@ export default function PracticeTrendsPage() {
 
 <div style={actionRow}>
   <button
-    style={editButton}
-    onClick={() => setIsEditing(!isEditing)}
-  >
-    {isEditing ? 'Save' : 'Edit'}
-  </button>
+  style={editButton}
+  onClick={() => {
+    if (isEditing) {
+      handleSave()
+    } else {
+      setIsEditing(true)
+    }
+  }}
+>
+  {isEditing ? 'Save' : 'Edit'}
+</button>
 </div>
-
 </div>
 
 <div style={sectionCard}>
@@ -82,10 +117,23 @@ export default function PracticeTrendsPage() {
   style={input}
   placeholder="$0.00"
   readOnly={!isEditing}
+  value={tableData[`${month}-${year}`] || ''}
+  onChange={(e) => {
+    setTableData({
+      ...tableData,
+      [`${month}-${year}`]: e.target.value
+    })
+  }}
   onBlur={(e) => {
-    e.target.value = formatCurrency(e.target.value)
+    const formatted = formatCurrency(e.target.value)
+
+    setTableData({
+      ...tableData,
+      [`${month}-${year}`]: formatted
+    })
   }}
 />
+
                   </td>
                 ))}
               </tr>
@@ -96,6 +144,7 @@ export default function PracticeTrendsPage() {
     </div>
   )
 }
+
 
 const container: React.CSSProperties = {
   minHeight: '100vh',
