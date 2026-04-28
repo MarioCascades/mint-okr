@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
 
@@ -46,9 +46,11 @@ const handleSave = async () => {
     }
   })
 
-  const { error } = await supabase
-    .from('practice_trends_data')
-    .upsert(rows)
+ const { error } = await supabase
+  .from('practice_trends_data')
+  .upsert(rows, {
+    onConflict: 'metric_type,month_name,year_value'
+  })
 
   if (error) {
     console.error('SAVE ERROR:', error)
@@ -58,7 +60,34 @@ const handleSave = async () => {
   setIsEditing(false)
   console.log('Saved successfully')
 }
+useEffect(() => {
+  const fetchData = async () => {
+    const { data, error } = await supabase
+      .from('practice_trends_data')
+      .select('*')
+      .eq('metric_type', 'Production')
 
+    if (error) {
+      console.error('FETCH ERROR:', error)
+      return
+    }
+
+    const formattedData: Record<string, string> = {}
+
+    data.forEach((row) => {
+      const key = `${row.month_name}-${row.year_value}`
+
+      formattedData[key] = `$${Number(row.metric_value).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}`
+    })
+
+    setTableData(formattedData)
+  }
+
+  fetchData()
+}, [])
   return (
     <div style={container}>
       <TopNav />
