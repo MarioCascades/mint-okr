@@ -488,171 +488,216 @@ setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
 // =========================
 // CARD
 // =========================
-
-const Card = ({ title, value, prev = 0, target = 0 }: any) =>
+const Card = ({ title, value, prev = 0, target = 0 }: any) => (
   <div style={card}>
+
     <div style={cardTitle}>{title}</div>
-    <div style={cardValue}>{value}</div>
 
-   <div style={bottomRow}>
-  <div>
-    <span style={smallLabel}>Previous</span>
-    <div style={smallBox}>{prev}</div>
+    <div style={cardHeader}>
+      <span>Prev</span>
+      <span>Target</span>
+      <span>Current</span>
+      <span>Result</span>
+    </div>
+
+    <div style={cardRow}>
+
+      <input
+        style={cardCell}
+        value={prev}
+        readOnly
+      />
+
+      <input
+        style={cardCell}
+        value={target}
+        readOnly
+      />
+
+      <input
+        style={cardCell}
+        value={value}
+        readOnly
+      />
+
+      <input
+        style={{
+          ...cardCell,
+          fontWeight: 800,
+          color: '#F26C2F'
+        }}
+        value={
+          Number(target) > 0
+            ? `${Math.round((Number(String(value).replace(/[^0-9.-]+/g, '')) / Number(target)) * 100)}%`
+            : ''
+        }
+        readOnly
+      />
+
+    </div>
+
+    <button style={initiativeButton}>
+      + Initiatives
+    </button>
+
   </div>
+)
+// ================= STYLES =================
 
-  <div>
-    <span style={smallLabel}>Target</span>
-
-  <div style={{ ...smallBox, width: 100 }}>
-  {target}
-</div>
-  </div>
-</div>
-  </div>
-
-
-// =========================
-// STYLES
-// =========================
+const COLORS = {
+  navy: '#1E266D',
+  orange: '#F26C2F',
+  white: '#FFFFFF',
+  lightGray: '#f5f5f5d5',
+  border: '#F6A27A',
+  text: '#1F2937',
+  muted: '#6B7280'
+}
 
 const container: React.CSSProperties = {
-  backgroundColor: '#ecececd5',
-  minHeight: '100vh',
-  color: '#1E266D'
+  backgroundColor: COLORS.lightGray,
+  color: COLORS.text,
+  minHeight: '100vh'
 }
 
 const headerBar: React.CSSProperties = {
+  backgroundColor: COLORS.orange,
+  padding: 24,
+  margin: 20,
+  borderRadius: 14,
+  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
   position: 'sticky',
   top: 60,
-  zIndex: 10,
-  background: 'linear-gradient(90deg, #F26C2F 0%, #F58220 100%)',
-  padding: 24,
-  borderBottom: '1px solid #F6A27A',
-  borderRadius: 16,
-  margin: 16,
-  boxShadow: '0 8px 24px rgba(0,0,0,0.06)'
+  zIndex: 50
 }
 
 const headerTop: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginBottom: 20
+  marginBottom: 18
 }
 
 const headerTitle: React.CSSProperties = {
-  fontSize: 36,
-  fontWeight: 700,
-  color: '#FFFFFF'
+  fontSize: 42,
+  fontWeight: 800,
+  color: COLORS.white
 }
 
 const backButton: React.CSSProperties = {
-  backgroundColor: '#1E266D',
+  backgroundColor: COLORS.navy,
   border: 'none',
-  padding: '12px 20px',
   borderRadius: 10,
-  color: '#FFFFFF',
-  cursor: 'pointer',
-  fontWeight: 600,
-  fontSize: 15,
-  height: 52
+  padding: '10px 18px',
+  color: COLORS.white,
+  fontWeight: 700,
+  cursor: 'pointer'
 }
 
 const headerMeta: React.CSSProperties = {
   display: 'flex',
-  gap: 20,
-  flexWrap: 'wrap',
-  alignItems: 'flex-end'
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
+  gap: 24,
+  flexWrap: 'wrap'
 }
 
 const metaBlock: React.CSSProperties = {
   display: 'flex',
-  flexDirection: 'column',
-  minWidth: 220
+  flexDirection: 'column'
 }
 
 const metaInput: React.CSSProperties = {
-  height: 44,
-  padding: '10px 14px',
-  borderRadius: 10,
-  border: '1px solid #F6A27A',
-  backgroundColor: '#FFFFFF',
-  color: '#1E266D',
-  fontSize: 15,
-  fontWeight: 500
+  padding: 10,
+  backgroundColor: COLORS.white,
+  color: COLORS.text,
+  border: `1px solid ${COLORS.border}`,
+  borderRadius: 8,
+  minWidth: 160
 }
 
 const monthSelector: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 12,
-  padding: 8,
+  gap: 14,
+  backgroundColor: 'rgba(255,255,255,0.18)',
+  padding: '10px 18px',
   borderRadius: 12,
-  backgroundColor: '#F6A27A'
+  width: 'fit-content'
 }
 
 const grid: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 24,
-  padding: 20
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  gap: 20,
+  padding: '0 20px'
 }
 
 const card: React.CSSProperties = {
-  backgroundColor: '#FFFFFF',
-  border: '2px solid #F6A27A',
+  backgroundColor: '#E5E5E5',
+  padding: 20,
   borderRadius: 18,
-  padding: 24,
-  boxShadow: '0 10px 24px rgba(0,0,0,0.06)',
-  overflow: 'hidden'
+  border: '1px solid #F6A27A',
+  boxShadow: '0 12px 30px rgba(0,0,0,0.10)'
 }
 
 const cardTitle: React.CSSProperties = {
-  color: '#1E266D',
-  fontSize: 24,
-  fontWeight: 800,
-  marginBottom: 16,
-  paddingBottom: 10,
-  borderBottom: '2px solid #F6A27A'
-}
-
-const cardValue: React.CSSProperties = {
-  fontSize: 38,
-  fontWeight: 800,
-  color: '#1E266D',
-  marginBottom: 20
-}
-
-const bottomRow: React.CSSProperties = {
-  display: 'flex',
-  gap: 20
-}
-
-const smallLabel: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: '#6B7280'
-}
-
-const smallBox: React.CSSProperties = {
-  border: '1px solid #F6A27A',
-  padding: '10px 12px',
-  marginTop: 6,
-  backgroundColor: '#FFFFFF',
-  borderRadius: 8,
-  color: '#1E266D',
-  minWidth: 100,
   textAlign: 'center',
-  fontWeight: 500
+  marginBottom: 18,
+  fontWeight: 800,
+  fontSize: 30,
+  color: COLORS.navy
+}
+
+const cardHeader: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gap: 8,
+  fontSize: 13,
+  fontWeight: 700,
+  color: COLORS.muted,
+  marginBottom: 10,
+  textAlign: 'center'
+}
+
+const cardRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gap: 8
+}
+
+const cardCell: React.CSSProperties = {
+  width: '100%',
+  padding: 12,
+  backgroundColor: '#F8FAFC',
+  color: COLORS.text,
+  border: '1px solid #F6A27A',
+  borderRadius: 10,
+  fontSize: 15,
+  fontWeight: 600,
+  textAlign: 'center'
+}
+
+const initiativeButton: React.CSSProperties = {
+  marginTop: 14,
+  width: '100%',
+  backgroundColor: COLORS.orange,
+  border: 'none',
+  padding: '10px 12px',
+  borderRadius: 8,
+  cursor: 'pointer',
+  color: COLORS.white,
+  fontSize: 13,
+  fontWeight: 600
 }
 
 const notesSection: React.CSSProperties = {
+  backgroundColor: '#E5E5E5',
+  padding: 28,
   margin: 20,
-  backgroundColor: '#FFFFFF',
-  border: '2px solid #F6A27A',
-  borderRadius: 18,
-  padding: 24,
-  boxShadow: '0 10px 24px rgba(0,0,0,0.06)'
+  marginTop: 24,
+  borderRadius: 20,
+  border: '1px solid #F6A27A'
 }
 
 const notesInput: React.CSSProperties = {
@@ -660,13 +705,9 @@ const notesInput: React.CSSProperties = {
   minHeight: 160,
   padding: 20,
   fontSize: 16,
-  fontWeight: 500,
-  color: '#1E266D',
-  backgroundColor: '#FFFFFF',
+  color: COLORS.navy,
+  backgroundColor: '#F8FAFC',
   border: '1px solid #F6A27A',
   borderRadius: 16,
-  outline: 'none',
-  resize: 'vertical',
-  fontFamily: 'inherit',
-  lineHeight: 1.6
+  resize: 'vertical'
 }
