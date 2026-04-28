@@ -826,7 +826,7 @@ const kpiGrid: React.CSSProperties = {
 }
 
 const notesBlock: React.CSSProperties = {
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '#E5E5E5',
   padding: 28,
   marginTop: 24,
   borderRadius: 20,
@@ -848,7 +848,7 @@ const textarea: React.CSSProperties = {
   fontSize: 16,
   fontWeight: 500,
   color: '#1E266D',
-  backgroundColor: '#F8FAFC',
+  backgroundColor: '#E5E5E5',
   border: '1px solid #F6A27A',
   borderRadius: 16,
   outline: 'none',

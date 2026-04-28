@@ -307,22 +307,22 @@ const KPI_COLORS = {
 
 const kpiCard: React.CSSProperties = {
   backgroundColor: '#E5E5E5',
-  padding: 20,
+  border: '2px solid #F6A27A',
   borderRadius: 18,
-  border: '1px solid rgba(255,255,255,0.6)',
-  boxShadow: '0 12px 30px rgba(0,0,0,0.10)',
-  backdropFilter: 'blur(4px)'
+  padding: 24,
+  boxShadow: '0 10px 24px rgba(0,0,0,0.06)',
+  overflow: 'hidden'
 }
 
 const kpiLabel: React.CSSProperties = {
-  textAlign: 'center',
-  marginBottom: 18,
+  color: '#1E266D',
+  fontSize: 24,
   fontWeight: 800,
-  fontSize: 28,
-  color: KPI_COLORS.navy,
-  letterSpacing: '-0.3px'
+  marginBottom: 16,
+  paddingBottom: 10,
+  borderBottom: '2px solid #F6A27A',
+  textAlign: 'center'
 }
-
 const kpiHeader: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(4, 1fr)',
@@ -342,15 +342,17 @@ const kpiRow: React.CSSProperties = {
 
 const cell: React.CSSProperties = {
   width: '100%',
-  padding: 12,
-  backgroundColor: '#F8FAFC',
-  color: KPI_COLORS.text,
-  border: `1px solid ${KPI_COLORS.border}`,
-  borderRadius: 10,
-  fontSize: 15,
-  fontWeight: 600,
-  textAlign: 'center'
+  padding: '10px 12px',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #F6A27A',
+  borderRadius: 8,
+  color: '#1E266D',
+  fontSize: 14,
+  fontWeight: 500,
+  textAlign: 'center',
+  outline: 'none'
 }
+
 const cellWide: React.CSSProperties = {
   ...cell,
   textAlign: 'left'
@@ -370,7 +372,12 @@ const button: React.CSSProperties = {
 }
 
 const initRow: React.CSSProperties = {
-  display: 'flex',
-  gap: 8,
-  marginTop: 12
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr 1fr',
+  gap: 10,
+  marginTop: 10,
+  padding: 12,
+  backgroundColor: '#FFF7F3',
+  borderRadius: 12,
+  border: '1px solid #F6A27A'
 }
