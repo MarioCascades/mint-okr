@@ -31,9 +31,8 @@ export default function LoginPage() {
     return
   }
 
-  setLoading(false)
-  router.push('/')
-  router.refresh()
+ setLoading(false)
+window.location.href = '/'
 }
 
     return (
