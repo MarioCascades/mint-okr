@@ -87,29 +87,47 @@ useEffect(() => {
     const { data, error } = await supabase
       .from('practice_trends_data')
       .select('*')
-      .eq('metric_type', 'Production')
 
     if (error) {
       console.error('FETCH ERROR:', error)
       return
     }
 
-    const formattedData: Record<string, string> = {}
+    const productionFormatted: Record<string, string> = {}
+    const collectionsFormatted: Record<string, string> = {}
+    const startsFormatted: Record<string, string> = {}
 
     data.forEach((row) => {
       const key = `${row.month_name}-${row.year_value}`
 
-      formattedData[key] = `$${Number(row.metric_value).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })}`
+      if (row.metric_type === 'Production') {
+        productionFormatted[key] = `$${Number(row.metric_value).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}`
+      }
+
+      if (row.metric_type === 'Collections') {
+        collectionsFormatted[key] = `$${Number(row.metric_value).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}`
+      }
+
+      if (row.metric_type === 'Starts') {
+        startsFormatted[key] = Number(row.metric_value).toLocaleString()
+      }
     })
 
-    setProductionData(formattedData)
+    setProductionData(productionFormatted)
+    setCollectionsData(collectionsFormatted)
+    setStartsData(startsFormatted)
   }
 
   fetchData()
 }, [])
+
+
   return (
     <div style={container}>
       <TopNav />
