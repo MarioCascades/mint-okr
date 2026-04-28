@@ -6,7 +6,9 @@ import { supabase } from '../../lib/supabase'
 
 export default function PracticeTrendsPage() {
   const [isEditing, setIsEditing] = useState(false)
-  const [tableData, setTableData] = useState<Record<string, string>>({})
+  const [productionData, setProductionData] = useState<Record<string, string>>({})
+  const [collectionsData, setCollectionsData] = useState<Record<string, string>>({})
+  const [startsData, setStartsData] = useState<Record<string, string>>({})
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -31,7 +33,7 @@ export default function PracticeTrendsPage() {
   })}`
 }
 const handleSave = async () => {
-  const rows = Object.entries(tableData).map(([key, value]) => {
+  const productionRows = Object.entries(productionData).map(([key, value]) => {
     const [month, year] = key.split('-')
 
     return {
@@ -46,11 +48,31 @@ const handleSave = async () => {
     }
   })
 
- const { error } = await supabase
-  .from('practice_trends_data')
-  .upsert(rows, {
-    onConflict: 'metric_type,month_name,year_value'
+  const collectionsRows = Object.entries(collectionsData).map(([key, value]) => {
+    const [month, year] = key.split('-')
+
+    return {
+      metric_type: 'Collections',
+      month_name: month,
+      year_value: Number(year),
+      metric_value: Number(
+        value
+          .replace(/\$/g, '')
+          .replace(/,/g, '')
+      ) || 0
+    }
   })
+
+  const allRows = [
+    ...productionRows,
+    ...collectionsRows
+  ]
+
+  const { error } = await supabase
+    .from('practice_trends_data')
+    .upsert(allRows, {
+      onConflict: 'metric_type,month_name,year_value'
+    })
 
   if (error) {
     console.error('SAVE ERROR:', error)
@@ -83,7 +105,7 @@ useEffect(() => {
       })}`
     })
 
-    setTableData(formattedData)
+    setProductionData(formattedData)
   }
 
   fetchData()
@@ -122,8 +144,10 @@ useEffect(() => {
     Production
   </div>
 </div>
-      <div style={tableWrapper}>
-        <table style={table}>
+
+<div style={sectionTableCard}>
+  <div style={tableWrapper}>
+    <table style={table}>
           <thead>
             <tr>
               <th style={th}>Month</th>
@@ -146,18 +170,18 @@ useEffect(() => {
   style={input}
   placeholder="$0.00"
   readOnly={!isEditing}
-  value={tableData[`${month}-${year}`] || ''}
+  value={productionData[`${month}-${year}`] || ''}
   onChange={(e) => {
-    setTableData({
-      ...tableData,
+    setProductionData({
+      ...productionData,
       [`${month}-${year}`]: e.target.value
     })
   }}
   onBlur={(e) => {
     const formatted = formatCurrency(e.target.value)
 
-    setTableData({
-      ...tableData,
+    setProductionData({
+      ...productionData,
       [`${month}-${year}`]: formatted
     })
   }}
@@ -169,7 +193,104 @@ useEffect(() => {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
+
+      <div style={sectionCard}>
+  <div style={sectionTitle}>
+    Collections
+  </div>
+</div>
+
+<div style={sectionTableCard}>
+  <div style={tableWrapper}>
+    <table style={table}>
+      <thead>
+        <tr>
+          <th style={th}>Month</th>
+          {years.map((year) => (
+            <th key={year} style={th}>
+              {year}
+            </th>
+          ))}
+        </tr>
+      </thead>
+
+      <tbody>
+        {months.map((month) => (
+          <tr key={month}>
+            <td style={monthCell}>{month}</td>
+
+            {years.map((year) => (
+              <td key={year} style={td}>
+               <input
+  style={input}
+  placeholder="$0.00"
+  readOnly={!isEditing}
+  value={collectionsData[`${month}-${year}`] || ''}
+  onChange={(e) => {
+    setCollectionsData({
+      ...collectionsData,
+      [`${month}-${year}`]: e.target.value
+    })
+  }}
+  onBlur={(e) => {
+    const formatted = formatCurrency(e.target.value)
+
+    setCollectionsData({
+      ...collectionsData,
+      [`${month}-${year}`]: formatted
+    })
+  }}
+/>
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div style={sectionCard}>
+  <div style={sectionTitle}>
+    Starts
+  </div>
+</div>
+
+<div style={sectionTableCard}>
+  <div style={tableWrapper}>
+    <table style={table}>
+      <thead>
+        <tr>
+          <th style={th}>Month</th>
+          {years.map((year) => (
+            <th key={year} style={th}>
+              {year}
+            </th>
+          ))}
+        </tr>
+      </thead>
+
+      <tbody>
+        {months.map((month) => (
+          <tr key={month}>
+            <td style={monthCell}>{month}</td>
+
+            {years.map((year) => (
+              <td key={year} style={td}>
+                <input
+                  style={input}
+                  placeholder="0"
+                  readOnly={!isEditing}
+                />
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
     </div>
   )
 }
@@ -286,4 +407,12 @@ const editButton: React.CSSProperties = {
   fontSize: 14,
   cursor: 'pointer',
   minWidth: 110
+}
+const sectionTableCard: React.CSSProperties = {
+  margin: '0 20px 32px 20px',
+  backgroundColor: '#F3F4F6',
+  border: '2px solid #D1D5DB',
+  borderRadius: 16,
+  padding: 20,
+  boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
 }
