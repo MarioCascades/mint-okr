@@ -27,51 +27,60 @@ export default function LoginPage() {
       return
     }
 
+    setLoading(false)
     router.push('/')
     router.refresh()
   }
 
-  return (
-    <div style={container}>
-      <div style={card}>
-        <h1 style={title}>Mint OKR Login</h1>
+    return (
+  <div style={container}>
+    <form
+      style={card}
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleLogin()
+      }}
+    >
+      <h1 style={title}>Mint OKR Login</h1>
 
-        <p style={subtitle}>
-          Secure access for Mint Orthodontics team members
+      <p style={subtitle}>
+        Secure access for Mint Orthodontics team members
+      </p>
+
+      <input
+        style={input}
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        autoFocus
+      />
+
+      <input
+        style={input}
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      {error && (
+        <p style={errorText}>
+          {error}
         </p>
+      )}
 
-        <input
-          style={input}
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <button
+        type="submit"
+        style={button}
+        disabled={loading}
+      >
+        {loading ? 'Signing In...' : 'Login'}
+      </button>
+    </form>
+  </div>
+)
 
-        <input
-          style={input}
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        {error && (
-          <p style={errorText}>
-            {error}
-          </p>
-        )}
-
-        <button
-          style={button}
-          onClick={handleLogin}
-          disabled={loading}
-        >
-          {loading ? 'Signing In...' : 'Login'}
-        </button>
-      </div>
-    </div>
-  )
 }
 
 const container: React.CSSProperties = {
@@ -114,7 +123,10 @@ const input: React.CSSProperties = {
   borderRadius: 10,
   border: '1px solid #F6A27A',
   fontSize: 15,
-  backgroundColor: '#F8FAFC'
+  backgroundColor: '#F8FAFC',
+  color: '#1F2937',
+  outline: 'none',
+  fontWeight: 500
 }
 
 const button: React.CSSProperties = {
