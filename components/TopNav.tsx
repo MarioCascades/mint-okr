@@ -2,6 +2,7 @@
 
 
 import { useRouter, usePathname } from 'next/navigation'
+import { supabase } from '../lib/supabase'
 
 const users = [
   { name: 'Mari', path: '/mari' },
@@ -19,6 +20,12 @@ const users = [
 export default function TopNav() {
   const router = useRouter()
   const pathname = usePathname()
+
+  const handleLogout = async () => {
+  await supabase.auth.signOut()
+  router.push('/login')
+  router.refresh()
+}
 
   return (
     <div style={navContainer}>
@@ -59,7 +66,16 @@ onMouseLeave={(e) => {
     })}
   </div>
 
+  <div style={logoutSection}>
   <img src="/ce.png" style={logoImg} />
+
+  <button
+    onClick={handleLogout}
+    style={logoutButton}
+  >
+    Logout
+  </button>
+</div>
 </div>
     </div>
   )
@@ -124,4 +140,19 @@ const selectorRow : React.CSSProperties = {
   display: 'flex',
   gap: 8,
   flexWrap: 'wrap'
+}
+const logoutSection: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12
+}
+
+const logoutButton: React.CSSProperties = {
+  padding: '8px 14px',
+  borderRadius: 8,
+  border: '1px solid #F26C2F',
+  backgroundColor: '#FFFFFF',
+  color: '#F26C2F',
+  fontWeight: 700,
+  cursor: 'pointer'
 }
