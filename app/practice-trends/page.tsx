@@ -8,19 +8,26 @@ export default function PracticeTrendsPage() {
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
   ]
 
-  const years = [2024, 2025, 2026]
+  const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026]
 
   return (
     <div style={container}>
       <TopNav />
 
-      <div style={header}>
-        <h1 style={title}>Practice Trends</h1>
-        <p style={subtitle}>
-          Historical Production, Collections, and Starts
-        </p>
-      </div>
+     <div style={headerBar}>
+  <h1 style={headerTitle}>
+    Practice Trends
+  </h1>
 
+  <p style={headerSubtitle}>
+    Historical Production, Collections, and Starts
+  </p>
+</div>
+<div style={sectionCard}>
+  <div style={sectionTitle}>
+    Production
+  </div>
+</div>
       <div style={tableWrapper}>
         <table style={table}>
           <thead>
@@ -117,4 +124,34 @@ const input: React.CSSProperties = {
   borderRadius: 8,
   textAlign: 'center',
   color: '#111827'
+}const headerBar: React.CSSProperties = {
+  backgroundColor: '#F26C2F',
+  padding: 24,
+  margin: 20,
+  borderRadius: 14,
+  boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
+}
+
+const headerTitle: React.CSSProperties = {
+  fontSize: 40,
+  fontWeight: 800,
+  color: '#FFFFFF',
+  marginBottom: 6
+}
+
+const headerSubtitle: React.CSSProperties = {
+  color: '#FFFFFF',
+  fontSize: 15,
+  opacity: 0.95
+}
+
+const sectionCard: React.CSSProperties = {
+  margin: '0 20px',
+  marginBottom: 16
+}
+
+const sectionTitle: React.CSSProperties = {
+  fontSize: 28,
+  fontWeight: 800,
+  color: '#1E266D'
 }
