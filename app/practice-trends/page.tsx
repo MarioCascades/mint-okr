@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import TopNav from '@/components/TopNav'
 
 export default function PracticeTrendsPage() {
+    const [isEditing, setIsEditing] = useState(false)
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -10,11 +12,28 @@ export default function PracticeTrendsPage() {
 
   const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026]
 
+  const formatCurrency = (value: string) => {
+  if (!value) return ''
+
+  const numeric = value
+    .replace(/\$/g, '')
+    .replace(/,/g, '')
+
+  const numberValue = Number(numeric)
+
+  if (isNaN(numberValue)) return ''
+
+  return `$${numberValue.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`
+}
+
   return (
     <div style={container}>
       <TopNav />
 
-     <div style={headerBar}>
+    <div style={headerBar}>
   <h1 style={headerTitle}>
     Practice Trends
   </h1>
@@ -22,7 +41,24 @@ export default function PracticeTrendsPage() {
   <p style={headerSubtitle}>
     Historical Production, Collections, and Starts
   </p>
+
+  <div style={actionRow}>
+    <button
+      style={editButton}
+      onClick={() => setIsEditing(true)}
+    >
+      Edit
+    </button>
+
+    <button
+      style={saveButton}
+      onClick={() => setIsEditing(false)}
+    >
+      Save
+    </button>
+  </div>
 </div>
+
 <div style={sectionCard}>
   <div style={sectionTitle}>
     Production
@@ -49,9 +85,13 @@ export default function PracticeTrendsPage() {
                 {years.map((year) => (
                   <td key={year} style={td}>
                     <input
-                      style={input}
-                      placeholder="0"
-                    />
+  style={input}
+  placeholder="$0.00"
+  readOnly={!isEditing}
+  onBlur={(e) => {
+    e.target.value = formatCurrency(e.target.value)
+  }}
+/>
                   </td>
                 ))}
               </tr>
@@ -156,4 +196,29 @@ const sectionTitle: React.CSSProperties = {
   fontSize: 28,
   fontWeight: 800,
   color: '#1E266D'
+}
+const actionRow: React.CSSProperties = {
+  display: 'flex',
+  gap: 12,
+  marginTop: 18
+}
+
+const editButton: React.CSSProperties = {
+  backgroundColor: '#1E266D',
+  color: '#FFFFFF',
+  border: 'none',
+  padding: '10px 18px',
+  borderRadius: 10,
+  fontWeight: 700,
+  cursor: 'pointer'
+}
+
+const saveButton: React.CSSProperties = {
+  backgroundColor: '#FFFFFF',
+  color: '#F26C2F',
+  border: 'none',
+  padding: '10px 18px',
+  borderRadius: 10,
+  fontWeight: 700,
+  cursor: 'pointer'
 }
