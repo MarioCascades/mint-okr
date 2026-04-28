@@ -42,21 +42,15 @@ export default function PracticeTrendsPage() {
     Historical Production, Collections, and Starts
   </p>
 
-  <div style={actionRow}>
-    <button
-      style={editButton}
-      onClick={() => setIsEditing(true)}
-    >
-      Edit
-    </button>
+<div style={actionRow}>
+  <button
+    style={editButton}
+    onClick={() => setIsEditing(!isEditing)}
+  >
+    {isEditing ? 'Save' : 'Edit'}
+  </button>
+</div>
 
-    <button
-      style={saveButton}
-      onClick={() => setIsEditing(false)}
-    >
-      Save
-    </button>
-  </div>
 </div>
 
 <div style={sectionCard}>
@@ -197,9 +191,10 @@ const sectionTitle: React.CSSProperties = {
   fontWeight: 800,
   color: '#1E266D'
 }
+
 const actionRow: React.CSSProperties = {
   display: 'flex',
-  gap: 12,
+  justifyContent: 'flex-end',
   marginTop: 18
 }
 
@@ -207,18 +202,10 @@ const editButton: React.CSSProperties = {
   backgroundColor: '#1E266D',
   color: '#FFFFFF',
   border: 'none',
-  padding: '10px 18px',
+  padding: '12px 22px',
   borderRadius: 10,
   fontWeight: 700,
-  cursor: 'pointer'
-}
-
-const saveButton: React.CSSProperties = {
-  backgroundColor: '#FFFFFF',
-  color: '#F26C2F',
-  border: 'none',
-  padding: '10px 18px',
-  borderRadius: 10,
-  fontWeight: 700,
-  cursor: 'pointer'
+  fontSize: 14,
+  cursor: 'pointer',
+  minWidth: 110
 }
