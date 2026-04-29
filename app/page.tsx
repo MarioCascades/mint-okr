@@ -471,7 +471,7 @@ const prevConversion =
   prevStarts > 0 ? (prevKept / prevStarts) * 100 : 0
 
 const conversionTarget =
-  keptTarget > 0 ? ( startsTarget / keptTarget) * 100 : 0 
+  keptTarget > 0 ? ( keptTarget / startsTarget) * 100 : 0 
 
   return (
     <div style={container}>
