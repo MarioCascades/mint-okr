@@ -400,28 +400,38 @@ if (
     return l.includes('late arrivals') || l.includes('call outs')
   }
 
-  const getScoreColor = () => {
-    const num = Number(score.replace('%', ''))
-    if (!num) return '#9CA3AF'
-    return isLowerBetter(label)
-      ? num <= 100 ? '#22c55e' : '#c2410c'
-      : num >= 100 ? '#22c55e' : '#c2410c'
+  const getScoreBackground = () => {
+  const num = Number(score.replace('%', ''))
+
+  if (!num && num !== 0) {
+    return '#FFFFFF'
   }
+
+  if (num >= 100) {
+    return '#acf3c3d7' // green
+  }
+
+  if (num >= 90) {
+    return '#fff4ccf3' // yellow
+  }
+
+  return '#f3b8b8d8' // red
+}
 
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
         <span>{label}</span>
 
-        <input style={cell} value={lastMonth} readOnly />
+        <input style={prevCell} value={lastMonth} readOnly />
 
         <input
-  style={cell}
+  style={targetCell}
   value={
   isEditing
     ? target
-    : isPercentage && target
-    ? target + '%'
+    : isPercentage && target !== ''
+    ? `${target}%`
     : target
 }
   disabled={!isEditing}
@@ -430,12 +440,12 @@ if (
         />
 
         <input
-          style={cell}
+          style={currentCell}
           value={
   isEditing
     ? value
-    : isPercentage && value
-    ? value + '%'
+    : isPercentage && value !== ''
+    ? `${value}%`
     : value
 }
           disabled={!isEditing}
@@ -444,7 +454,16 @@ if (
           onKeyDown={handleEnter}
         />
 
-        <input style={{ ...cell, color: getScoreColor() }} value={score} readOnly />
+        <input
+  style={{
+    ...cell,
+    backgroundColor: getScoreBackground(),
+    fontWeight: 800,
+    color: '#1E266D'
+  }}
+  value={score}
+  readOnly
+/>
 
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
   {showInitiatives ? 'Hide' : '+ Initiatives'}
@@ -679,6 +698,20 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
 }
 
 const button: React.CSSProperties = {
