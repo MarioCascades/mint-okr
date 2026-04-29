@@ -557,18 +557,15 @@ if (loadedMonth !== currentMonthKey) {
 // SCORE
 // ------------------------
 
-const c = Number(currentValue)
+const c = Number(currentValue || 0)
+const t = Number(resolvedTarget ?? 0)
 
-const effectiveTarget =
-  target !== undefined
-    ? Number(target)
-    : Number(localTarget || 0)
-
-if (effectiveTarget <= 0) {
+if (t === 0) {
   setScore('0%')
 } else {
-  setScore(Math.round((c / effectiveTarget) * 100) + '%')
-}  
+  const percent = Math.round((c / t) * 100)
+  setScore(percent + '%')
+}
       // =========================
 // GLOBAL TOTALS (JORDYN + OLIVIA)
 // =========================
@@ -633,11 +630,11 @@ setLoadedMonth(currentMonthKey)
 // SCORE CALCULATION (FIXED)
 // =========================
 
-// use MASTER target if available (Obj 4 & 5)
+// use MASTER target if available (Objective 4 & 5)
 const effectiveTarget =
   target !== undefined
     ? Number(target)
-    : Number(localTarget || 0)
+    : Number(resolvedTarget ?? 0)
 
 if (effectiveTarget <= 0) {
   setScore('0%')
