@@ -573,11 +573,6 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) => (
       />
 
     </div>
-
-    <button style={initiativeButton}>
-      + Initiatives
-    </button>
-
   </div>
 )
 // ================= STYLES =================
@@ -706,18 +701,6 @@ const cardCell: React.CSSProperties = {
   textAlign: 'center'
 }
 
-const initiativeButton: React.CSSProperties = {
-  marginTop: 14,
-  width: '100%',
-  backgroundColor: COLORS.orange,
-  border: 'none',
-  padding: '10px 12px',
-  borderRadius: 8,
-  cursor: 'pointer',
-  color: COLORS.white,
-  fontSize: 13,
-  fontWeight: 600
-}
 
 const notesSection: React.CSSProperties = {
   backgroundColor: '#E5E5E5',
