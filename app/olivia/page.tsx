@@ -558,13 +558,17 @@ if (loadedMonth !== currentMonthKey) {
 // ------------------------
 
 const c = Number(currentValue)
-const t = Number(localTarget || 0)
 
-if (t > 0) {
-  setScore(Math.round((c / t) * 100) + '%')
-}
+const effectiveTarget =
+  target !== undefined
+    ? Number(target)
+    : Number(localTarget || 0)
 
-        
+if (effectiveTarget <= 0) {
+  setScore('0%')
+} else {
+  setScore(Math.round((c / effectiveTarget) * 100) + '%')
+}  
       // =========================
 // GLOBAL TOTALS (JORDYN + OLIVIA)
 // =========================
@@ -626,14 +630,20 @@ const total = jordyn + olivia
 setValue(total.toString())
 setLoadedMonth(currentMonthKey)
 // =========================
-// SCORE CALCULATION 
+// SCORE CALCULATION (FIXED)
 // =========================
-const t = Number(localTarget || 0)
 
-if (t > 0) {
-  setScore(Math.round((total / t) * 100) + '%')
+// use MASTER target if available (Obj 4 & 5)
+const effectiveTarget =
+  target !== undefined
+    ? Number(target)
+    : Number(localTarget || 0)
+
+if (effectiveTarget <= 0) {
+  setScore('0%')
+} else {
+  setScore(Math.round((total / effectiveTarget) * 100) + '%')
 }
-
 // =========================
 // PREVIOUS MONTH CALCULATION
 // =========================
@@ -691,11 +701,6 @@ setLastMonth(prevTotal.toString())
 return
 }
 
-
-
-         if (t > 0) {
-        setScore(Math.round((c / t) * 100) + '%')
-      }
     }
 
     fetchData()
@@ -746,10 +751,31 @@ return
     )
 }
 
-  const getScoreColor = () => {
-    const num = Number(score.replace('%', ''))
-    return num >= 100 ? '#22c55e' : '#c2410c'
+const isLowerBetter = (label: string) => {
+  const l = label.toLowerCase()
+
+  return (
+    l.includes('call out') ||
+    l.includes('conversion') ||
+    l.includes('wait')
+  )
+}
+
+const getScoreBackground = () => {
+  const num = Number(score.replace('%', ''))
+
+  if (!num && num !== 0) return '#FFFFFF'
+
+  if (isLowerBetter(label)) {
+    if (num <= 100) return '#acf3c3d7'   // green
+    if (num <= 110) return '#fff4ccf3'   // yellow
+    return '#f3b8b8d8'                   // red
   }
+
+  if (num >= 100) return '#acf3c3d7'     // green
+  if (num >= 90) return '#fff4ccf3'      // yellow
+  return '#f3b8b8d8'                     // red
+}
 
   return (
     <div style={{ marginBottom: 10 }}>
@@ -757,7 +783,7 @@ return
         <span>{label}</span>
 
         <input
-          style={cell}
+          style={prevCell}
           value={
   isCurrency && lastMonth
   ? formatCurrency(lastMonth)
@@ -769,7 +795,7 @@ return
         />
 
         <input
-          style={cell}
+          style={targetCell}
           value={
   isEditing
     ? localTarget
@@ -811,7 +837,7 @@ if (parts.length === 2) {
         />
 
         <input
-  style={cell}
+  style={currentCell}
   value={
   forcedValue !== undefined
     ? (isCurrency
@@ -861,8 +887,15 @@ if (parts.length === 2) {
   onKeyDown={handleEnter}
 />
 
-        <input style={{ ...cell, color: getScoreColor() }} value={score} readOnly />
-
+<input
+  style={{
+    ...cell,
+    backgroundColor: getScoreBackground(),
+    fontWeight: 800
+  }}
+  value={score}
+  readOnly
+/>
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
           {showInitiatives ? 'Hide' : '+ Initiatives'}
         </button>
@@ -1092,6 +1125,21 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
 }
 
 const button: React.CSSProperties = {
