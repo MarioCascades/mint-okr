@@ -629,14 +629,19 @@ const total = jordyn + heather
 setValue(total.toString())
 setLoadedMonth(currentMonthKey)
 // =========================
-// SCORE CALCULATION 
+// SCORE CALCULATION (FIXED)
 // =========================
-const t = Number(resolvedTarget ?? 0)
 
-if (t <= 0) {
+// use MASTER target if available (Objective 4 & 5)
+const effectiveTarget =
+  target !== undefined
+    ? Number(target)
+    : Number(resolvedTarget ?? 0)
+
+if (effectiveTarget <= 0) {
   setScore('0%')
 } else {
-  setScore(Math.round((total / t) * 100) + '%')
+  setScore(Math.round((total / effectiveTarget) * 100) + '%')
 }
 
 // =========================
