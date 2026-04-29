@@ -371,7 +371,7 @@ const prevCell: React.CSSProperties = {
 
 const targetCell: React.CSSProperties = {
   ...cell,
-  backgroundColor: '#a3a4da'
+  backgroundColor: '#9c9dfd'
 }
 
 const currentCell: React.CSSProperties = {

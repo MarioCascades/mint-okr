@@ -648,55 +648,77 @@ setKitsTarget(
 // =========================
 // CARD
 // =========================
-const Card = ({ title, value, prev = 0, target = 0 }: any) => (
-  <div style={card}>
+const Card = ({ title, value, prev = 0, target = 0 }: any) => {
+  const numericValue = Number(
+    String(value).replace(/[^0-9.-]+/g, '')
+  )
 
-    <div style={cardTitle}>{title}</div>
+  const percent =
+    Number(target) > 0
+      ? (numericValue / Number(target)) * 100
+      : 0
 
-    <div style={cardHeader}>
-      <span>Prev</span>
-      <span>Target</span>
-      <span>Current</span>
-      <span>Result</span>
+  const getResultBackground = () => {
+    if (percent >= 100) {
+      return '#acf3c3d7' // green
+    }
+
+    if (percent >= 90) {
+      return '#fff4ccf3' // yellow
+    }
+
+    return '#f3b8b8d8' // red
+  }
+
+  return (
+    <div style={card}>
+      <div style={cardTitle}>{title}</div>
+
+      <div style={cardHeader}>
+        <span>Prev</span>
+        <span>Target</span>
+        <span>Current</span>
+        <span>Result</span>
+      </div>
+
+      <div style={cardRow}>
+        <input
+          style={prevCardCell}
+          value={prev}
+          readOnly
+        />
+
+        <input
+          style={targetCardCell}
+          value={target}
+          readOnly
+        />
+
+        <input
+          style={currentCardCell}
+          value={value}
+          readOnly
+        />
+
+        <input
+          style={{
+            ...cardCell,
+            backgroundColor: getResultBackground(),
+            fontWeight: 800,
+            color: '#1E266D'
+          }}
+          value={
+            Number(target) > 0
+              ? `${Math.round(percent)}%`
+              : ''
+          }
+          readOnly
+        />
+      </div>
     </div>
-
-    <div style={cardRow}>
-
-      <input
-        style={cardCell}
-        value={prev}
-        readOnly
-      />
-
-      <input
-        style={cardCell}
-        value={target}
-        readOnly
-      />
-
-      <input
-        style={cardCell}
-        value={value}
-        readOnly
-      />
-
-      <input
-        style={{
-          ...cardCell,
-          fontWeight: 800,
-          color: '#F26C2F'
-        }}
-        value={
-          Number(target) > 0
-            ? `${Math.round((Number(String(value).replace(/[^0-9.-]+/g, '')) / Number(target)) * 100)}%`
-            : ''
-        }
-        readOnly
-      />
-
-    </div>
-  </div>
-)
+  )
+}
+  
 
 // ================= STYLES =================
 
@@ -823,7 +845,20 @@ const cardCell: React.CSSProperties = {
   fontWeight: 600,
   textAlign: 'center'
 }
+const prevCardCell: React.CSSProperties = {
+  ...cardCell,
+  backgroundColor: '#cacacada'
+}
 
+const targetCardCell: React.CSSProperties = {
+  ...cardCell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCardCell: React.CSSProperties = {
+  ...cardCell,
+  backgroundColor: '#FFFFFF'
+}
 
 const notesSection: React.CSSProperties = {
   backgroundColor: '#E5E5E5',
