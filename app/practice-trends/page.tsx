@@ -174,10 +174,9 @@ useEffect(() => {
 <div style={sectionBlock}>
   <div style={sectionTitle}>
     Production
-  </div>
+ 
 </div>
 
-<div style={sectionTableCard}>
   <div style={tableWrapper}>
     <table style={table}>
           <thead>
@@ -231,10 +230,10 @@ useEffect(() => {
       <div style={sectionBlock}>
   <div style={sectionTitle}>
     Collections
-  </div>
+
 </div>
 
-<div style={sectionTableCard}>
+
   <div style={tableWrapper}>
     <table style={table}>
       <thead>
@@ -289,10 +288,10 @@ useEffect(() => {
     <div style={sectionBlock}>
   <div style={sectionTitle}>
     Starts
-  </div>
+ 
 </div>
 
-<div style={sectionTableCard}>
+
   <div style={tableWrapper}>
     <table style={table}>
       <thead>
