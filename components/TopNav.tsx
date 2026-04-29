@@ -16,8 +16,8 @@ const users = [
   { name: 'Ashlynn', path: '/ashlynn' },
   { name: 'Eric', path: '/eric' },
 
-  { name: 'Practice Trends', path: '/practice-trends' },
-  { name: 'PT Dashboard', path: '/practice-trends/dashboard' }
+  { name: 'Trends', path: '/practice-trends' },
+  { name: 'Dashboard', path: '/practice-trends/dashboard' }
 ]
 
 export default function TopNav() {
