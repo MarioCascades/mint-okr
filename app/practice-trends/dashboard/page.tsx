@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import TopNav from '@/components/TopNav'
+import { supabase } from '../../../lib/supabase'
 import {
   LineChart,
   Line,
@@ -13,14 +15,62 @@ import {
 } from 'recharts'
 
 export default function PracticeTrendsDashboardPage() {
+  const [productionData, setProductionData] = useState<any[]>([])
+  const [collectionsData, setCollectionsData] = useState<any[]>([])
+  const [startsData, setStartsData] = useState<any[]>([])
 
-    const productionData = [
-  { month: 'Jan', y2024: 210000, y2025: 245000, y2026: 260000 },
-  { month: 'Feb', y2024: 225000, y2025: 250000, y2026: 270000 },
-  { month: 'Mar', y2024: 240000, y2025: 265000, y2026: 285000 },
-  { month: 'Apr', y2024: 230000, y2025: 275000, y2026: 295000 }
-]
-    
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      const { data, error } = await supabase
+        .from('practice_trends_data')
+        .select('*')
+
+      if (error) {
+        console.error('Dashboard Fetch Error:', error)
+        return
+      }
+
+      const productionMap: any = {}
+      const collectionsMap: any = {}
+      const startsMap: any = {}
+
+      data.forEach((row) => {
+        const month = row.month_name
+        const yearKey = `y${row.year_value}`
+
+        if (row.metric_type === 'Production') {
+          if (!productionMap[month]) {
+            productionMap[month] = { month }
+          }
+
+          productionMap[month][yearKey] = Number(row.metric_value)
+        }
+
+        if (row.metric_type === 'Collections') {
+          if (!collectionsMap[month]) {
+            collectionsMap[month] = { month }
+          }
+
+          collectionsMap[month][yearKey] = Number(row.metric_value)
+        }
+
+        if (row.metric_type === 'Starts') {
+          if (!startsMap[month]) {
+            startsMap[month] = { month }
+          }
+
+          startsMap[month][yearKey] = Number(row.metric_value)
+        }
+      })
+
+      setProductionData(Object.values(productionMap))
+      setCollectionsData(Object.values(collectionsMap))
+      setStartsData(Object.values(startsMap))
+    }
+
+    fetchDashboardData()
+  }, [])
+
   return (
     <div style={container}>
       <TopNav />
@@ -38,51 +88,130 @@ export default function PracticeTrendsDashboardPage() {
       <div style={topRowGrid}>
         <div style={chartCard}>
           <h2 style={sectionTitle}>Production</h2>
-          <ResponsiveContainer width="100%" height={320}>
-  <LineChart data={productionData}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="month" />
-    <YAxis />
-    <Tooltip />
-    <Legend />
 
-    <Line
-      type="monotone"
-      dataKey="y2024"
-      stroke="#1E266D"
-      strokeWidth={3}
-      name="2024"
-    />
+          <ResponsiveContainer width="100%" height={420}>
+            <LineChart data={productionData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={true}
+                horizontal={true}
+              />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
 
-    <Line
-      type="monotone"
-      dataKey="y2025"
-      stroke="#F26C2F"
-      strokeWidth={3}
-      name="2025"
-    />
+              <Line
+                type="monotone"
+                dataKey="y2024"
+                stroke="#1E266D"
+                strokeWidth={3}
+                name="2024"
+              />
 
-    <Line
-      type="monotone"
-      dataKey="y2026"
-      stroke="#10B981"
-      strokeWidth={3}
-      name="2026"
-    />
-  </LineChart>
-</ResponsiveContainer>
+              <Line
+                type="monotone"
+                dataKey="y2025"
+                stroke="#F26C2F"
+                strokeWidth={3}
+                name="2025"
+              />
+
+              <Line
+                type="monotone"
+                dataKey="y2026"
+                stroke="#10B981"
+                strokeWidth={3}
+                name="2026"
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
 
         <div style={chartCard}>
           <h2 style={sectionTitle}>Collections</h2>
-          <p>Collections graph goes here</p>
+
+          <ResponsiveContainer width="100%" height={420}>
+            <LineChart data={collectionsData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={true}
+                horizontal={true}
+              />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+
+              <Line
+                type="monotone"
+                dataKey="y2024"
+                stroke="#1E266D"
+                strokeWidth={3}
+                name="2024"
+              />
+
+              <Line
+                type="monotone"
+                dataKey="y2025"
+                stroke="#F26C2F"
+                strokeWidth={3}
+                name="2025"
+              />
+
+              <Line
+                type="monotone"
+                dataKey="y2026"
+                stroke="#10B981"
+                strokeWidth={3}
+                name="2026"
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
       <div style={startsWrapper}>
         <div style={chartCard}>
           <h2 style={sectionTitle}>Starts</h2>
-          <p>Starts graph goes here</p>
+
+          <ResponsiveContainer width="100%" height={420}>
+            <LineChart data={startsData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={true}
+                horizontal={true}
+              />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+
+              <Line
+                type="monotone"
+                dataKey="y2024"
+                stroke="#1E266D"
+                strokeWidth={3}
+                name="2024"
+              />
+
+              <Line
+                type="monotone"
+                dataKey="y2025"
+                stroke="#F26C2F"
+                strokeWidth={3}
+                name="2025"
+              />
+
+              <Line
+                type="monotone"
+                dataKey="y2026"
+                stroke="#10B981"
+                strokeWidth={3}
+                name="2026"
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
@@ -91,7 +220,7 @@ export default function PracticeTrendsDashboardPage() {
 
 const container: React.CSSProperties = {
   minHeight: '100vh',
-  backgroundColor: '#f5f5f5'
+  backgroundColor: '#f5f5f5cc'
 }
 
 const headerBar: React.CSSProperties = {
@@ -133,10 +262,11 @@ const startsWrapper: React.CSSProperties = {
 const chartCard: React.CSSProperties = {
   backgroundColor: '#FFFFFF',
   width: '100%',
-  padding: 24,
-  borderRadius: 16,
-  border: '1px solid #E5E7EB',
-  boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+  padding: 28,
+  borderRadius: 18,
+  border: '2px solid #D1D5DB',
+  boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+  minHeight: 500
 }
 
 const sectionTitle: React.CSSProperties = {
