@@ -153,7 +153,19 @@ export default function KPI({
   finalTarget > 0
     ? finalCurrent / finalTarget
     : 0
+  const getResultBackground = () => {
+  const score = percent * 100
 
+  if (score >= 100) {
+    return '#ddf3e4d7' // light green
+  }
+
+  if (score >= 90) {
+    return '#fff4ccf3' // soft yellow
+  }
+
+  return '#fde2e2d8' // light red
+}
   // =========================
   // UPDATE LOGIC (ONLY SINGLE)
   // =========================
@@ -201,7 +213,7 @@ export default function KPI({
       <div style={kpiRow}>
 
         <input
-  style={cell}
+  style={prevCell}
   value={
     isCurrency
       ? `$${Number(finalPrev).toLocaleString()}`
@@ -213,7 +225,7 @@ export default function KPI({
 />
 
 <input
-  style={cell}
+  style={targetCell}
   value={
     isCurrency
       ? `$${Number(finalTarget).toLocaleString()}`
@@ -225,7 +237,7 @@ export default function KPI({
 />
 
 <input
-  style={cell}
+  style={currentCell}
   value={
     isCurrency
       ? `$${Number(finalCurrent).toLocaleString()}`
@@ -238,17 +250,17 @@ export default function KPI({
   disabled={config[label]?.type !== 'single'}
 />
 
-       <input
+<input
   style={{
     ...cell,
+    backgroundColor: getResultBackground(),
     fontWeight: 800,
     fontSize: 16,
-    color: '#F26C2F'
+    color: '#1E266D'
   }}
   value={percent ? `${Math.round(percent * 100)}%` : ''}
   disabled
 />
-
       </div>
 
       <button style={button} onClick={() => setShowInit(!showInit)}>
@@ -351,6 +363,20 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#E5E5E5'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#DCEBFA'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
 }
 
 const cellWide: React.CSSProperties = {
