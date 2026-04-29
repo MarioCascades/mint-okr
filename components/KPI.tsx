@@ -366,12 +366,12 @@ const cell: React.CSSProperties = {
 }
 const prevCell: React.CSSProperties = {
   ...cell,
-  backgroundColor: '#E5E5E5'
+  backgroundColor: '#e5e5e5d5'
 }
 
 const targetCell: React.CSSProperties = {
   ...cell,
-  backgroundColor: '#DCEBFA'
+  backgroundColor: '#dcebfacc'
 }
 
 const currentCell: React.CSSProperties = {
