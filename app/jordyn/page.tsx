@@ -539,7 +539,7 @@ setValue(total.toString())
 // =========================
 // SCORE CALCULATION (ADD THIS)
 // =========================
-const t = Number(localTarget || dbTarget || kr?.target_value || 0)
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
 if (t <= 0) {
   setScore('0%')
@@ -611,9 +611,10 @@ if (!isDirty) {
 
 
 const c = Number(currentValue || 0)
-const t = Number(localTarget || dbTarget || 0)
 
-// ALWAYS set score (no silent failure)
+// USE DIRECT VALUE — NOT STATE
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+
 if (t === 0) {
   setScore('0%')
 } else {
