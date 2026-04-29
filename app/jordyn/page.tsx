@@ -541,9 +541,12 @@ setValue(total.toString())
 // =========================
 const t = Number(localTarget || dbTarget || kr?.target_value || 0)
 
-if (t > 0) {
+if (t <= 0) {
+  setScore('0%')
+} else {
   setScore(Math.round((total / t) * 100) + '%')
 }
+
 // =========================
 // PREVIOUS MONTH CALCULATION
 // =========================
@@ -607,11 +610,14 @@ if (!isDirty) {
 }
 
 
-const c = Number(currentValue)
+const c = Number(currentValue || 0)
 const t = Number(localTarget || dbTarget || 0)
 
-if (t > 0) {
-  setScore(Math.round((c / t) * 100) + '%')
+if (t <= 0) {
+  setScore('0%')
+} else {
+  const percent = Math.round((c / t) * 100)
+  setScore(percent + '%')
 }
     }
 
@@ -663,10 +669,32 @@ const handleInitiativeSave = async (
       }
     )
 }
-  const getScoreColor = () => {
-    const num = Number(score.replace('%', ''))
-    return num >= 100 ? '#22c55e' : '#c2410c'
+const isLowerBetter = (label: string) => {
+  const l = label.toLowerCase()
+
+  return (
+    l.includes('call out') ||
+    l.includes('conversion') ||
+    l.includes('wait')
+  )
+}
+
+const getScoreBackground = () => {
+  const num = Number(score.replace('%', ''))
+
+  // handles empty safely
+  if (!num && num !== 0) return '#FFFFFF'
+
+  if (isLowerBetter(label)) {
+    if (num <= 100) return '#acf3c3d7'   // green
+    if (num <= 110) return '#fff4ccf3'   // yellow
+    return '#f3b8b8d8'                   // red
   }
+
+  if (num >= 100) return '#acf3c3d7'     // green
+  if (num >= 90) return '#fff4ccf3'      // yellow
+  return '#f3b8b8d8'                     // red
+}
 
   return (
     <div style={{ marginBottom: 10 }}>
@@ -771,7 +799,15 @@ setIsDirty(true)
           onKeyDown={handleEnter}
         />
 
-        <input style={{ ...cell, color: getScoreColor() }} value={score} readOnly />
+       <input
+  style={{
+    ...cell,
+    backgroundColor: getScoreBackground(),
+    fontWeight: 800
+  }}
+  value={score}
+  readOnly
+/>
 
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
           {showInitiatives ? 'Hide' : '+ Initiatives'}
