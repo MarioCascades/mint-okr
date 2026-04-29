@@ -157,14 +157,14 @@ export default function KPI({
   const score = percent * 100
 
   if (score >= 100) {
-    return '#ddf3e4d7' // light green
+    return '#acf3c3d7' // light green
   }
 
   if (score >= 90) {
     return '#fff4ccf3' // soft yellow
   }
 
-  return '#fde2e2d8' // light red
+  return '#f3b8b8d8' // light red
 }
   // =========================
   // UPDATE LOGIC (ONLY SINGLE)
