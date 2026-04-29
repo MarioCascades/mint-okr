@@ -400,22 +400,24 @@ if (
     return l.includes('late arrivals') || l.includes('call outs')
   }
 
-  const getScoreBackground = () => {
+ const getScoreBackground = () => {
   const num = Number(score.replace('%', ''))
 
   if (!num && num !== 0) {
     return '#FFFFFF'
   }
 
-  if (num >= 100) {
-    return '#acf3c3d7' // green
+  if (isLowerBetter(label)) {
+    // LOWER IS BETTER
+    if (num <= 100) return '#acf3c3d7' // green
+    if (num <= 110) return '#fff4ccf3' // yellow
+    return '#f3b8b8d8' // red
+  } else {
+    // HIGHER IS BETTER
+    if (num >= 100) return '#acf3c3d7' // green
+    if (num >= 90) return '#fff4ccf3' // yellow
+    return '#f3b8b8d8' // red
   }
-
-  if (num >= 90) {
-    return '#fff4ccf3' // yellow
-  }
-
-  return '#f3b8b8d8' // red
 }
 
   return (
