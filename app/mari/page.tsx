@@ -379,13 +379,13 @@ const { data: prevData } = await supabase
      const c = Number(currentValue || 0)
     const t = Number(resolvedTarget || 0)
 
-if (!t || t <= 0) {
+if (t <= 0) {
   setScore('')
   return
 }
 
 const percent = Math.round((c / t) * 100)
-setScore(percent + '%')
+setScore(`${percent}%`)
     }
 
     fetchData()
@@ -448,27 +448,33 @@ const isLowerBetter = (label: string) => {
     l.includes('reschedule')
   )
 }
-  const getScoreColor = () => {
+const getScoreBackground = () => {
   const num = Number(score.replace('%', ''))
 
-  if (!num) return '#fff'
-
-  if (isLowerBetter(label)) {
-    return num <= 100 ? '#22c55e' : '#c2410c'
-  } else {
-    return num >= 100 ? '#22c55e' : '#c2410c'
+  if (!num && num !== 0) {
+    return '#FFFFFF'
   }
+
+  if (num >= 100) {
+    return '#acf3c3d7' // green
+  }
+
+  if (num >= 90) {
+    return '#fff4ccf3' // yellow
+  }
+
+  return '#f3b8b8d8' // red
 }
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
         <span>{label}</span>
 
-        <input style={cell} value={lastMonth} readOnly />
+        <input style={prevCell} value={lastMonth} readOnly />
 
         <input
-          style={cell}
-          value={target}
+  style={targetCell}
+  value={target}
           disabled={!isEditing}
           onChange={(e) => {
   const val = e.target.value.replace(/[^0-9.]/g, '')
@@ -478,9 +484,9 @@ const isLowerBetter = (label: string) => {
           onKeyDown={handleEnter}
         />
 
-        <input
-          style={cell}
-          value={value}
+       <input
+  style={currentCell}
+  value={value}
           disabled={!isEditing}
           onChange={(e) => {
   const val = e.target.value.replace(/[^0-9]/g, '')
@@ -491,12 +497,22 @@ const isLowerBetter = (label: string) => {
           onKeyDown={handleEnter}
         />
 
-        <input style={{ ...cell, color: getScoreColor() }} value={score} readOnly />
+        <input
+  style={{
+    ...cell,
+    backgroundColor: getScoreBackground(),
+    fontWeight: 800,
+    color: '#1E266D'
+  }}
+  value={score}
+  readOnly
+/>
 
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
           {showInitiatives ? 'Hide' : '+ Initiatives'}
         </button>
       </div>
+
 {showInitiatives && (
   <div style={initiativeRow}>
     {initiatives.map((item, index) => (
@@ -723,6 +739,20 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
 }
 
 const button: React.CSSProperties = {
