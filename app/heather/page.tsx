@@ -558,8 +558,7 @@ if (loadedMonth !== currentMonthKey) {
 // ------------------------
 
 const c = Number(currentValue || 0)
-
-const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+const t = Number(resolvedTarget ?? 0)
 
 if (t === 0) {
   setScore('0%')
@@ -632,7 +631,7 @@ setLoadedMonth(currentMonthKey)
 // =========================
 // SCORE CALCULATION 
 // =========================
-const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+const t = Number(resolvedTarget ?? 0)
 
 if (t <= 0) {
   setScore('0%')
