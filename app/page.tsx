@@ -29,12 +29,15 @@ export default function Home() {
     return new Date(now.getFullYear(), now.getMonth(), 1)
   })
 
-  const [today, setToday] = useState('')
-  const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+    const transitionDate = new Date(2026, 3, 1) // April 1, 2026
+  const tcPartner =
+  selectedMonth >= transitionDate
+    ? 'Heather'
+    : 'Olivia'
 
-  useEffect(() => {
-    setToday(new Date().toISOString().split('T')[0])
-  }, [])
+
+   const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+
 
   useEffect(() => {
     const today = new Date()
@@ -96,6 +99,7 @@ const fetchMainPageNote = async (
   noteType: string
 ) => {
   const reportingDate = formatDate(selectedMonth)
+
 
   // STEP 1: current month first
   const { data: current } = await supabase
@@ -386,58 +390,145 @@ const getTargetWithCarryForward = async (user: string, krTitle: string) => {
       const formatted = new Date(updates[0].last_updated_at).toLocaleString()
       setLastUpdated(formatted)
 }
+// STARTS
+const jStarts = await getValue(
+  'Jordyn',
+  'Total Starts (Individual)'
+)
 
-    // STARTS
-    const jStarts = await getValue('Jordyn', 'Total Starts (Individual)')
-    const oStarts = await getValue('Olivia', 'Total Starts (Individual)')
-    setStarts(jStarts + oStarts)
+const partnerStarts = await getValue(
+  tcPartner,
+  'Total Starts (Individual)'
+)
 
-    const pjStarts = await getPrevValue('Jordyn', 'Total Starts (Individual)')
-    const poStarts = await getPrevValue('Olivia', 'Total Starts (Individual)')
-    setPrevStarts(pjStarts + poStarts)
+setStarts(jStarts + partnerStarts)
 
-    const jt = await getTargetWithCarryForward('Jordyn', 'Total Starts (Individual)')
-    const ot = await getTargetWithCarryForward('Olivia', 'Total Starts (Individual)')
+const pjStarts = await getPrevValue(
+  'Jordyn',
+  'Total Starts (Individual)'
+)
 
-    setStartsTarget(jt + ot)
+const pPartnerStarts = await getPrevValue(
+  tcPartner,
+  'Total Starts (Individual)'
+)
 
-    // PRODUCTION
-    const jProd = await getValue('Jordyn', 'Total Production (Individual)')
-    const oProd = await getValue('Olivia', 'Total Production (Individual)')
-    setProduction(jProd + oProd)
+setPrevStarts(pjStarts + pPartnerStarts)
 
-    const pjProd = await getPrevValue('Jordyn', 'Total Production (Individual)')
-    const poProd = await getPrevValue('Olivia', 'Total Production (Individual)')
-    setPrevProduction(pjProd + poProd)
+const jt = await getTargetWithCarryForward(
+  'Jordyn',
+  'Total Starts (Individual)'
+)
 
-    const jtProd = await getTargetWithCarryForward('Jordyn', 'Total Production (Individual)')
-    const otProd = await getTargetWithCarryForward('Olivia', 'Total Production (Individual)')
-    setProductionTarget(jtProd + otProd)
+const partnerTarget = await getTargetWithCarryForward(
+  tcPartner,
+  'Total Starts (Individual)'
+)
 
-    // SCHEDULED
-    const jScheduled = await getValue('Jordyn', 'TC Scheduled New Patients')
-    const oScheduled = await getValue('Olivia', 'TC Scheduled New Patients')
-    setScheduled(jScheduled + oScheduled)
+setStartsTarget(jt + partnerTarget)
 
-    const pjScheduled = await getPrevValue('Jordyn', 'TC Scheduled New Patients')
-    const poScheduled = await getPrevValue('Olivia', 'TC Scheduled New Patients')
-    setPrevScheduled(pjScheduled + poScheduled)
-    const scheduledTarget = await getTargetWithCarryForward('Jordyn','TC Scheduled New Patients')
 
-    // KEPT
-    const jKept = await getValue('Jordyn', labelMap["Kept New Patients"])
-    const oKept = await getValue('Olivia', labelMap["Kept New Patients"])
-    setKept(jKept + oKept)
+// PRODUCTION
+const jProd = await getValue(
+  'Jordyn',
+  'Total Production (Individual)'
+)
 
-    const pjKept = await getPrevValue('Jordyn', labelMap["Kept New Patients"])
-    const poKept = await getPrevValue('Olivia', labelMap["Kept New Patients"])
-    setPrevKept(pjKept + poKept)
+const partnerProd = await getValue(
+  tcPartner,
+  'Total Production (Individual)'
+)
 
-    const jtKept = await getTargetWithCarryForward('Jordyn', labelMap["Kept New Patients"])
-    const otKept = await getTargetWithCarryForward('Olivia', labelMap["Kept New Patients"])
-    setKeptTarget(jtKept + otKept)
+setProduction(jProd + partnerProd)
 
-  
+const pjProd = await getPrevValue(
+  'Jordyn',
+  'Total Production (Individual)'
+)
+
+const pPartnerProd = await getPrevValue(
+  tcPartner,
+  'Total Production (Individual)'
+)
+
+setPrevProduction(pjProd + pPartnerProd)
+
+const jtProd = await getTargetWithCarryForward(
+  'Jordyn',
+  'Total Production (Individual)'
+)
+
+const partnerProdTarget = await getTargetWithCarryForward(
+  tcPartner,
+  'Total Production (Individual)'
+)
+
+setProductionTarget(jtProd + partnerProdTarget)
+
+
+// SCHEDULED
+const jScheduled = await getValue(
+  'Jordyn',
+  'TC Scheduled New Patients'
+)
+
+const partnerScheduled = await getValue(
+  tcPartner,
+  'TC Scheduled New Patients'
+)
+
+setScheduled(jScheduled + partnerScheduled)
+
+const pjScheduled = await getPrevValue(
+  'Jordyn',
+  'TC Scheduled New Patients'
+)
+
+const pPartnerScheduled = await getPrevValue(
+  tcPartner,
+  'TC Scheduled New Patients'
+)
+
+setPrevScheduled(pjScheduled + pPartnerScheduled)
+
+
+
+// KEPT
+const jKept = await getValue(
+  'Jordyn',
+  labelMap["Kept New Patients"]
+)
+
+const partnerKept = await getValue(
+  tcPartner,
+  labelMap["Kept New Patients"]
+)
+
+setKept(jKept + partnerKept)
+
+const pjKept = await getPrevValue(
+  'Jordyn',
+  labelMap["Kept New Patients"]
+)
+
+const pPartnerKept = await getPrevValue(
+  tcPartner,
+  labelMap["Kept New Patients"]
+)
+
+setPrevKept(pjKept + pPartnerKept)
+
+const jtKept = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Kept New Patients"]
+)
+
+const partnerKeptTarget = await getTargetWithCarryForward(
+  tcPartner,
+  labelMap["Kept New Patients"]
+)
+
+setKeptTarget(jtKept + partnerKeptTarget)
   }
 
 const macroConversion =

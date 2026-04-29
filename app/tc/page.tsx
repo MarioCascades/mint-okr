@@ -120,7 +120,13 @@ export default function Page() {
 
   const fetchData = async () => {
 
-    const reportingDate = formatDate(selectedMonth)
+  const reportingDate = formatDate(selectedMonth)
+  const switchMonth = new Date(2026, 3, 1) // April 1, 2026
+
+  const secondTC =
+  selectedMonth >= switchMonth
+    ? 'Heather'
+    : 'Olivia'
 
   const getTargetWithCarryForward = async (user: string, krTitle: string) => {
 
@@ -217,17 +223,23 @@ const getPrevValue = async (user: string, krTitle: string) => {
     // =========================
 
     const jordynStarts = await getValue('Jordyn', 'Total Starts (Individual)')
-    const oliviaStarts = await getValue('Olivia', 'Total Starts (Individual)')
+    const secondStarts = await getValue(
+  secondTC,
+  'Total Starts (Individual)'
+)
 
-    setTotalStarts(jordynStarts + oliviaStarts)
+    setTotalStarts(jordynStarts + secondStarts)
 
     const prevJStarts = await getPrevValue('Jordyn', 'Total Starts (Individual)')
-    const prevOStarts = await getPrevValue('Olivia', 'Total Starts (Individual)')
+   const prevSecondStarts = await getPrevValue(
+  secondTC,
+  'Total Starts (Individual)'
+)
 
     console.log("PREV JORDYN:", prevJStarts)
-    console.log("PREV OLIVIA:", prevOStarts)
+console.log("PREV SECOND TC:", prevSecondStarts)
 
-    setPrevStarts(prevJStarts + prevOStarts)
+   setPrevStarts(prevJStarts + prevSecondStarts)
 
 
 const jordynStartsTarget = await getTargetWithCarryForward(
@@ -235,125 +247,234 @@ const jordynStartsTarget = await getTargetWithCarryForward(
   labelMap["Total Starts (Individual)"]
 )
 
-const oliviaStartsTarget = await getTargetWithCarryForward(
-  'Olivia',
+const secondStartsTarget = await getTargetWithCarryForward(
+  secondTC,
   labelMap["Total Starts (Individual)"]
 )
 
-setStartsTarget(jordynStartsTarget + oliviaStartsTarget)
-    // =========================
-    // TOTAL PRODUCTION
-    // =========================
+setStartsTarget(jordynStartsTarget + secondStartsTarget)
 
-    const jordynProduction = await getValue('Jordyn', 'Total Production (Individual)')
-    const oliviaProduction = await getValue('Olivia', 'Total Production (Individual)')
+// =========================
+// TOTAL PRODUCTION
+// =========================
 
-    setTotalProduction(jordynProduction + oliviaProduction)
-    const prevJProduction = await getPrevValue('Jordyn', 'Total Production (Individual)')
-    const prevOProduction = await getPrevValue('Olivia', 'Total Production (Individual)')
+const jordynProduction = await getValue(
+  'Jordyn',
+  'Total Production (Individual)'
+)
 
-    setPrevProduction(prevJProduction + prevOProduction)
+const secondProduction = await getValue(
+  secondTC,
+  'Total Production (Individual)'
+)
 
-  
+setTotalProduction(
+  jordynProduction + secondProduction
+)
 
-const jordynProdTarget = await getTargetWithCarryForward('Jordyn', 'Total Production (Individual)')
-const oliviaProdTarget = await getTargetWithCarryForward('Olivia', 'Total Production (Individual)')
+const prevJProduction = await getPrevValue(
+  'Jordyn',
+  'Total Production (Individual)'
+)
 
-setProductionTarget(jordynProdTarget + oliviaProdTarget)
+const prevSecondProduction = await getPrevValue(
+  secondTC,
+  'Total Production (Individual)'
+)
 
-    // =========================
-    // SCHEDULED NEW PATIENTS
-    // =========================
+setPrevProduction(
+  prevJProduction + prevSecondProduction
+)
 
-    const jordynScheduled = await getValue('Jordyn', labelMap["Scheduled New Patients"])
-const oliviaScheduled = await getValue('Olivia', labelMap["Scheduled New Patients"])
+const jordynProdTarget =
+  await getTargetWithCarryForward(
+    'Jordyn',
+    'Total Production (Individual)'
+  )
 
-    setScheduled(jordynScheduled + oliviaScheduled)
+const secondProdTarget =
+  await getTargetWithCarryForward(
+    secondTC,
+    'Total Production (Individual)'
+  )
 
-    const prevJScheduled = await getPrevValue('Jordyn', labelMap["Scheduled New Patients"])
-const prevOScheduled = await getPrevValue('Olivia', labelMap["Scheduled New Patients"])
+setProductionTarget(
+  jordynProdTarget + secondProdTarget
+)
 
-    setPrevScheduled(prevJScheduled + prevOScheduled)
+// =========================
+// SCHEDULED NEW PATIENTS
+// =========================
 
-    const scheduledTargetValue = await getTargetWithCarryForward(
+const jordynScheduled = await getValue(
   'Jordyn',
   labelMap["Scheduled New Patients"]
 )
 
-setScheduledTarget(scheduledTargetValue)
+const secondScheduled = await getValue(
+  secondTC,
+  labelMap["Scheduled New Patients"]
+)
 
-    // =========================
-    // KEPT NEW PATIENTS
-    // =========================
+setScheduled(
+  jordynScheduled + secondScheduled
+)
 
-    const jordynKept = await getValue('Jordyn', labelMap['Kept New Patients'])
-    const oliviaKept = await getValue('Olivia', labelMap['Kept New Patients'])
-
-    setKept(jordynKept + oliviaKept)
-
-    const prevJKept = await getPrevValue('Jordyn', labelMap["Kept New Patients"])
-    const prevOKept = await getPrevValue('Olivia', labelMap["Kept New Patients"])
-
-    setPrevKept(prevJKept + prevOKept)
-
-    const jordynKeptTarget = await getTargetWithCarryForward('Jordyn', labelMap["Kept New Patients"])
-    const oliviaKeptTarget = await getTargetWithCarryForward('Olivia', labelMap["Kept New Patients"])
-
-    setKeptTarget(jordynKeptTarget + oliviaKeptTarget)
-
-    // =========================
-    // CONVERSION RATE
-    // =========================
-
-      const prevConversionValue = (prevJScheduled + prevOScheduled)
-  ? ((prevJKept + prevOKept) / (prevJScheduled + prevOScheduled)) * 100
-  : 0
-      setPrevConversion(prevConversionValue)
-
-     const jordynConversionTarget = await getTargetWithCarryForward(
+const prevJScheduled = await getPrevValue(
   'Jordyn',
-  labelMap["Conversion Rate"]
+  labelMap["Scheduled New Patients"]
 )
 
-const oliviaConversionTarget = await getTargetWithCarryForward(
-  'Olivia',
-  labelMap["Conversion Rate"]
+const prevSecondScheduled = await getPrevValue(
+  secondTC,
+  labelMap["Scheduled New Patients"]
 )
+
+setPrevScheduled(
+  prevJScheduled + prevSecondScheduled
+)
+
+const jordynScheduledTarget =
+  await getTargetWithCarryForward(
+    'Jordyn',
+    labelMap["Scheduled New Patients"]
+  )
+
+const secondScheduledTarget =
+  await getTargetWithCarryForward(
+    secondTC,
+    labelMap["Scheduled New Patients"]
+  )
+
+setScheduledTarget(
+  jordynScheduledTarget + secondScheduledTarget
+)
+
+// =========================
+// KEPT NEW PATIENTS
+// =========================
+
+const jordynKept = await getValue(
+  'Jordyn',
+  labelMap['Kept New Patients']
+)
+
+const secondKept = await getValue(
+  secondTC,
+  labelMap['Kept New Patients']
+)
+
+setKept(
+  jordynKept + secondKept
+)
+
+const prevJKept = await getPrevValue(
+  'Jordyn',
+  labelMap["Kept New Patients"]
+)
+
+const prevSecondKept = await getPrevValue(
+  secondTC,
+  labelMap["Kept New Patients"]
+)
+
+setPrevKept(
+  prevJKept + prevSecondKept
+)
+
+const jordynKeptTarget =
+  await getTargetWithCarryForward(
+    'Jordyn',
+    labelMap["Kept New Patients"]
+  )
+
+const secondKeptTarget =
+  await getTargetWithCarryForward(
+    secondTC,
+    labelMap["Kept New Patients"]
+  )
+
+setKeptTarget(
+  jordynKeptTarget + secondKeptTarget
+)
+
+// =========================
+// CONVERSION RATE
+// =========================
+
+const prevConversionValue =
+  (prevJScheduled + prevSecondScheduled) > 0
+    ? (
+        (prevJKept + prevSecondKept) /
+        (prevJScheduled + prevSecondScheduled)
+      ) * 100
+    : 0
+
+setPrevConversion(prevConversionValue)
+
+const conversionTargetValue =
+  (jordynScheduledTarget + secondScheduledTarget) > 0
+    ? (
+        (jordynKeptTarget + secondKeptTarget) /
+        (jordynScheduledTarget + secondScheduledTarget)
+      ) * 100
+    : 0
 
 setConversionTarget(
-  (jordynConversionTarget + oliviaConversionTarget) / 2
+  conversionTargetValue
 )
 
-      const jordynKits = await getValue('Jordyn', labelMap["Whitening Kits"])
-      const oliviaKits = await getValue('Olivia', labelMap["Whitening Kits"])
+// =========================
+// WHITENING KITS
+// =========================
 
-    setKits(jordynKits + oliviaKits)
-
-     
-
-     // =========================
-    // TOTAL WHITENING KITS
-    // =========================
-    
-
-    const prevJKits = await getPrevValue('Jordyn', labelMap["Whitening Kits"])
-    const prevOKits = await getPrevValue('Olivia', labelMap["Whitening Kits"])
-
-    setPrevKits(prevJKits + prevOKits)
-
-      const jordynKitsTarget = await getTargetWithCarryForward(
+const jordynKits = await getValue(
   'Jordyn',
   labelMap["Whitening Kits"]
 )
 
-const oliviaKitsTarget = await getTargetWithCarryForward(
-  'Olivia',
+const secondKits = await getValue(
+  secondTC,
   labelMap["Whitening Kits"]
 )
 
-setKitsTarget(jordynKitsTarget + oliviaKitsTarget)
-  }
-  
+setKits(
+  jordynKits + secondKits
+)
+
+// =========================
+// TOTAL WHITENING KITS
+// =========================
+
+const prevJKits = await getPrevValue(
+  'Jordyn',
+  labelMap["Whitening Kits"]
+)
+
+const prevSecondKits = await getPrevValue(
+  secondTC,
+  labelMap["Whitening Kits"]
+)
+
+setPrevKits(
+  prevJKits + prevSecondKits
+)
+
+const jordynKitsTarget =
+  await getTargetWithCarryForward(
+    'Jordyn',
+    labelMap["Whitening Kits"]
+  )
+
+const secondKitsTarget =
+  await getTargetWithCarryForward(
+    secondTC,
+    labelMap["Whitening Kits"]
+  )
+
+setKitsTarget(
+  jordynKitsTarget + secondKitsTarget
+)
   // =========================
   // MONTH NAV
   // =========================
@@ -750,4 +871,4 @@ const monthText: React.CSSProperties = {
   color: '#FFFFFF',
   minWidth: 110,
   textAlign: 'center'
-}
+}}
