@@ -613,7 +613,8 @@ if (!isDirty) {
 const c = Number(currentValue || 0)
 const t = Number(localTarget || dbTarget || 0)
 
-if (t <= 0) {
+// ALWAYS set score (no silent failure)
+if (t === 0) {
   setScore('0%')
 } else {
   const percent = Math.round((c / t) * 100)
@@ -702,7 +703,7 @@ const getScoreBackground = () => {
         <span>{label}</span>
 
         <input
-          style={cell}
+          style={prevCell}
           value={
   isCurrency && lastMonth
     ? '$' + Number(lastMonth).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -714,7 +715,7 @@ const getScoreBackground = () => {
         />
 
         <input
-          style={cell}
+          style={targetCell}
           value={
   isCurrency && localTarget
     ? '$' + localTarget
@@ -761,7 +762,7 @@ onKeyDown={handleEnter}
 />
 
         <input
-          style={cell}
+          style={currentCell}
           value={
   forcedValue !== undefined
     ? (label === "Total Production"
@@ -1038,6 +1039,21 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
 }
 
 const button: React.CSSProperties = {
