@@ -348,7 +348,7 @@ useEffect(() => {
 
 const container: React.CSSProperties = {
   minHeight: '100vh',
-  backgroundColor: '#f5f5f5'
+  backgroundColor: '#f5f5f5c4'
 }
 
 const header: React.CSSProperties = {
