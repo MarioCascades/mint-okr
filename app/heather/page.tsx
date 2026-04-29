@@ -557,11 +557,15 @@ if (loadedMonth !== currentMonthKey) {
 // SCORE
 // ------------------------
 
-const c = Number(currentValue)
-const t = Number(localTarget || 0)
+const c = Number(currentValue || 0)
 
-if (t > 0) {
-  setScore(Math.round((c / t) * 100) + '%')
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+
+if (t === 0) {
+  setScore('0%')
+} else {
+  const percent = Math.round((c / t) * 100)
+  setScore(percent + '%')
 }
 
         
@@ -628,9 +632,11 @@ setLoadedMonth(currentMonthKey)
 // =========================
 // SCORE CALCULATION 
 // =========================
-const t = Number(localTarget || 0)
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (t > 0) {
+if (t <= 0) {
+  setScore('0%')
+} else {
   setScore(Math.round((total / t) * 100) + '%')
 }
 
@@ -741,18 +747,39 @@ return
     )
 }
 
-  const getScoreColor = () => {
-    const num = Number(score.replace('%', ''))
-    return num >= 100 ? '#22c55e' : '#c2410c'
+const isLowerBetter = (label: string) => {
+  const l = label.toLowerCase()
+
+  return (
+    l.includes('call out') ||
+    l.includes('conversion') ||
+    l.includes('wait')
+  )
+}
+
+const getScoreBackground = () => {
+  const num = Number(score.replace('%', ''))
+
+  // handle empty safely
+  if (!num && num !== 0) return '#FFFFFF'
+
+  if (isLowerBetter(label)) {
+    if (num <= 100) return '#acf3c3d7'   // green
+    if (num <= 110) return '#fff4ccf3'   // yellow
+    return '#f3b8b8d8'                   // red
   }
 
+  if (num >= 100) return '#acf3c3d7'     // green
+  if (num >= 90) return '#fff4ccf3'      // yellow
+  return '#f3b8b8d8'                     // red
+}
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
         <span>{label}</span>
 
         <input
-          style={cell}
+          style={prevCell}
           value={
   isCurrency && lastMonth
   ? formatCurrency(lastMonth)
@@ -764,7 +791,7 @@ return
         />
 
         <input
-          style={cell}
+          style={targetCell}
           value={
   isEditing
     ? localTarget
@@ -806,7 +833,7 @@ if (parts.length === 2) {
         />
 
         <input
-  style={cell}
+  style={currentCell}
   value={
   forcedValue !== undefined
     ? (isCurrency
@@ -856,7 +883,15 @@ if (parts.length === 2) {
   onKeyDown={handleEnter}
 />
 
-        <input style={{ ...cell, color: getScoreColor() }} value={score} readOnly />
+        <input
+  style={{
+    ...cell,
+    backgroundColor: getScoreBackground(),
+    fontWeight: 800
+  }}
+  value={score}
+  readOnly
+/>
 
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
           {showInitiatives ? 'Hide' : '+ Initiatives'}
@@ -1087,6 +1122,21 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
 }
 
 const button: React.CSSProperties = {
