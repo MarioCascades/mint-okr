@@ -50,9 +50,11 @@ export default function TopNav() {
           style={{
   ...button,
   backgroundColor: isActive ? '#F97316' : '#FFFFFF',
-  color: isActive ? '#000' : '#111827',
-  border: isActive ? '1px solid #F97316' : '1px solid #E5E7EB'
+  color: isActive ? '#1E266D' : '#F26C2F',
+  border: '1px solid #F26C2F',
+  fontWeight: isActive ? 700 : 500
 }}
+
 onMouseEnter={(e) => {
   if (!isActive) {
     e.currentTarget.style.backgroundColor = '#F9FAFB'
@@ -116,17 +118,18 @@ const logo : React.CSSProperties = {
   color: '#000'
 }
 
-const title : React.CSSProperties = {
-  fontWeight: 600,
+const title: React.CSSProperties = {
+  fontSize: 22,
+  fontWeight: 700,
   color: '#111827'
 }
 
 const right: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 20,
   flex: 1,
-  justifyContent: 'center'
+  justifyContent: 'space-between',
+  marginLeft: 40
 }
 
 const button: React.CSSProperties = {
@@ -150,7 +153,8 @@ const selectorRow: React.CSSProperties = {
   gap: 10,
   flexWrap: 'wrap',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  flex: 1
 }
 
 const logoutSection: React.CSSProperties = {
