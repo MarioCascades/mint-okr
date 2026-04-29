@@ -4,8 +4,8 @@ export const dynamic = 'force-dynamic'
 
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import KPI from '../components/KPI'
+import TopNav from '@/components/TopNav'
 import { supabase } from '../lib/supabase'
 
 // ================= LABEL MAP =================
@@ -21,30 +21,6 @@ const formatDate = (d: Date) =>
 
 export default function Home() {
 
-  const router = useRouter()
-
-  const handleLogout = async () => {
-  await supabase.auth.signOut()
-  router.push('/login')
-  router.refresh()
-}
-
-  const [selectedUser, setSelectedUser] = useState('Jordyn')
-
-  const users = [
-    'Mari','Emily','TC Team','Jordyn','Olivia','Ashley','Alli','Kelle','Ashlynn','Eric'
-  ]
-
-  const handleNavigation = (user: string) => {
-    setSelectedUser(user)
-
-    const pathMap: any = {
-      'Mari': '/mari','Emily': '/emily','TC Team': '/tc','Jordyn': '/jordyn',
-      'Olivia': '/olivia','Ashley': '/ashley', 'Alli': '/alli','Kelle': '/kelle','Ashlynn': '/ashlynn','Eric': '/eric',
-    }
-
-    router.push(pathMap[user])
-  }
 
   // ================= DATE =================
 
@@ -473,42 +449,9 @@ const prevConversion =
 const conversionTarget =
   keptTarget > 0 ? ( keptTarget / startsTarget) * 100 : 0 
 
-  return (
-    <div style={container}>
-
-      {/* TOP BAR */}
-      <div style={topBar}>
-        <div style={logoLeft}>
-          <img src="/mint.png" style={logoImg} />
-          <span style={brandText}>Mint Orthodontics</span>
-        </div>
-
-        <div style={selectorRow}>
-          {users.map((user) => (
-            <button
-              key={user}
-              style={{
-                ...selectorButton,
-                ...(selectedUser === user ? activeTab : {})
-              }}
-              onClick={() => handleNavigation(user)}
-            >
-              {user}
-            </button>
-          ))}
-        </div>
-
-        <div style={logoutSection}>
-  <img src="/ce.png" style={logoImg} />
-
-  <button
-    onClick={handleLogout}
-    style={logoutButton}
-  >
-    Logout
-  </button>
-</div>
-      </div>
+return (
+  <div style={container}>
+    <TopNav />
 
       {/* HEADER */}
       <div style={headerBox}>
@@ -716,25 +659,6 @@ const container: React.CSSProperties = {
   minHeight: '100vh'
 }
 
-const topBar: React.CSSProperties = {
-  position: 'sticky',
-  top: 0,
-  zIndex: 100,
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '14px 24px',
-  backgroundColor: COLORS.white,
-  borderBottom: `1px solid ${COLORS.border}`,
-  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-}
-
-const logoLeft: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 10
-}
-
 const logoImg: React.CSSProperties = {
   height: 42
 }
@@ -743,28 +667,6 @@ const brandText: React.CSSProperties = {
   fontSize: 18,
   fontWeight: 700,
   color: COLORS.navy
-}
-
-const selectorRow: React.CSSProperties = {
-  display: 'flex',
-  gap: 8,
-  flexWrap: 'wrap'
-}
-
-const selectorButton: React.CSSProperties = {
-  padding: '8px 14px',
-  border: `1px solid ${COLORS.border}`,
-  borderRadius: 8,
-  backgroundColor: COLORS.white,
-  color: COLORS.navy,
-  fontWeight: 600,
-  cursor: 'pointer'
-}
-
-const activeTab: React.CSSProperties = {
-  backgroundColor: COLORS.orange,
-  color: COLORS.white,
-  border: `1px solid ${COLORS.orange}`
 }
 
 const headerBox: React.CSSProperties = {
@@ -870,19 +772,4 @@ const textarea: React.CSSProperties = {
   resize: 'vertical',
   fontFamily: 'inherit',
   lineHeight: 1.6
-}
-const logoutSection: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 12
-}
-
-const logoutButton: React.CSSProperties = {
-  padding: '8px 14px',
-  borderRadius: 8,
-  border: '1px solid #F26C2F',
-  backgroundColor: '#FFFFFF',
-  color: '#F26C2F',
-  fontWeight: 700,
-  cursor: 'pointer'
 }

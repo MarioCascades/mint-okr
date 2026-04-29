@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 
 const users = [
-  
+  { name: 'Main', path: '/' },
   { name: 'Mari', path: '/mari' },
   { name: 'Emily', path: '/emily' },
   { name: 'TC Team', path: '/tc' },
@@ -17,8 +17,6 @@ const users = [
   { name: 'Kelle', path: '/kelle' },
   { name: 'Ashlynn', path: '/ashlynn' },
   { name: 'Eric', path: '/eric' },
-  { name: 'Heather', path: '/heather' },
-  { name: 'Olivia', path: '/olivia' },
   { name: 'Tables', path: '/practice-trends' },
   { name: 'Charts', path: '/practice-trends/dashboard' }
 ]
@@ -123,30 +121,38 @@ const title : React.CSSProperties = {
   color: '#111827'
 }
 
-const right : React.CSSProperties = {
+const right: React.CSSProperties = {
   display: 'flex',
-  gap: 8,
-  flexWrap: 'wrap'
+  alignItems: 'center',
+  gap: 20,
+  flex: 1,
+  justifyContent: 'center'
 }
 
-const button : React.CSSProperties = {
-  padding: '6px 10px',
-  borderRadius: 6,
-  border: '1px solid #E5E7EB',
-  color: '#111827',
+const button: React.CSSProperties = {
+  padding: '8px 16px',
+  borderRadius: 8,
+  border: '1px solid #F26C2F',
   backgroundColor: '#FFFFFF',
-  cursor: 'pointer'
+  color: '#1E266D',
+  fontWeight: 600,
+  cursor: 'pointer',
+  fontSize: 15,
+  minWidth: 'fit-content'
 }
 
 const logoImg : React.CSSProperties = {
   height: 40
 }
 
-const selectorRow : React.CSSProperties = {
+const selectorRow: React.CSSProperties = {
   display: 'flex',
-  gap: 8,
-  flexWrap: 'wrap'
+  gap: 10,
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+  alignItems: 'center'
 }
+
 const logoutSection: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
