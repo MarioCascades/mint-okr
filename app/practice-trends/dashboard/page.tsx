@@ -43,7 +43,7 @@ export default function PracticeTrendsDashboardPage() {
             productionMap[month] = { month }
           }
 
-          productionMap[month][yearKey] = Number(row.metric_value)
+          productionMap[month][yearKey] = Number(row.metric_value) === 0 ? null : Number(row.metric_value)
         }
 
         if (row.metric_type === 'Collections') {
@@ -51,7 +51,7 @@ export default function PracticeTrendsDashboardPage() {
             collectionsMap[month] = { month }
           }
 
-          collectionsMap[month][yearKey] = Number(row.metric_value)
+          collectionsMap[month][yearKey] = Number(row.metric_value) === 0 ? null : Number(row.metric_value)
         }
 
         if (row.metric_type === 'Starts') {
@@ -59,7 +59,7 @@ export default function PracticeTrendsDashboardPage() {
             startsMap[month] = { month }
           }
 
-          startsMap[month][yearKey] = Number(row.metric_value)
+          startsMap[month][yearKey] = Number(row.metric_value) === 0 ? null : Number(row.metric_value)
         }
       })
 
