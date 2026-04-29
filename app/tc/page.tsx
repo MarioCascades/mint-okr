@@ -475,6 +475,7 @@ const secondKitsTarget =
 setKitsTarget(
   jordynKitsTarget + secondKitsTarget
 )
+  }
   // =========================
   // MONTH NAV
   // =========================
@@ -696,7 +697,7 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) => (
     </div>
   </div>
 )
-}
+
 // ================= STYLES =================
 
 const COLORS = {
