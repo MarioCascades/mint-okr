@@ -11,12 +11,12 @@ const users = [
   { name: 'TC Team', path: '/tc' },
   { name: 'Jordyn', path: '/jordyn' },
   { name: 'Heather', path: '/heather' },
-  { name: 'Olivia', path: '/olivia' },
   { name: 'Ashley', path: '/ashley' },
   { name: 'Alli', path: '/alli' },
   { name: 'Kelle', path: '/kelle' },
   { name: 'Ashlynn', path: '/ashlynn' },
   { name: 'Eric', path: '/eric' },
+  { name: 'Olivia Historical', path: '/olivia' },
   { name: 'Tables', path: '/practice-trends' },
   { name: 'Charts', path: '/practice-trends/dashboard' }
 ]
