@@ -696,6 +696,7 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) => (
     </div>
   </div>
 )
+}
 // ================= STYLES =================
 
 const COLORS = {
@@ -871,4 +872,4 @@ const monthText: React.CSSProperties = {
   color: '#FFFFFF',
   minWidth: 110,
   textAlign: 'center'
-}}
+}
