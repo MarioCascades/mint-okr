@@ -344,7 +344,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 const { data: base } = await supabase
   .from('dashboard_okr_data')
   .select('*')
-  .eq('user_name', 'Heather')
+  .eq('user_id', 'a34ec871-9a02-4c62-858c-4344726f9251')
   .eq('key_result_title', dbLabel)
   .maybeSingle()
 
@@ -355,9 +355,6 @@ if (!base || !base.key_result_id) {
 
 setKeyResultId(base.key_result_id)
  
-      if (!base) return
-
-      setKeyResultId(base.key_result_id)
 const initiativeDate = `${selectedMonth.getFullYear()}-${String(
   selectedMonth.getMonth() + 1
 ).padStart(2, '0')}-01`
@@ -495,16 +492,22 @@ if (
   label === "Total Whitening Kits"
 ) {
 
-  const getValue = async (user: string, krTitle: string) => {
+  const JORDYN_ID = "83b4a979-bef3-4418-9f71-fa7a77f53ed8"
+  const HEATHER_ID = "a34ec871-9a02-4c62-858c-4344726f9251" // Mint Heather
+
+  const getValue = async (userId: string, krTitle: string) => {
 
     const { data: row } = await supabase
       .from('dashboard_okr_data')
       .select('key_result_id')
-      .eq('user_name', user)
+      .eq('user_id', userId)
       .eq('key_result_title', krTitle)
       .maybeSingle()
 
-    if (!row) return 0
+    if (!row) {
+      console.warn("Missing KR:", userId, krTitle)
+      return 0
+    }
 
     const y = selectedMonth.getFullYear()
     const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
@@ -524,22 +527,22 @@ if (
   let heather = 0
 
   if (label === "Total Starts") {
-    jordyn = await getValue("Jordyn", labelMap["Total Starts (Individual)"])
-    heather = await getValue("Heather", labelMap["Total Starts (Individual)"])
+    jordyn = await getValue(JORDYN_ID, labelMap["Total Starts (Individual)"])
+    heather = await getValue(HEATHER_ID, labelMap["Total Starts (Individual)"])
   }
 
   if (label === "Total Production") {
-    jordyn = await getValue("Jordyn", labelMap["Total Production (Individual)"])
-    heather = await getValue("Heather", labelMap["Total Production (Individual)"])
+    jordyn = await getValue(JORDYN_ID, labelMap["Total Production (Individual)"])
+    heather = await getValue(HEATHER_ID, labelMap["Total Production (Individual)"])
   }
 
   if (label === "Total Whitening Kits") {
-    jordyn = await getValue("Jordyn", labelMap["Whitening Kits"])
-    heather = await getValue("Heather", labelMap["Whitening Kits"])
+    jordyn = await getValue(JORDYN_ID, labelMap["Whitening Kits"])
+    heather = await getValue(HEATHER_ID, labelMap["Whitening Kits"])
   }
 
-const total = jordyn + heather
-
+  const total = jordyn + heather
+  
 // =========================
 // CURRENT VALUE
 // =========================
@@ -559,6 +562,7 @@ if (t <= 0) {
 // =========================
 // PREVIOUS MONTH CALCULATION
 // =========================
+
 const prevDateObj = new Date(selectedMonth)
 prevDateObj.setMonth(prevDateObj.getMonth() - 1)
 
@@ -566,15 +570,21 @@ const prevY = prevDateObj.getFullYear()
 const prevM = String(prevDateObj.getMonth() + 1).padStart(2, '0')
 const prevReportingDate = `${prevY}-${prevM}-01`
 
-const getPrevValue = async (user: string, krTitle: string) => {
+
+
+// FIXED FUNCTION
+const getPrevValue = async (userId: string, krTitle: string) => {
   const { data: row } = await supabase
     .from('dashboard_okr_data')
     .select('key_result_id')
-    .eq('user_name', user)
+    .eq('user_id', userId)
     .eq('key_result_title', krTitle)
     .maybeSingle()
 
-  if (!row) return 0
+  if (!row) {
+    console.warn("Missing PREV KR:", userId, krTitle)
+    return 0
+  }
 
   const { data: update } = await supabase
     .from('key_result_updates')
@@ -589,19 +599,20 @@ const getPrevValue = async (user: string, krTitle: string) => {
 let prevJordyn = 0
 let prevHeather = 0
 
+// FIXED CALLS (use IDs, not names)
 if (label === "Total Starts") {
-  prevJordyn = await getPrevValue("Jordyn", labelMap["Total Starts (Individual)"])
-  prevHeather = await getPrevValue("Heather", labelMap["Total Starts (Individual)"])
+  prevJordyn = await getPrevValue(JORDYN_ID, labelMap["Total Starts (Individual)"])
+  prevHeather = await getPrevValue(HEATHER_ID, labelMap["Total Starts (Individual)"])
 }
 
 if (label === "Total Production") {
-  prevJordyn = await getPrevValue("Jordyn", labelMap["Total Production (Individual)"])
-  prevHeather = await getPrevValue("Heather", labelMap["Total Production (Individual)"])
+  prevJordyn = await getPrevValue(JORDYN_ID, labelMap["Total Production (Individual)"])
+  prevHeather = await getPrevValue(HEATHER_ID, labelMap["Total Production (Individual)"])
 }
 
 if (label === "Total Whitening Kits") {
-  prevJordyn = await getPrevValue("Jordyn", labelMap["Whitening Kits"])
-  prevHeather = await getPrevValue("Heather", labelMap["Whitening Kits"])
+  prevJordyn = await getPrevValue(JORDYN_ID, labelMap["Whitening Kits"])
+  prevHeather = await getPrevValue(HEATHER_ID, labelMap["Whitening Kits"])
 }
 
 const prevTotal = prevJordyn + prevHeather
@@ -610,18 +621,9 @@ setLastMonth(prevTotal.toString())
 
 return
 }
-if (!isDirty) {
-  setValue(currentValue || '')
-
-  if (setParentValue && currentValue !== undefined) {
-    setParentValue(Number(currentValue))
-  }
-}
-
-
-const c = Number(currentValue || 0)
 
 // USE DIRECT VALUE — NOT STATE
+const c = Number(currentValue || 0)
 const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
 if (t === 0) {
