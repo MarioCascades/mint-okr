@@ -360,7 +360,7 @@ if (label === "Total Whitening Kits") {
   const { data } = await supabase
     .from('key_results')
     .select('id')
-    .eq('title', 'TC Whitening Kits')
+    .eq('title', 'TC Total Whitening Kits')
     .maybeSingle()
 
   base = { key_result_id: data?.id }

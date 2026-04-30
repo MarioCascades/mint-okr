@@ -44,7 +44,7 @@ export default function Page() {
   const [jordynStarts, setJordynStarts] = useState(0)
   const [jordynProduction, setJordynProduction] = useState(0)
   const [jordynWhitening, setJordynWhitening] = useState(0)
-  const [oliviaStarts, setOliviaStarts] = useState(0)
+ 
 
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -477,7 +477,7 @@ const prevValue = prevValueRow?.value ?? ''
 
 setLastMonth(prevValue !== '' && prevValue !== null ? prevValue.toString() : '')
 // =========================
-//  GLOBAL TOTALS (JORDYN + OLIVIA)
+// GLOBAL TOTALS (DYNAMIC PARTNER SWITCH)
 // =========================
 
 if (
@@ -486,8 +486,13 @@ if (
   label === "Total Whitening Kits"
 ) {
 
-  const getValue = async (user: string, krTitle: string) => {
+  const isAfterApril2026 =
+    selectedMonth.getFullYear() > 2026 ||
+    (selectedMonth.getFullYear() === 2026 && selectedMonth.getMonth() >= 3)
 
+  const partnerName = isAfterApril2026 ? "Heather" : "Olivia"
+
+  const getValue = async (user: string, krTitle: string) => {
     const { data: row } = await supabase
       .from('dashboard_okr_data')
       .select('key_result_id')
@@ -512,94 +517,88 @@ if (
   }
 
   let jordyn = 0
-  let olivia = 0
+  let partner = 0
 
   if (label === "Total Starts") {
     jordyn = await getValue("Jordyn", labelMap["Total Starts (Individual)"])
-    olivia = await getValue("Olivia", labelMap["Total Starts (Individual)"])
+    partner = await getValue(partnerName, labelMap["Total Starts (Individual)"])
   }
 
   if (label === "Total Production") {
     jordyn = await getValue("Jordyn", labelMap["Total Production (Individual)"])
-    olivia = await getValue("Olivia", labelMap["Total Production (Individual)"])
+    partner = await getValue(partnerName, labelMap["Total Production (Individual)"])
   }
 
   if (label === "Total Whitening Kits") {
     jordyn = await getValue("Jordyn", labelMap["Whitening Kits"])
-    olivia = await getValue("Olivia", labelMap["Whitening Kits"])
+    partner = await getValue(partnerName, labelMap["Whitening Kits"])
   }
 
-const total = jordyn + olivia
+  const total = jordyn + partner
 
-// =========================
-// CURRENT VALUE
-// =========================
-setValue(total.toString())
+  // CURRENT
+  setValue(total.toString())
 
-// =========================
-// SCORE CALCULATION (ADD THIS)
-// =========================
-const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+  const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (t <= 0) {
-  setScore('0%')
-} else {
-  setScore(Math.round((total / t) * 100) + '%')
-}
+  if (t <= 0) {
+    setScore('0%')
+  } else {
+    setScore(Math.round((total / t) * 100) + '%')
+  }
 
-// =========================
-// PREVIOUS MONTH CALCULATION
-// =========================
-const prevDateObj = new Date(selectedMonth)
-prevDateObj.setMonth(prevDateObj.getMonth() - 1)
+  // PREVIOUS MONTH
+  const prevDateObj = new Date(selectedMonth)
+  prevDateObj.setMonth(prevDateObj.getMonth() - 1)
 
-const prevY = prevDateObj.getFullYear()
-const prevM = String(prevDateObj.getMonth() + 1).padStart(2, '0')
-const prevReportingDate = `${prevY}-${prevM}-01`
+  const prevY = prevDateObj.getFullYear()
+  const prevM = String(prevDateObj.getMonth() + 1).padStart(2, '0')
+  const prevReportingDate = `${prevY}-${prevM}-01`
 
-const getPrevValue = async (user: string, krTitle: string) => {
-  const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', user)
-    .eq('key_result_title', krTitle)
-    .maybeSingle()
+  const getPrevValue = async (user: string, krTitle: string) => {
+    const { data: row } = await supabase
+      .from('dashboard_okr_data')
+      .select('key_result_id')
+      .eq('user_name', user)
+      .eq('key_result_title', krTitle)
+      .maybeSingle()
 
-  if (!row) return 0
+    if (!row) return 0
 
-  const { data: update } = await supabase
-    .from('key_result_updates')
-    .select('value')
-    .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', prevReportingDate)
-    .maybeSingle()
+    const { data: update } = await supabase
+      .from('key_result_updates')
+      .select('value')
+      .eq('key_result_id', row.key_result_id)
+      .eq('reporting_month', prevReportingDate)
+      .maybeSingle()
 
-  return Number(update?.value ?? 0)
-}
+    return Number(update?.value ?? 0)
+  }
 
-let prevJordyn = 0
-let prevOlivia = 0
+  let prevJordyn = 0
+  let prevPartner = 0
 
-if (label === "Total Starts") {
-  prevJordyn = await getPrevValue("Jordyn", labelMap["Total Starts (Individual)"])
-  prevOlivia = await getPrevValue("Olivia", labelMap["Total Starts (Individual)"])
-}
+  if (label === "Total Starts") {
+    prevJordyn = await getPrevValue("Jordyn", labelMap["Total Starts (Individual)"])
+    prevPartner = await getPrevValue(partnerName, labelMap["Total Starts (Individual)"])
+  }
 
-if (label === "Total Production") {
-  prevJordyn = await getPrevValue("Jordyn", labelMap["Total Production (Individual)"])
-  prevOlivia = await getPrevValue("Olivia", labelMap["Total Production (Individual)"])
-}
+  if (label === "Total Production") {
+    prevJordyn = await getPrevValue("Jordyn", labelMap["Total Production (Individual)"])
+    prevPartner = await getPrevValue(partnerName, labelMap["Total Production (Individual)"])
+  }
 
-if (label === "Total Whitening Kits") {
-  prevJordyn = await getPrevValue("Jordyn", labelMap["Whitening Kits"])
-  prevOlivia = await getPrevValue("Olivia", labelMap["Whitening Kits"])
-}
+  if (label === "Total Whitening Kits") {
+    prevJordyn = await getPrevValue("Jordyn", labelMap["Whitening Kits"])
+    prevPartner = await getPrevValue(partnerName, labelMap["Whitening Kits"])
+  }
 
-const prevTotal = prevJordyn + prevOlivia
+  const prevTotal = prevJordyn + prevPartner
+  setLastMonth(prevTotal.toString())
 
-setLastMonth(prevTotal.toString())
+  return
 
-return
+
 }
 if (!isDirty) {
   setValue(currentValue || '')
