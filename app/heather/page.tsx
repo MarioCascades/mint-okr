@@ -339,21 +339,69 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
     const fetchData = async () => {
 
-      const dbLabel = labelMap[label]
+const dbLabel = labelMap[label]
 
-const { data: base } = await supabase
-  .from('dashboard_okr_data')
-  .select('*')
-  .eq('user_id', 'a34ec871-9a02-4c62-858c-4344726f9251')
-  .eq('key_result_title', dbLabel)
-  .maybeSingle()
+let keyResultIdLocal: string | null = null
 
-if (!base || !base.key_result_id) {
-  console.warn("Missing KR for Heather:", label, dbLabel)
-  return
+// =======================================
+// HANDLE SHARED (GLOBAL) KRs FIRST
+// =======================================
+if (
+  label === "Total Starts" ||
+  label === "Total Production" ||
+  label === "Total Whitening Kits"
+) {
+  const { data: sharedKR } = await supabase
+    .from('key_results')
+    .select('id, metric_type')
+   .eq('title',
+  label === "Total Starts"
+    ? "Total Starts"
+    : label === "Total Production"
+    ? "Total Production"
+    : label === "Total Whitening Kits"
+    ? "Total Whitening Kits"
+    : dbLabel
+)
+    .maybeSingle()
+
+  if (!sharedKR) {
+    console.warn("Missing SHARED KR:", label, dbLabel)
+    return
+  }
+
+  keyResultIdLocal = sharedKR.id
+  setKeyResultId(sharedKR.id)
+  setMetricType(sharedKR.metric_type)
+
+} else {
+
+  // =======================================
+  // NORMAL USER KRs (HEATHER)
+  // =======================================
+  const { data: base } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_id', 'a34ec871-9a02-4c62-858c-4344726f9251')
+    .eq('key_result_title', dbLabel)
+    .maybeSingle()
+
+  if (!base || !base.key_result_id) {
+    console.warn("Missing KR for Heather:", label, dbLabel)
+    return
+  }
+
+  keyResultIdLocal = base.key_result_id
+  setKeyResultId(base.key_result_id)
+
+  const { data: kr } = await supabase
+    .from('key_results')
+    .select('metric_type')
+    .eq('id', base.key_result_id)
+    .maybeSingle()
+
+  setMetricType(kr?.metric_type ?? '')
 }
-
-setKeyResultId(base.key_result_id)
  
 const initiativeDate = `${selectedMonth.getFullYear()}-${String(
   selectedMonth.getMonth() + 1
@@ -362,7 +410,7 @@ const initiativeDate = `${selectedMonth.getFullYear()}-${String(
 const { data: currentInitiatives } = await supabase
   .from('initiatives')
   .select('initiative_index, text')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', initiativeDate)
   .order('initiative_index', { ascending: true })
 
@@ -378,7 +426,7 @@ if (currentInitiatives && currentInitiatives.length > 0) {
   const { data: previousInitiatives } = await supabase
     .from('initiatives')
     .select('initiative_index, text, reporting_month')
-    .eq('key_result_id', base.key_result_id)
+    .eq('key_result_id', keyResultIdLocal)
     .lt('reporting_month', initiativeDate)
     .order('reporting_month', { ascending: false })
     .order('initiative_index', { ascending: true })
@@ -397,18 +445,16 @@ if (currentInitiatives && currentInitiatives.length > 0) {
 }
 
 setInitiatives(loaded)
-        console.log("BASE OBJECT:", base)
+        
 
       const { data: kr } = await supabase
         .from('key_results')
         .select('target_value, metric_type')
-        .eq('id', base.key_result_id)
+        .eq('id', keyResultIdLocal)
         .maybeSingle()
 
 
-        console.log("BASE:", base)
-        console.log("KR:", kr)
-
+    
 // =======================
 // DATE SETUP
 // =======================
@@ -429,7 +475,7 @@ const prevDate = formatDate(prev)
 const { data: currentRows } = await supabase
   .from('key_result_updates')
   .select('target_value')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', currentDate)
 
 const currentRow = currentRows?.[0] ?? null
@@ -437,7 +483,7 @@ const currentRow = currentRows?.[0] ?? null
   const { data: prevRows } = await supabase
   .from('key_result_updates')
   .select('target_value')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', prevDate)
 
 const prevRow = prevRows?.[0] ?? null
@@ -463,7 +509,7 @@ if (localTarget === '') {
       const { data: current } = await supabase
         .from('key_result_updates')
         .select('value')
-        .eq('key_result_id', base.key_result_id)
+        .eq('key_result_id', keyResultIdLocal)
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
@@ -475,7 +521,7 @@ if (localTarget === '') {
 const { data: prevValueRow } = await supabase
   .from('key_result_updates')
   .select('value')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', prevDate)
   .maybeSingle()
 
