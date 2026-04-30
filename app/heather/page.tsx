@@ -335,29 +335,39 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
       const dbLabel = labelMap[label]
 
-let base
-
-// =========================
-// SHARED KRs (Objective 4 & 5)
-// =========================
-if (
-  label === "Total Starts" ||
-  label === "Total Production" ||
-  label === "Total Whitening Kits"
-) {
+    let base
+if (label === "Total Starts") {
   const { data } = await supabase
     .from('key_results')
     .select('id')
-    .eq('title', dbLabel) // uses labelMap
+    .eq('title', 'Total Starts')
     .maybeSingle()
 
   base = { key_result_id: data?.id }
 }
 
-// =========================
-// INDIVIDUAL KRs
-// =========================
-else {
+if (label === "Total Production") {
+  const { data } = await supabase
+    .from('key_results')
+    .select('id')
+    .eq('title', 'Total Production')
+    .maybeSingle()
+
+  base = { key_result_id: data?.id }
+}
+
+if (label === "Total Whitening Kits") {
+  const { data } = await supabase
+    .from('key_results')
+    .select('id')
+    .eq('title', 'TC Whitening Kits')
+    .maybeSingle()
+
+  base = { key_result_id: data?.id }
+}
+
+
+    else {
   const { data } = await supabase
     .from('dashboard_okr_data')
     .select('*')
@@ -367,7 +377,6 @@ else {
 
   base = data
 }
-
 
       if (!base) return
 
