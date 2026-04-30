@@ -393,12 +393,24 @@ if (
 
      setLastMonth(prevRow?.value ?? '')
 
-    if (resolvedTarget && Number(resolvedTarget) > 0) {
-  const percent = Math.round((Number(currentValue) / Number(resolvedTarget)) * 100)
-  setScore(percent + '%')
-} else {
+const numericValue = Number(currentValue)
+const numericTarget = Number(resolvedTarget)
+
+if (!numericTarget || numericTarget === 0) {
   setScore('')
+  return
 }
+
+let percent = 0
+
+// LOWER IS BETTER
+if (numericValue === 0) {
+  percent = 100
+} else {
+  percent = Math.round((numericTarget / numericValue) * 100)
+}
+
+setScore(percent + '%')
     }
 
     fetchData()
