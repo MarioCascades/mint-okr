@@ -835,10 +835,10 @@ const handleInitiativeSave = async (
 >
        <span>{displayLabelMap[label] || label}</span>
 
-        <input style={cell} value={lastMonth} readOnly />
+        <input style={prevCell} value={lastMonth} readOnly />
 
 <input
-  style={cell}
+  style={targetCell}
   value={target}
   disabled={!isEditing}
   onChange={(e) => {
@@ -850,7 +850,7 @@ const handleInitiativeSave = async (
 />
 
 <input
-  style={cell}
+  style={currentCell}
   value={
     percentageMetrics.includes(label) && value !== ''
       ? value + '%'
@@ -865,21 +865,23 @@ const handleInitiativeSave = async (
   }}
 />
 
-        <input 
- style={{ 
-  ...cell, 
-  color: (() => {
-    if (!score.includes('%')) return '#9CA3AF' // neutral (—)
+<input
+  style={{
+    ...scoreCellBase,
+    backgroundColor: (() => {
+      if (!score.includes('%')) return '#FFFFFF'
 
-    const value = Number(score.replace('%',''))
+      const value = Number(score.replace('%', ''))
 
-    if (isNaN(value)) return '#9CA3AF'
+      if (isNaN(value)) return '#FFFFFF'
 
-    return value >= 100 ? '#22c55e' : '#c2410c'
-  })()
-}}
-  value={score} 
-  readOnly 
+      if (value >= 100) return '#acf3c3d7'
+      if (value >= 90) return '#fff4ccf3'
+      return '#f3b8b8d8'
+    })()
+  }}
+  value={score}
+  readOnly
 />
 
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
@@ -1058,7 +1060,7 @@ const monthText: React.CSSProperties = {
 
 const objective: React.CSSProperties = {
   marginBottom: 32,
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '#E5E5E5',
   border: '2px solid #F6A27A',
   borderRadius: 18,
   padding: 24,
@@ -1082,7 +1084,7 @@ const headerRow: React.CSSProperties = {
   marginBottom: 14,
   padding: '0 6px',
   fontWeight: 600,
-  color: '#4B5563',
+  color: '#6B7280',
   fontSize: 14
 }
 
@@ -1110,6 +1112,25 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
+}
+
+const scoreCellBase: React.CSSProperties = {
+  ...cell,
+  fontWeight: 600
 }
 
 const button: React.CSSProperties = {
