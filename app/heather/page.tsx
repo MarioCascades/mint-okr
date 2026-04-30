@@ -336,22 +336,40 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
       const dbLabel = labelMap[label]
 
     let base
-
-if (
-  label === "Total Starts" ||
-  label === "Total Production" ||
-  label === "Total Whitening Kits"
-) {
+if (label === "Total Starts") {
   const { data } = await supabase
     .from('key_results')
     .select('id')
-    .eq('title', dbLabel)
+    .eq('title', 'Total Starts')
     .maybeSingle()
 
-  base = {
-    key_result_id: data?.id
-  }
-} else {
+  base = { key_result_id: data?.id }
+}
+
+if (label === "Total Production") {
+  const { data } = await supabase
+    .from('key_results')
+    .select('id')
+    .eq('title', 'Total Production')
+    .maybeSingle()
+
+  base = { key_result_id: data?.id }
+}
+
+if (label === "Total Whitening Kits") {
+  const { data } = await supabase
+    .from('key_results')
+    .select('id')
+    .eq('title', 'Total Whitening Kits')
+    .maybeSingle()
+
+  base = { key_result_id: data?.id }
+}
+
+
+
+
+    else {
   const { data } = await supabase
     .from('dashboard_okr_data')
     .select('*')
