@@ -344,7 +344,7 @@ const dbLabel = labelMap[label]
 let keyResultIdLocal: string | null = null
 
 // =======================================
-// HANDLE SHARED KRs
+// HANDLE SHARED KRs (DIRECT - FIXED)
 // =======================================
 
 if (
@@ -352,30 +352,30 @@ if (
   label === "Total Production" ||
   label === "Total Whitening Kits"
 ) {
-  const { data: base } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_id', 'a34ec871-9a02-4c62-858c-4344726f9251')
-    .eq('key_result_title', labelMap[label])
+
+  const sharedTitle =
+    label === "Total Starts"
+      ? "TC Total Starts"
+      : label === "Total Production"
+      ? "TC Total Production after Discounts"
+      : "TC Total Whitening Kits"
+
+  const { data: sharedKR } = await supabase
+    .from('key_results')
+    .select('id, metric_type')
+    .eq('title', sharedTitle)
     .maybeSingle()
 
-  if (!base || !base.key_result_id) {
-    console.warn("Missing SHARED KR via dashboard:", label)
+  if (!sharedKR) {
+    console.warn("Missing SHARED KR:", sharedTitle)
     return
   }
 
-  keyResultIdLocal = base.key_result_id
-  setKeyResultId(base.key_result_id)
+  keyResultIdLocal = sharedKR.id
+  setKeyResultId(sharedKR.id)
+  setMetricType(sharedKR.metric_type)
 
-  const { data: kr } = await supabase
-    .from('key_results')
-    .select('metric_type')
-    .eq('id', base.key_result_id)
-    .maybeSingle()
-
-  setMetricType(kr?.metric_type ?? '')
-
-} else {
+}else{
 
 // =======================================
 // NORMAL USER KRs (HEATHER)
