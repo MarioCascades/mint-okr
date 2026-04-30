@@ -363,11 +363,29 @@ if (label === "Total Production") {
 }
 
 if (label === "Total Whitening Kits") {
-  const { data } = await supabase
+  let { data } = await supabase
     .from('key_results')
-    .select('id')
+    .select('id, title')
     .eq('title', 'TC Total Whitening Kits')
     .maybeSingle()
+
+  //fallback if exact match fails
+  if (!data) {
+    const res = await supabase
+      .from('key_results')
+      .select('id, title')
+
+    const found = res.data?.find(r =>
+      r.title.toLowerCase().includes('whitening') &&
+      r.title.toLowerCase().includes('total')
+    )
+
+    console.log("Fallback whitening match:", found)
+
+    data = found || null
+  }
+
+  console.log("FINAL Whitening KR:", data)
 
   base = { key_result_id: data?.id }
 }
