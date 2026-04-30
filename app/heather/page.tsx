@@ -355,21 +355,17 @@ if (
 
 const sharedTitle =
   label === "Total Starts"
-    ? "Total Starts"
+    ? "Total TC Starts"
     : label === "Total Production"
-    ? "Total Production"
-    : "Total Whitening Kits"
+    ? "TC Total Production after Discounts"
+    : "TC Total Whitening Kits"
 
-const { data: allKRs } = await supabase
+const { data: sharedKR } = await supabase
   .from('key_results')
-  .select('id, title, metric_type')
+  .select('id, metric_type')
+  .eq('title', sharedTitle)
+  .maybeSingle()
 
-const sharedKR = allKRs?.find((item: any) => {
-  const db = item.title.toLowerCase().replace(/\s+/g, '')
-  const ui = sharedTitle.toLowerCase().replace(/\s+/g, '')
-
-  return db.includes(ui) || ui.includes(db)
-})
   if (!sharedKR) {
     console.warn("Missing SHARED KR:", sharedTitle)
     return
