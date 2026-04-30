@@ -494,12 +494,27 @@ const resolvedTarget =
   prevRow?.target_value ??
   kr?.target_value ??
   ''
+
+
+  if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
+  await supabase
+    .from('key_result_updates')
+    .upsert(
+      {
+        key_result_id: keyResultIdLocal,
+        reporting_month: currentDate,
+        target_value: resolvedTarget,
+      },
+      { onConflict: 'key_result_id,reporting_month' }
+    )
+}
+
   console.log("TARGET ROWS:", { currentRow, prevRow, kr })
 
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
 
-if (localTarget === '') {
+if (!isDirty) {
   setLocalTarget(
     resolvedTarget !== null && resolvedTarget !== undefined
       ? String(resolvedTarget)
@@ -596,14 +611,14 @@ if (
 setValue(total.toString())
 
 // =========================
-// SCORE CALCULATION — FIX: use resolvedTarget, not redeclared const t
+// SCORE CALCULATION (ADD THIS)
 // =========================
-const totalTargetNum = Number(resolvedTarget ?? kr?.target_value ?? 0)
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (totalTargetNum <= 0) {
+if (t <= 0) {
   setScore('0%')
 } else {
-  setScore(Math.round((total / totalTargetNum) * 100) + '%')
+  setScore(Math.round((total / t) * 100) + '%')
 }
 
 // =========================
@@ -669,19 +684,14 @@ setLastMonth(prevTotal.toString())
 return
 }
 
-// =========================
-// FIX: Renamed from const c / const t to avoid duplicate const declaration
-// that was breaking the entire fetchData function scope
-// =========================
-const currentNum = Number(currentValue || 0)
-const targetNum = Number(resolvedTarget ?? kr?.target_value ?? 0)
+// USE DIRECT VALUE — NOT STATE
+const c = Number(currentValue || 0)
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-setValue(currentValue !== '' && currentValue !== null ? currentValue.toString() : '')
-
-if (targetNum === 0) {
+if (t === 0) {
   setScore('0%')
 } else {
-  const percent = Math.round((currentNum / targetNum) * 100)
+  const percent = Math.round((c / t) * 100)
   setScore(percent + '%')
 }
     }
@@ -702,8 +712,8 @@ const reportingDate = `${y}-${m}-01`
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: value !== '' ? Number(value) : null,
-    target_value: localTarget !== '' ? Number(localTarget) : null,
+    value: value ? Number(value) : null,
+    target_value: localTarget ? Number(localTarget) : null,
   },
   
   { onConflict: 'key_result_id,reporting_month' }
@@ -788,7 +798,8 @@ const getScoreBackground = () => {
   : localTarget
 }
           disabled={!isEditing}
-onChange={async (e) => {
+
+onChange={(e) => {
   let val = ''
 
   if (isCurrency || isPercentage) {
@@ -806,24 +817,8 @@ onChange={async (e) => {
 
   setLocalTarget(val)
   setIsDirty(true)
-
-  if (!keyResultId) return
-
-  const y = selectedMonth.getFullYear()
-  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
-  const reportingDate = `${y}-${m}-01`
-
-  // FIX: use null instead of 0 so we don't overwrite a real current value with zero
-  await supabase.from('key_result_updates').upsert(
-    {
-      key_result_id: keyResultId,
-      reporting_month: reportingDate,
-      value: value !== '' ? Number(value) : null,
-      target_value: val !== '' ? Number(val) : null,
-    },
-    { onConflict: 'key_result_id,reporting_month' }
-  )
 }}
+onBlur={handleSave}
 onKeyDown={handleEnter}
 />
 
