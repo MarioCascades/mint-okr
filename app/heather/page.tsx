@@ -344,47 +344,48 @@ const dbLabel = labelMap[label]
 let keyResultIdLocal: string | null = null
 
 // =======================================
-// HANDLE SHARED (GLOBAL) KRs FIRST
+// HANDLE SHARED KRs
 // =======================================
+
 if (
   label === "Total Starts" ||
   label === "Total Production" ||
   label === "Total Whitening Kits"
 ) {
-  const { data: sharedKR } = await supabase
-    .from('key_results')
-    .select('id, metric_type')
- .eq('title',
-  label === "Total Starts"
-    ? "Total TC Starts"
-    : label === "Total Production"
-    ? "TC Total Production after Discounts"
-    : label === "Total Whitening Kits"
-    ? "TC Total Whitening Kits"
-    : dbLabel
-)
-    .maybeSingle()
-
-  if (!sharedKR) {
-    console.warn("Missing SHARED KR:", label, dbLabel)
-    return
-  }
-
-  keyResultIdLocal = sharedKR.id
-  setKeyResultId(sharedKR.id)
-  setMetricType(sharedKR.metric_type)
-
-} else {
-
-  // =======================================
-  // NORMAL USER KRs (HEATHER)
-  // =======================================
   const { data: base } = await supabase
     .from('dashboard_okr_data')
     .select('key_result_id')
     .eq('user_id', 'a34ec871-9a02-4c62-858c-4344726f9251')
-    .eq('key_result_title', dbLabel)
+    .eq('key_result_title', labelMap[label])
     .maybeSingle()
+
+  if (!base || !base.key_result_id) {
+    console.warn("Missing SHARED KR via dashboard:", label)
+    return
+  }
+
+  keyResultIdLocal = base.key_result_id
+  setKeyResultId(base.key_result_id)
+
+  const { data: kr } = await supabase
+    .from('key_results')
+    .select('metric_type')
+    .eq('id', base.key_result_id)
+    .maybeSingle()
+
+  setMetricType(kr?.metric_type ?? '')
+
+} else {
+
+// =======================================
+// NORMAL USER KRs (HEATHER)
+// =======================================
+const { data: base } = await supabase
+  .from('dashboard_okr_data')
+  .select('key_result_id')
+  .eq('user_id', 'a34ec871-9a02-4c62-858c-4344726f9251')
+  .eq('key_result_title', dbLabel)
+  .maybeSingle()
 
   if (!base || !base.key_result_id) {
     console.warn("Missing KR for Heather:", label, dbLabel)
