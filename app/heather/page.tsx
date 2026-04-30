@@ -354,13 +354,13 @@ if (
   const { data: sharedKR } = await supabase
     .from('key_results')
     .select('id, metric_type')
-   .eq('title',
+ .eq('title',
   label === "Total Starts"
-    ? "Total Starts"
+    ? "Total TC Starts"
     : label === "Total Production"
-    ? "Total Production"
+    ? "TC Total Production after Discounts"
     : label === "Total Whitening Kits"
-    ? "Total Whitening Kits"
+    ? "TC Total Whitening Kits"
     : dbLabel
 )
     .maybeSingle()
