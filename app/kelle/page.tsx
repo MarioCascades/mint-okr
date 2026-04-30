@@ -566,9 +566,10 @@ if (finalTarget > 0) {
       <div style={row}>
         <span>{label}</span>
 
-        <input style={cell} value={lastMonth} readOnly />
+        <input style={prevCell} value={lastMonth} readOnly />
+        
         <input
-  style={cell}
+  style={targetCell}
   value={target}
   readOnly={!isEditing}
   onChange={(e) => {
@@ -579,18 +580,27 @@ if (finalTarget > 0) {
 />
 
         <input
-            style={cell}
+            style={currentCell}
             value={value}
             readOnly={!isEditing}
             onChange={(e) => setValue(e.target.value)}
             onBlur={handleSave}
 />
 
-        <input
+  <input
   style={{
-    ...cell,
-    color: getScoreColor(),
-    fontWeight: 600
+    ...scoreCellBase,
+    backgroundColor: (() => {
+      if (!score.includes('%')) return '#FFFFFF'
+
+      const value = Number(score.replace('%', ''))
+
+      if (isNaN(value)) return '#FFFFFF'
+
+      if (value >= 100) return '#acf3c3d7'
+      if (value >= 90) return '#fff4ccf3'
+      return '#f3b8b8d8'
+    })()
   }}
   value={score}
   readOnly
@@ -777,7 +787,7 @@ const monthText: React.CSSProperties = {
 
 const objective: React.CSSProperties = {
   marginBottom: 32,
-  backgroundColor: '#FFFFFF',
+   backgroundColor: '#E5E5E5',
   border: '2px solid #F6A27A',
   borderRadius: 18,
   padding: 24,
@@ -801,7 +811,7 @@ const headerRow: React.CSSProperties = {
   marginBottom: 14,
   padding: '0 6px',
   fontWeight: 600,
-  color: '#4B5563',
+  color: '#6B7280',
   fontSize: 14
 }
 
@@ -829,6 +839,26 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
+}
+
+const scoreCellBase: React.CSSProperties = {
+  ...cell,
+  fontWeight: 600
 }
 
 const button: React.CSSProperties = {
