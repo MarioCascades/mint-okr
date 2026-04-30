@@ -341,77 +341,20 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
       const dbLabel = labelMap[label]
 
-  let base = null
+const { data: base } = await supabase
+  .from('dashboard_okr_data')
+  .select('*')
+  .eq('user_name', 'Heather')
+  .eq('key_result_title', dbLabel)
+  .maybeSingle()
 
-// =========================
-// SHARED / MASTER KRs
-// =========================
-if (label === "Total Starts") {
-
-  const { data } = await supabase
-    .from('key_results')
-    .select('id')
-    .eq('title', 'Total Starts')
-    .maybeSingle()
-
-  if (!data) return
-
-  base = { key_result_id: data.id }
-
-} else if (label === "Total Production") {
-
-  const { data } = await supabase
-    .from('key_results')
-    .select('id')
-    .eq('title', 'Total Production')
-    .maybeSingle()
-
-  if (!data) return
-
-  base = { key_result_id: data.id }
-
-} else if (label === "Total Whitening Kits") {
-
-  let { data } = await supabase
-    .from('key_results')
-    .select('id, title')
-    .eq('title', 'TC Total Whitening Kits')
-    .maybeSingle()
-
-  if (!data) {
-    const res = await supabase
-      .from('key_results')
-      .select('id, title')
-
-    const found = res.data?.find(r =>
-      r.title.toLowerCase().includes('whitening') &&
-      r.title.toLowerCase().includes('total')
-    )
-
-    data = found || null
-  }
-
-  if (!data) return
-
-  base = { key_result_id: data.id }
-
-// =========================
-// NORMAL KRs
-// =========================
-} else {
-
-  const { data } = await supabase
-    .from('dashboard_okr_data')
-    .select('*')
-    .eq('user_name', 'Heather')
-    .eq('key_result_title', dbLabel)
-    .maybeSingle()
-
-  if (!data) return
-
-  base = data
+if (!base || !base.key_result_id) {
+  console.warn("Missing KR for Heather:", label, dbLabel)
+  return
 }
 
+setKeyResultId(base.key_result_id)
+ 
       if (!base) return
 
       setKeyResultId(base.key_result_id)
