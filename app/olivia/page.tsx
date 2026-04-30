@@ -361,22 +361,33 @@ if (isSharedKR) {
       ? "TC Total Production after Discounts"
       : "TC Total Whitening Kits"
 
-  const { data: sharedKR } = await supabase
-    .from('key_results')
-    .select('id, metric_type, target_value')
-    .eq('title', sharedTitle)
-    .maybeSingle()
+  // get shared KR from Jordyn (source of truth)
+const { data: sharedBase } = await supabase
+  .from('dashboard_okr_data')
+  .select('key_result_id')
+  .eq('user_name', 'Jordyn')
+  .eq('key_result_title', sharedTitle)
+  .maybeSingle()
 
-  if (!sharedKR) {
-    console.warn("Missing SHARED KR:", sharedTitle)
-    return
-  }
+if (!sharedBase) {
+  console.warn("Missing SHARED KR:", sharedTitle)
+  return
+}
 
-  keyResultIdLocal = sharedKR.id
-  kr = sharedKR
+keyResultIdLocal = sharedBase.key_result_id
+setKeyResultId(sharedBase.key_result_id)
 
-  setKeyResultId(sharedKR.id)
-  setMetricType(sharedKR.metric_type)
+// now get metric_type from key_results
+const { data: krData } = await supabase
+  .from('key_results')
+  .select('metric_type, target_value')
+  .eq('id', sharedBase.key_result_id)
+  .maybeSingle()
+
+kr = krData
+setMetricType(krData?.metric_type ?? '')
+
+
 
 } else {
   const { data: base } = await supabase
