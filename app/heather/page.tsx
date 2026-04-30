@@ -462,7 +462,7 @@ const resolvedTarget =
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
 
-if (!isDirty) {
+if (localTarget === '') {
   setLocalTarget(
     resolvedTarget !== null && resolvedTarget !== undefined
       ? String(resolvedTarget)
