@@ -521,7 +521,16 @@ return (
 
      <input
   style={targetCell}
-  value={localTarget}
+  value={
+  isCurrency && localTarget
+    ? '$' + Number(localTarget).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+    : isPercentage && localTarget
+    ? localTarget + '%'
+    : localTarget
+}
   disabled={!isEditing}
   onChange={async (e) => {
     const val = e.target.value.replace(/[^0-9.]/g, '')
@@ -547,9 +556,31 @@ await supabase.from('key_result_updates').upsert(
 />
       <input
         style={currentCell}
-        value={value}
+        value={
+  isEditing
+    ? value
+    : isCurrency && value
+    ? '$' + Number(value).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+    : isPercentage && value
+    ? value + '%'
+    : value
+}
         disabled={!isEditing}
-        onChange={(e) => setValue(e.target.value)}
+       onChange={(e) => {
+  const raw = e.target.value.replace(/[^0-9.]/g, '')
+  const parts = raw.split('.').slice(0, 2)
+
+  let val = parts[0]
+
+  if (parts.length > 1) {
+    val += '.' + parts[1].slice(0, 2)
+  }
+
+  setValue(val)
+}}
       />
 
       <input style={cell} value={score} readOnly />
