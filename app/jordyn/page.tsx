@@ -241,7 +241,7 @@ export default function Page() {
           <KeyResult
   label="Total Starts"
   selectedMonth={selectedMonth}
-  isEditing={false}
+  isEditing={isEditing}
   target={masterStartsTarget}
   setTarget={setMasterStartsTarget}
 />
@@ -250,7 +250,7 @@ export default function Page() {
           <KeyResult
   label="Total Production"
   selectedMonth={selectedMonth}
-  isEditing={false}
+  isEditing={isEditing}
   target={masterProductionTarget}
   setTarget={setMasterProductionTarget}
  
@@ -263,7 +263,7 @@ export default function Page() {
           <KeyResult 
   label="Total Whitening Kits" 
   selectedMonth={selectedMonth} 
-  isEditing={false}
+  isEditing={isEditing}
 />
         </Objective>
 
@@ -476,7 +476,7 @@ const resolvedTarget =
   krData?.target_value ??
   ''
 
-  console.log("TARGET ROWS:", { currentRow, prevRow, kr })
+  console.log("TARGET ROWS:", { currentRow, prevRow, krData })
 
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(krData?.metric_type ?? '')
@@ -645,7 +645,7 @@ if (!isDirty) {
 const c = Number(currentValue || 0)
 
 // USE DIRECT VALUE — NOT STATE
-const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
 
 if (t === 0) {
   setScore('0%')
@@ -751,8 +751,12 @@ const getScoreBackground = () => {
         <input
           style={targetCell}
           value={
-  isCurrency && localTarget
-    ? '$' + localTarget
+ isCurrency && localTarget
+  ? '$' + Number(localTarget).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })
+
   : isPercentage && localTarget
     ? localTarget + '%'
   : localTarget
@@ -761,18 +765,14 @@ const getScoreBackground = () => {
 onChange={async (e) => {
   let val = ''
 
-  if (isCurrency || isPercentage) {
-    const raw = e.target.value.replace(/[^0-9.]/g, '')
-    const parts = raw.split('.').slice(0, 2)
+const raw = e.target.value.replace(/[^0-9.]/g, '')
+const parts = raw.split('.').slice(0, 2)
 
-    val = parts[0]
+val = parts[0]
 
-    if (parts.length > 1) {
-      val += '.' + parts[1].slice(0, 2)
-    }
-  } else {
-    val = e.target.value.replace(/[^0-9]/g, '')
-  }
+if (parts.length > 1) {
+  val += '.' + parts[1].slice(0, 2)
+}
 
   setLocalTarget(val)
 
@@ -800,35 +800,41 @@ onKeyDown={handleEnter}
           value={
   forcedValue !== undefined
     ? (label === "Total Production"
-        ? '$' + Number(forcedValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        ? '$' + Number(forcedValue).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })
         : forcedValue)
     : (
-    isEditing
-      ? value
-      : isCurrency && value
-      ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-      : isPercentage && value
-      ? value + '%'
-      : value
-  )
+      isEditing
+        ? value
+        : isCurrency && value
+        ? '$' + Number(value).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })
+        : isPercentage && value
+        ? value + '%'
+        : value
+    )
 }
           disabled={!isEditing || (isComputed && label !== "Total Whitening Kits")}
           onChange={(e) => {
               const raw = e.target.value.replace(/[^0-9.]/g, '')
-              const parts = raw.split('.').slice(0, 2)
+const parts = raw.split('.').slice(0, 2)
 
-              let val = parts[0]
+let val = parts[0]
 
-              if (parts.length > 1) {
-          val += '.' + parts[1].slice(0, 2)
-          }
+if (parts.length > 1) {
+  val += '.' + parts[1].slice(0, 2)
+}
 
 setValue(val)
 setIsDirty(true)
 
-  if (setParentValue) {
-    setParentValue(Number(val))
-  }
+if (setParentValue) {
+  setParentValue(Number(val))
+}
 }}
           onBlur={handleSave}
           onKeyDown={handleEnter}
