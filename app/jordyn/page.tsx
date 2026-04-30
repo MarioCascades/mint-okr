@@ -340,17 +340,52 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
     const fetchData = async () => {
 
       const dbLabel = labelMap[label]
+let keyResultIdLocal: string | null = null
+let kr: any = null
 
-      const { data: base } = await supabase
-        .from('dashboard_okr_data')
-        .select('*')
-        .eq('user_name', 'Jordyn')
-        .eq('key_result_title', dbLabel)
-        .maybeSingle()
+const isSharedKR =
+  label === "Total Starts" ||
+  label === "Total Production" ||
+  label === "Total Whitening Kits"
 
-      if (!base) return
+if (isSharedKR) {
+  const sharedTitle =
+    label === "Total Starts"
+      ? "Total TC Starts"
+      : label === "Total Production"
+      ? "TC Total Production after Discounts"
+      : "TC Total Whitening Kits"
 
-      setKeyResultId(base.key_result_id)
+  const { data: sharedBase } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', 'Jordyn')
+    .eq('key_result_title', sharedTitle)
+    .maybeSingle()
+
+  if (!sharedBase) {
+    console.warn("Missing SHARED KR:", sharedTitle)
+    return
+  }
+
+  keyResultIdLocal = sharedBase.key_result_id
+  setKeyResultId(sharedBase.key_result_id)
+
+} else {
+  const { data: base } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', 'Jordyn')
+    .eq('key_result_title', dbLabel)
+    .maybeSingle()
+
+  if (!base) return
+
+  keyResultIdLocal = base.key_result_id
+  setKeyResultId(base.key_result_id)
+}
+
+
 const initiativeDate = `${selectedMonth.getFullYear()}-${String(
   selectedMonth.getMonth() + 1
 ).padStart(2, '0')}-01`
@@ -358,7 +393,7 @@ const initiativeDate = `${selectedMonth.getFullYear()}-${String(
 const { data: currentInitiatives } = await supabase
   .from('initiatives')
   .select('initiative_index, text')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', initiativeDate)
   .order('initiative_index', { ascending: true })
 
@@ -374,7 +409,7 @@ if (currentInitiatives && currentInitiatives.length > 0) {
   const { data: previousInitiatives } = await supabase
     .from('initiatives')
     .select('initiative_index, text, reporting_month')
-    .eq('key_result_id', base.key_result_id)
+    .eq('key_result_id', keyResultIdLocal)
     .lt('reporting_month', initiativeDate)
     .order('reporting_month', { ascending: false })
     .order('initiative_index', { ascending: true })
@@ -393,18 +428,15 @@ if (currentInitiatives && currentInitiatives.length > 0) {
 }
 
 setInitiatives(loaded)
-        console.log("BASE OBJECT:", base)
-
-      const { data: kr } = await supabase
+    
+      const { data: krData } = await supabase
         .from('key_results')
         .select('target_value, metric_type')
-        .eq('id', base.key_result_id)
+        .eq('id', keyResultIdLocal)
         .maybeSingle()
 
 
-        console.log("BASE:", base)
-        console.log("KR:", kr)
-
+        console.log("KR DATA:", krData)
 // =======================
 // DATE SETUP
 // =======================
@@ -425,7 +457,7 @@ const prevDate = formatDate(prev)
 const { data: currentRows } = await supabase
   .from('key_result_updates')
   .select('target_value')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', currentDate)
 
 const currentRow = currentRows?.[0] ?? null
@@ -433,7 +465,7 @@ const currentRow = currentRows?.[0] ?? null
   const { data: prevRows } = await supabase
   .from('key_result_updates')
   .select('target_value')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', prevDate)
 
 const prevRow = prevRows?.[0] ?? null
@@ -441,12 +473,13 @@ const prevRow = prevRows?.[0] ?? null
 const resolvedTarget =
   currentRow?.target_value ??
   prevRow?.target_value ??
-  kr?.target_value ??
+  krData?.target_value ??
   ''
+
   console.log("TARGET ROWS:", { currentRow, prevRow, kr })
 
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
-setMetricType(kr?.metric_type ?? '')
+setMetricType(krData?.metric_type ?? '')
 
 setLocalTarget(
   resolvedTarget !== null && resolvedTarget !== undefined
@@ -457,7 +490,7 @@ setLocalTarget(
       const { data: current } = await supabase
         .from('key_result_updates')
         .select('value')
-        .eq('key_result_id', base.key_result_id)
+        .eq('key_result_id', keyResultIdLocal)
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
@@ -469,7 +502,7 @@ setLocalTarget(
 const { data: prevValueRow } = await supabase
   .from('key_result_updates')
   .select('value')
-  .eq('key_result_id', base.key_result_id)
+  .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', prevDate)
   .maybeSingle()
 
@@ -539,7 +572,7 @@ if (
   // CURRENT
   setValue(total.toString())
 
-  const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+  const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
 
   if (t <= 0) {
     setScore('0%')
@@ -638,7 +671,7 @@ const reportingDate = `${y}-${m}-01`
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: value ? Number(value) : null,
+    value: Number(value) || 0,
     target_value: localTarget ? Number(localTarget) : null,
   },
   
@@ -679,22 +712,23 @@ const isLowerBetter = (label: string) => {
     l.includes('wait')
   )
 }
-
 const getScoreBackground = () => {
   const num = Number(score.replace('%', ''))
 
-  // handles empty safely
   if (!num && num !== 0) return '#FFFFFF'
 
+  // 🚨 PREVENT RED WHEN NO TARGET
+  if (num === 0 && Number(localTarget) === 0) return '#FFFFFF'
+
   if (isLowerBetter(label)) {
-    if (num <= 100) return '#acf3c3d7'   // green
-    if (num <= 110) return '#fff4ccf3'   // yellow
-    return '#f3b8b8d8'                   // red
+    if (num <= 100) return '#acf3c3d7'
+    if (num <= 110) return '#fff4ccf3'
+    return '#f3b8b8d8'
   }
 
-  if (num >= 100) return '#acf3c3d7'     // green
-  if (num >= 90) return '#fff4ccf3'      // yellow
-  return '#f3b8b8d8'                     // red
+  if (num >= 100) return '#acf3c3d7'
+  if (num >= 90) return '#fff4ccf3'
+  return '#f3b8b8d8'
 }
 
   return (
