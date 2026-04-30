@@ -28,6 +28,12 @@ const labelMap: Record<string, string> = {
   "Total Whitening Kits": "TC Total Whitening Kits"
 }
 
+const SHARED_KR_TITLES: Record<string, string> = {
+  "Total Starts": "Total Starts",
+  "Total Production": "Total Production",
+  "Total Whitening Kits": "TC Total Whitening Kits"
+}
+
 const computedLabels = [
   "Total Starts",
   "Total Production",
@@ -335,39 +341,26 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
       const dbLabel = labelMap[label]
 
-    let base
-if (label === "Total Starts") {
-  const { data } = await supabase
+let base
+
+if (computedLabels.includes(label)) {
+
+  const title = SHARED_KR_TITLES[label]
+
+  const { data, error } = await supabase
     .from('key_results')
     .select('id')
-    .eq('title', 'Total Starts')
+    .eq('title', title)
     .maybeSingle()
 
-  base = { key_result_id: data?.id }
-}
-
-if (label === "Total Production") {
-  const { data } = await supabase
-    .from('key_results')
-    .select('id')
-    .eq('title', 'Total Production')
-    .maybeSingle()
+  if (!data) {
+    console.error("Missing shared KR:", label, title)
+  }
 
   base = { key_result_id: data?.id }
-}
 
-if (label === "Total Whitening Kits") {
-  const { data } = await supabase
-    .from('key_results')
-    .select('id')
-    .eq('title', 'TC Total Whitening Kits')
-    .maybeSingle()
+} else {
 
-  base = { key_result_id: data?.id }
-}
-
-
-    else {
   const { data } = await supabase
     .from('dashboard_okr_data')
     .select('*')
