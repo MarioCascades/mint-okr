@@ -347,35 +347,35 @@ let keyResultIdLocal: string | null = null
 // HANDLE SHARED KRs (DIRECT - FIXED)
 // =======================================
 
-if (
+const isSharedKR =
   label === "Total Starts" ||
   label === "Total Production" ||
   label === "Total Whitening Kits"
-) {
 
-const sharedTitle =
-  label === "Total Starts"
-    ? "Total TC Starts"
-    : label === "Total Production"
-    ? "TC Total Production after Discounts"
-    : "TC Total Whitening Kits"
+if (isSharedKR) {
+  const sharedTitle =
+    label === "Total Starts"
+      ? "Total TC Starts"
+      : label === "Total Production"
+      ? "TC Total Production after Discounts"
+      : "TC Total Whitening Kits"
 
-const { data: sharedKR } = await supabase
-  .from('key_results')
-  .select('id, metric_type')
-  .eq('title', sharedTitle)
-  .maybeSingle()
+  const { data: sharedBase } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', 'Jordyn')
+    .eq('key_result_title', sharedTitle)
+    .maybeSingle()
 
-  if (!sharedKR) {
+  if (!sharedBase) {
     console.warn("Missing SHARED KR:", sharedTitle)
     return
   }
 
-  keyResultIdLocal = sharedKR.id
-  setKeyResultId(sharedKR.id)
-  setMetricType(sharedKR.metric_type)
+  keyResultIdLocal = sharedBase.key_result_id
+  setKeyResultId(sharedBase.key_result_id)
 
-}else{
+} else {
 
 // =======================================
 // NORMAL USER KRs (HEATHER)
