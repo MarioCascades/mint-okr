@@ -596,14 +596,14 @@ if (
 setValue(total.toString())
 
 // =========================
-// SCORE CALCULATION (ADD THIS)
+// SCORE CALCULATION — FIX: use resolvedTarget, not redeclared const t
 // =========================
-const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+const totalTargetNum = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (t <= 0) {
+if (totalTargetNum <= 0) {
   setScore('0%')
 } else {
-  setScore(Math.round((total / t) * 100) + '%')
+  setScore(Math.round((total / totalTargetNum) * 100) + '%')
 }
 
 // =========================
@@ -669,14 +669,19 @@ setLastMonth(prevTotal.toString())
 return
 }
 
-// USE DIRECT VALUE — NOT STATE
-const c = Number(currentValue || 0)
-const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+// =========================
+// FIX: Renamed from const c / const t to avoid duplicate const declaration
+// that was breaking the entire fetchData function scope
+// =========================
+const currentNum = Number(currentValue || 0)
+const targetNum = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (t === 0) {
+setValue(currentValue !== '' && currentValue !== null ? currentValue.toString() : '')
+
+if (targetNum === 0) {
   setScore('0%')
 } else {
-  const percent = Math.round((c / t) * 100)
+  const percent = Math.round((currentNum / targetNum) * 100)
   setScore(percent + '%')
 }
     }
@@ -697,8 +702,8 @@ const reportingDate = `${y}-${m}-01`
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: value ? Number(value) : null,
-    target_value: localTarget ? Number(localTarget) : null,
+    value: value !== '' ? Number(value) : null,
+    target_value: localTarget !== '' ? Number(localTarget) : null,
   },
   
   { onConflict: 'key_result_id,reporting_month' }
@@ -808,15 +813,16 @@ onChange={async (e) => {
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
- await supabase.from('key_result_updates').upsert(
-  {
-    key_result_id: keyResultId,
-    reporting_month: reportingDate,
-    value: Number(value) || 0,
-    target_value: val ? Number(val) : null,
-  },
-  { onConflict: 'key_result_id,reporting_month' }
-)
+  // FIX: use null instead of 0 so we don't overwrite a real current value with zero
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      value: value !== '' ? Number(value) : null,
+      target_value: val !== '' ? Number(val) : null,
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
 }}
 onKeyDown={handleEnter}
 />
