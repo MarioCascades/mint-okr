@@ -508,13 +508,30 @@ return (
 
       <input style={prevCell} value={lastMonth} readOnly />
 
-      <input
-        style={targetCell}
-        value={localTarget}
-        disabled={!isEditing}
-        onChange={(e) => setLocalTarget(e.target.value)}
-      />
+     <input
+  style={targetCell}
+  value={localTarget}
+  disabled={!isEditing}
+  onChange={async (e) => {
+    const val = e.target.value.replace(/[^0-9.]/g, '')
+    setLocalTarget(val)
 
+    if (!keyResultId) return
+
+    const y = selectedMonth.getFullYear()
+    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+    const reportingDate = `${y}-${m}-01`
+
+    await supabase.from('key_result_updates').upsert(
+      {
+        key_result_id: keyResultId,
+        reporting_month: reportingDate,
+        target_value: val ? Number(val) : null,
+      },
+      { onConflict: 'key_result_id,reporting_month' }
+    )
+  }}
+/>
       <input
         style={currentCell}
         value={value}
