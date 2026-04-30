@@ -347,7 +347,7 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
       const { data: base } = await supabase
         .from('dashboard_okr_data')
         .select('*')
-        .eq('user_name', 'Jordyn')
+        .eq('user_name', 'Heather')
         .eq('key_result_title', dbLabel)
         .maybeSingle()
 
@@ -480,7 +480,7 @@ const prevValue = prevValueRow?.value ?? ''
 
 setLastMonth(prevValue !== '' && prevValue !== null ? prevValue.toString() : '')
 // =========================
-//  GLOBAL TOTALS (JORDYN + OLIVIA)
+//  GLOBAL TOTALS (JORDYN + Heather)
 // =========================
 
 if (
@@ -515,24 +515,24 @@ if (
   }
 
   let jordyn = 0
-  let olivia = 0
+  let heather = 0
 
   if (label === "Total Starts") {
     jordyn = await getValue("Jordyn", labelMap["Total Starts (Individual)"])
-    olivia = await getValue("Olivia", labelMap["Total Starts (Individual)"])
+    heather = await getValue("Heather", labelMap["Total Starts (Individual)"])
   }
 
   if (label === "Total Production") {
     jordyn = await getValue("Jordyn", labelMap["Total Production (Individual)"])
-    olivia = await getValue("Olivia", labelMap["Total Production (Individual)"])
+    heather = await getValue("Heather", labelMap["Total Production (Individual)"])
   }
 
   if (label === "Total Whitening Kits") {
     jordyn = await getValue("Jordyn", labelMap["Whitening Kits"])
-    olivia = await getValue("Olivia", labelMap["Whitening Kits"])
+    heather = await getValue("Heather", labelMap["Whitening Kits"])
   }
 
-const total = jordyn + olivia
+const total = jordyn + heather
 
 // =========================
 // CURRENT VALUE
@@ -581,24 +581,24 @@ const getPrevValue = async (user: string, krTitle: string) => {
 }
 
 let prevJordyn = 0
-let prevOlivia = 0
+let prevHeather = 0
 
 if (label === "Total Starts") {
   prevJordyn = await getPrevValue("Jordyn", labelMap["Total Starts (Individual)"])
-  prevOlivia = await getPrevValue("Olivia", labelMap["Total Starts (Individual)"])
+  prevHeather = await getPrevValue("Heather", labelMap["Total Starts (Individual)"])
 }
 
 if (label === "Total Production") {
   prevJordyn = await getPrevValue("Jordyn", labelMap["Total Production (Individual)"])
-  prevOlivia = await getPrevValue("Olivia", labelMap["Total Production (Individual)"])
+  prevHeather = await getPrevValue("Heather", labelMap["Total Production (Individual)"])
 }
 
 if (label === "Total Whitening Kits") {
   prevJordyn = await getPrevValue("Jordyn", labelMap["Whitening Kits"])
-  prevOlivia = await getPrevValue("Olivia", labelMap["Whitening Kits"])
+  prevHeather = await getPrevValue("Heather", labelMap["Whitening Kits"])
 }
 
-const prevTotal = prevJordyn + prevOlivia
+const prevTotal = prevJordyn + prevHeather
 
 setLastMonth(prevTotal.toString())
 
