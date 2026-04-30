@@ -303,8 +303,8 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
-  const [localTarget, setLocalTarget] = useState('')
   const [dbTarget, setDbTarget] = useState('')
+  const [localTarget, setLocalTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [metricType, setMetricType] = useState('')
@@ -314,32 +314,16 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   '',
   ''
 ])
-  const [loadedMonth, setLoadedMonth] = useState('')
   const [isDirty, setIsDirty] = useState(false)
-  // SYNC MASTER TARGET PROP INTO LOCAL STATE
-useEffect(() => {
-  if (target !== undefined) {
-    setLocalTarget(target)
-  }
-}, [target])
+  const [loadedMonth, setLoadedMonth] = useState('')
 
   const isPercentage =
   metricType === 'percentage' ||
   label === 'Conversion Rate'
- const isCurrency =
+  const isCurrency =
   metricType === 'currency' ||
-  label === 'Collections from Starts' ||
-  label === 'Total Production (Individual)' ||
-  label === 'Total Production'
+  label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
-
-  const formatCurrency = (val: string | number) => {
-  if (val === '' || val === null || val === undefined) return ''
-  return '$' + Number(val).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
-}
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
@@ -355,54 +339,19 @@ useEffect(() => {
   useEffect(() => {
 
     const fetchData = async () => {
-      
+
       const dbLabel = labelMap[label]
-      console.log("LABEL:", label)
-      console.log("DB LABEL:", dbLabel)
 
-      let base
-
-if (label === "Total Whitening Kits") {
-  const { data } = await supabase
-    .from('key_results')
-    .select('id')
-    .eq('id', 'f4406ada-8fe2-42aa-9e84-c8c373e6dfe1')
-    .maybeSingle()
-
-  base = {
-    key_result_id: data?.id
-  }
-} else {
-  const { data } = await supabase
-    .from('dashboard_okr_data')
-    .select('*')
-    .eq('user_name', 'Olivia')
-    .eq('key_result_title', dbLabel)
-    .maybeSingle()
-
-  base = data
-
-  console.log('BASE RESULT:', base)
-  console.log('DB LABEL:', dbLabel)
-}
+      const { data: base } = await supabase
+        .from('dashboard_okr_data')
+        .select('*')
+        .eq('user_name', 'Olivia')
+        .eq('key_result_title', dbLabel)
+        .maybeSingle()
 
       if (!base) return
 
       setKeyResultId(base.key_result_id)
-
-        console.log("BASE OBJECT:", base)
-
-    const formatDate = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
-
-const currentMonthKey = selectedMonth.toISOString()
-
-const currentDate = formatDate(selectedMonth)
-
-const prevDateObj = new Date(selectedMonth)
-prevDateObj.setMonth(prevDateObj.getMonth() - 1)
-const prevDate = formatDate(prevDateObj)
-
 const initiativeDate = `${selectedMonth.getFullYear()}-${String(
   selectedMonth.getMonth() + 1
 ).padStart(2, '0')}-01`
@@ -418,156 +367,118 @@ let loaded = ['', '', '']
 
 if (currentInitiatives && currentInitiatives.length > 0) {
   currentInitiatives.forEach((row) => {
-    if (
-      row.initiative_index >= 1 &&
-      row.initiative_index <= 3
-    ) {
+    if (row.initiative_index >= 1 && row.initiative_index <= 3) {
       loaded[row.initiative_index - 1] = row.text || ''
     }
   })
 } else {
-  const previousMonth = new Date(selectedMonth)
-  previousMonth.setMonth(previousMonth.getMonth() - 1)
-
-  const previousMonthDate = `${previousMonth.getFullYear()}-${String(
-    previousMonth.getMonth() + 1
-  ).padStart(2, '0')}-01`
-
   const { data: previousInitiatives } = await supabase
     .from('initiatives')
-    .select('initiative_index, text')
+    .select('initiative_index, text, reporting_month')
     .eq('key_result_id', base.key_result_id)
-    .eq('reporting_month', previousMonthDate)
+    .lt('reporting_month', initiativeDate)
+    .order('reporting_month', { ascending: false })
     .order('initiative_index', { ascending: true })
 
   if (previousInitiatives && previousInitiatives.length > 0) {
-    previousInitiatives.forEach((row) => {
-      if (
-        row.initiative_index >= 1 &&
-        row.initiative_index <= 3
-      ) {
-        loaded[row.initiative_index - 1] =
-          row.text || ''
-      }
-    })
+    const latestMonth = previousInitiatives[0].reporting_month
+
+    previousInitiatives
+      .filter((row) => row.reporting_month === latestMonth)
+      .forEach((row) => {
+        if (row.initiative_index >= 1 && row.initiative_index <= 3) {
+          loaded[row.initiative_index - 1] = row.text || ''
+        }
+      })
   }
 }
 
 setInitiatives(loaded)
+        console.log("BASE OBJECT:", base)
 
-// ------------------------
-// FETCH CURRENT ROW
-// ------------------------
+      const { data: kr } = await supabase
+        .from('key_results')
+        .select('target_value, metric_type')
+        .eq('id', base.key_result_id)
+        .maybeSingle()
 
-const { data: currentRow } = await supabase
-  .from('key_result_updates')
-  .select('value, target_value')
-  .eq('key_result_id', base.key_result_id)
-  .eq('reporting_month', currentDate)
-  .maybeSingle()
 
-// ------------------------
-// FETCH PREVIOUS TARGET
-// ------------------------
+        console.log("BASE:", base)
+        console.log("KR:", kr)
 
-const { data: prevRow } = await supabase
+// =======================
+// DATE SETUP
+// =======================
+const formatDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+
+const currentDate = formatDate(selectedMonth)
+const currentMonthKey = selectedMonth.toISOString()    
+
+const prev = new Date(selectedMonth)
+prev.setMonth(prev.getMonth() - 1)
+const prevDate = formatDate(prev)
+
+
+// =======================
+// TARGET (MONTHLY SYSTEM)
+// =======================
+const { data: currentRows } = await supabase
   .from('key_result_updates')
   .select('target_value')
   .eq('key_result_id', base.key_result_id)
-  .lt('reporting_month', currentDate)
-  .not('target_value', 'is', null)
-  .order('reporting_month', { ascending: false })
-  .limit(1)
-  .maybeSingle()
+  .eq('reporting_month', currentDate)
 
-// ------------------------
-// RESOLVE TARGET
-// ------------------------
+const currentRow = currentRows?.[0] ?? null
+
+  const { data: prevRows } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', prevDate)
+
+const prevRow = prevRows?.[0] ?? null
 
 const resolvedTarget =
   currentRow?.target_value ??
   prevRow?.target_value ??
-  null
+  kr?.target_value ??
+  ''
+  console.log("TARGET ROWS:", { currentRow, prevRow, kr })
 
-// ------------------------
-// CARRY FORWARD TARGET
-// ------------------------
+setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
+setMetricType(kr?.metric_type ?? '')
 
-if (currentRow?.target_value === null && resolvedTarget !== null) {
-  await supabase
-    .from('key_result_updates')
-    .upsert({
-      key_result_id: base.key_result_id,
-      reporting_month: currentDate,
-      target_value: resolvedTarget,
-    }, {
-      onConflict: 'key_result_id,reporting_month'
-    })
-}
-
-// ------------------------
-// SET TARGET (SAFE)
-// ------------------------
-
-if (loadedMonth !== currentMonthKey && !isDirty) {
-  setLocalTarget(
-    resolvedTarget !== null ? resolvedTarget.toString() : ''
-  )
-}
-
-// ------------------------
-// SET VALUE
-// ------------------------
-
-const currentValue =
-  currentRow && currentRow.value !== null
-    ? currentRow.value
+setLocalTarget(
+  resolvedTarget !== null && resolvedTarget !== undefined
+    ? String(resolvedTarget)
     : ''
+)
 
-if (loadedMonth !== currentMonthKey && !isDirty) {
-  setValue(
-    currentRow && currentRow.value !== null
-      ? currentRow.value.toString()
-      : ''
-  )
+      const { data: current } = await supabase
+        .from('key_result_updates')
+        .select('value')
+        .eq('key_result_id', base.key_result_id)
+        .eq('reporting_month', currentDate)
+        .maybeSingle()
 
-  if (setParentValue && currentRow?.value !== undefined) {
-    setParentValue(Number(currentRow.value ?? 0))
-  }
-
-  setLoadedMonth(currentMonthKey)
-}
-
-// ------------------------
-// PREVIOUS MONTH VALUE
-// ------------------------
-
-const { data: prevData } = await supabase
+      const currentValue = current?.value ?? ''
+        
+// =========================
+// PREVIOUS MONTH (NORMAL KRs)
+// =========================
+const { data: prevValueRow } = await supabase
   .from('key_result_updates')
   .select('value')
   .eq('key_result_id', base.key_result_id)
   .eq('reporting_month', prevDate)
   .maybeSingle()
 
-if (loadedMonth !== currentMonthKey) {
-  setLastMonth(prevData?.value ?? '')
-}
+const prevValue = prevValueRow?.value ?? ''
 
-// ------------------------
-// SCORE
-// ------------------------
-
-const c = Number(currentValue || 0)
-const t = Number(resolvedTarget ?? 0)
-
-if (t === 0) {
-  setScore('0%')
-} else {
-  const percent = Math.round((c / t) * 100)
-  setScore(percent + '%')
-}
-      // =========================
-// GLOBAL TOTALS (JORDYN + OLIVIA)
+setLastMonth(prevValue !== '' && prevValue !== null ? prevValue.toString() : '')
+// =========================
+//  GLOBAL TOTALS (JORDYN + OLIVIA)
 // =========================
 
 if (
@@ -625,22 +536,18 @@ const total = jordyn + olivia
 // CURRENT VALUE
 // =========================
 setValue(total.toString())
-setLoadedMonth(currentMonthKey)
-// =========================
-// SCORE CALCULATION (FIXED)
-// =========================
 
-// use MASTER target if available (Objective 4 & 5)
-const effectiveTarget =
-  target !== undefined
-    ? Number(target)
-    : Number(resolvedTarget ?? 0)
+// =========================
+// SCORE CALCULATION (ADD THIS)
+// =========================
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (effectiveTarget <= 0) {
+if (t <= 0) {
   setScore('0%')
 } else {
-  setScore(Math.round((total / effectiveTarget) * 100) + '%')
+  setScore(Math.round((total / t) * 100) + '%')
 }
+
 // =========================
 // PREVIOUS MONTH CALCULATION
 // =========================
@@ -693,11 +600,28 @@ const prevTotal = prevJordyn + prevOlivia
 
 setLastMonth(prevTotal.toString())
 
-
-
 return
 }
+if (!isDirty) {
+  setValue(currentValue || '')
 
+  if (setParentValue && currentValue !== undefined) {
+    setParentValue(Number(currentValue))
+  }
+}
+
+
+const c = Number(currentValue || 0)
+
+// USE DIRECT VALUE — NOT STATE
+const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
+
+if (t === 0) {
+  setScore('0%')
+} else {
+  const percent = Math.round((c / t) * 100)
+  setScore(percent + '%')
+}
     }
 
     fetchData()
@@ -707,22 +631,23 @@ return
   const handleSave = async () => {
 
     if (!keyResultId) return
+    
+const y = selectedMonth.getFullYear()
+const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+const reportingDate = `${y}-${m}-01`
 
-    const y = selectedMonth.getFullYear()
-    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
-    const reportingDate = `${y}-${m}-01`
-
-    await supabase.from('key_result_updates').upsert(
+ await supabase.from('key_result_updates').upsert(
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: value === '' ? null : Number(value),
-    target_value: localTarget === '' ? null : Number(localTarget),
+    value: value ? Number(value) : null,
+    target_value: localTarget ? Number(localTarget) : null,
   },
+  
   { onConflict: 'key_result_id,reporting_month' }
 )
   }
-  const handleInitiativeSave = async (
+const handleInitiativeSave = async (
   index: number,
   text: string
 ) => {
@@ -747,7 +672,6 @@ return
       }
     )
 }
-
 const isLowerBetter = (label: string) => {
   const l = label.toLowerCase()
 
@@ -761,6 +685,7 @@ const isLowerBetter = (label: string) => {
 const getScoreBackground = () => {
   const num = Number(score.replace('%', ''))
 
+  // handles empty safely
   if (!num && num !== 0) return '#FFFFFF'
 
   if (isLowerBetter(label)) {
@@ -783,8 +708,8 @@ const getScoreBackground = () => {
           style={prevCell}
           value={
   isCurrency && lastMonth
-  ? formatCurrency(lastMonth)
-   : isPercentage && lastMonth
+    ? '$' + Number(lastMonth).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : isPercentage && lastMonth
   ? Number(lastMonth) + '%'
     : lastMonth
 }
@@ -794,111 +719,90 @@ const getScoreBackground = () => {
         <input
           style={targetCell}
           value={
-  isEditing
-    ? localTarget
-    : isCurrency && localTarget
-    ? formatCurrency(localTarget)
-    : isPercentage && localTarget
+  isCurrency && localTarget
+    ? '$' + localTarget
+  : isPercentage && localTarget
     ? localTarget + '%'
-    : localTarget
+  : localTarget
 }
-
-          disabled={
-  !isEditing && !target
-}
+          disabled={!isEditing}
 onChange={async (e) => {
   let val = ''
 
-  const raw = e.target.value.replace(/[^0-9.]/g, '')
-  const parts = raw.split('.')
+  if (isCurrency || isPercentage) {
+    const raw = e.target.value.replace(/[^0-9.]/g, '')
+    const parts = raw.split('.').slice(0, 2)
 
-  if (parts.length > 2) return
+    val = parts[0]
 
-  val = parts[0]
-
-  if (parts.length === 2) {
-    val += '.' + parts[1].slice(0, 2)
+    if (parts.length > 1) {
+      val += '.' + parts[1].slice(0, 2)
+    }
+  } else {
+    val = e.target.value.replace(/[^0-9]/g, '')
   }
 
   setLocalTarget(val)
-  setIsDirty(true)
 
-  if (setTarget) {
-    setTarget(val)
-  }
-
-  // SAVE IMMEDIATELY (THIS IS THE FIX)
   if (!keyResultId) return
 
   const y = selectedMonth.getFullYear()
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-  await supabase.from('key_result_updates').upsert(
-    {
-      key_result_id: keyResultId,
-      reporting_month: reportingDate,
-      value: value === '' ? null : Number(value),
-      target_value: val === '' ? null : Number(val),
-    },
-    { onConflict: 'key_result_id,reporting_month' }
-  )
+ await supabase.from('key_result_updates').upsert(
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: Number(value) || 0,
+    target_value: val ? Number(val) : null,
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
 }}
+onKeyDown={handleEnter}
+/>
+
+        <input
+          style={currentCell}
+          value={
+  forcedValue !== undefined
+    ? (label === "Total Production"
+        ? '$' + Number(forcedValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : forcedValue)
+    : (
+    isEditing
+      ? value
+      : isCurrency && value
+      ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : isPercentage && value
+      ? value + '%'
+      : value
+  )
+}
+          disabled={!isEditing || (isComputed && label !== "Total Whitening Kits")}
+          onChange={(e) => {
+              const raw = e.target.value.replace(/[^0-9.]/g, '')
+              const parts = raw.split('.').slice(0, 2)
+
+              let val = parts[0]
+
+              if (parts.length > 1) {
+          val += '.' + parts[1].slice(0, 2)
+          }
+
+setValue(val)
+setIsDirty(true)
+
+  if (setParentValue) {
+    setParentValue(Number(val))
+  }
+}}
+          onBlur={handleSave}
           onKeyDown={handleEnter}
         />
 
-        <input
-  style={currentCell}
-  value={
-  forcedValue !== undefined
-    ? (isCurrency
-        ? formatCurrency(forcedValue)
-        : forcedValue)
-    : (
-        isEditing
-          ? value
-          : isCurrency && value
-          ? formatCurrency(value)
-          : isPercentage && value
-          ? value + '%'
-          : value
-      )
-}
-  disabled={!isEditing || (isComputed && label !== "Total Whitening Kits")}
-  onChange={(e) => {
-    let val = ''
-
-    if (isCurrency || isPercentage) {
-  const raw = e.target.value.replace(/[^0-9.]/g, '')
-  const parts = raw.split('.')
-
-  val = parts[0]
-
-  if (parts.length > 1) {
-    val += '.' + parts[1].slice(0, 2)
-  }
-} else {
-  const raw = e.target.value.replace(/[^0-9.]/g, '')
-  const parts = raw.split('.')
-
-  val = parts[0]
-
-  if (parts.length > 1) {
-    val += '.' + parts[1].slice(0, 2)
-  }
-}
-    setValue(val)
-    setIsDirty(true)
-
-    if (setParentValue) {
-      setParentValue(Number(val))
-    }
-  }}
-  onBlur={handleSave}
-  onKeyDown={handleEnter}
-/>
-
-<input
+       <input
   style={{
     ...cell,
     backgroundColor: getScoreBackground(),
@@ -907,12 +811,13 @@ onChange={async (e) => {
   value={score}
   readOnly
 />
+
         <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
           {showInitiatives ? 'Hide' : '+ Initiatives'}
         </button>
       </div>
 
-    {showInitiatives && (
+     {showInitiatives && (
   <div style={initiativeRow}>
     {initiatives.map((item, index) => (
       <input
@@ -939,7 +844,6 @@ onChange={async (e) => {
     </div>
   )
 }
-
 // =========================
 // STYLES
 // =========================
