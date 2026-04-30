@@ -58,10 +58,6 @@ export default function Page() {
   const [isEditing, setIsEditing] = useState(false)
   
 
-  // 🔥 MASTER TARGETS (UI CONTROLLED)
-  const [masterStartsTarget, setMasterStartsTarget] = useState('0')
-  const [masterProductionTarget, setMasterProductionTarget] = useState('0')
-
 
   useEffect(() => {
     const today = new Date()
@@ -205,7 +201,7 @@ export default function Page() {
   label="Total Starts (Individual)" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
-  derivedTarget={Number(masterStartsTarget) / 2}
+ derivedTarget={undefined}
   setParentValue={setHeatherStarts}
 />
           <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -213,7 +209,7 @@ export default function Page() {
   label="Total Production (Individual)" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
-  derivedTarget={Number(masterProductionTarget) / 2}
+derivedTarget={undefined}
   setParentValue={setHeatherProduction}
 />
           <KeyResult label="Collections from Starts" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -238,40 +234,35 @@ export default function Page() {
 
         {/* OBJECTIVE 4 (MASTER) */}
         <Objective title="Objective 4: TC Total Start Performance">
-          <KeyResult
+
+     <KeyResult
   label="Total Starts"
   selectedMonth={selectedMonth}
-  isEditing={false}
-  target={masterStartsTarget}
-  setTarget={setMasterStartsTarget}
-  
+  isEditing={isEditing}
 />
 
           <KeyResult
   label="Total Production"
   selectedMonth={selectedMonth}
-  isEditing={false}
-  target={masterProductionTarget}
-  setTarget={setMasterProductionTarget}
- 
+  isEditing={isEditing}
 />
           
         </Objective>
 
-        {/* OBJECTIVE 5 */}
-        <Objective title="Objective 5: TC Whitening Kits">
-          <KeyResult 
-  label="Total Whitening Kits" 
-  selectedMonth={selectedMonth} 
-  isEditing={false}
-/>
+               {/* OBJECTIVE 5 */}
+<Objective title="Objective 5: TC Whitening Kits">
+  <KeyResult 
+    label="Total Whitening Kits" 
+    selectedMonth={selectedMonth} 
+    isEditing={isEditing}
+  />
+</Objective>
   
-        </Objective>
-
+      
       </div>
     </div>
-  )
-}
+        )
+      }
 
 // =========================
 // OBJECTIVE
