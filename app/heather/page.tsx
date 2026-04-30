@@ -341,35 +341,43 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
 
       const dbLabel = labelMap[label]
 
-    let base
+  let base = null
+
+// =========================
+// SHARED / MASTER KRs
+// =========================
 if (label === "Total Starts") {
+
   const { data } = await supabase
     .from('key_results')
     .select('id')
     .eq('title', 'Total Starts')
     .maybeSingle()
 
-  base = { key_result_id: data?.id }
-}
+  if (!data) return
 
-if (label === "Total Production") {
+  base = { key_result_id: data.id }
+
+} else if (label === "Total Production") {
+
   const { data } = await supabase
     .from('key_results')
     .select('id')
     .eq('title', 'Total Production')
     .maybeSingle()
 
-  base = { key_result_id: data?.id }
-}
+  if (!data) return
 
-if (label === "Total Whitening Kits") {
+  base = { key_result_id: data.id }
+
+} else if (label === "Total Whitening Kits") {
+
   let { data } = await supabase
     .from('key_results')
     .select('id, title')
     .eq('title', 'TC Total Whitening Kits')
     .maybeSingle()
 
-  //fallback if exact match fails
   if (!data) {
     const res = await supabase
       .from('key_results')
@@ -380,24 +388,26 @@ if (label === "Total Whitening Kits") {
       r.title.toLowerCase().includes('total')
     )
 
-    console.log("Fallback whitening match:", found)
-
     data = found || null
   }
 
-  console.log("FINAL Whitening KR:", data)
+  if (!data) return
 
-  base = { key_result_id: data?.id }
-}
+  base = { key_result_id: data.id }
 
+// =========================
+// NORMAL KRs
+// =========================
+} else {
 
-    else {
   const { data } = await supabase
     .from('dashboard_okr_data')
     .select('*')
     .eq('user_name', 'Heather')
     .eq('key_result_title', dbLabel)
     .maybeSingle()
+
+  if (!data) return
 
   base = data
 }
