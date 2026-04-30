@@ -231,10 +231,14 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any)
   ''
 ])
 
-  const getScoreColor = () => {
+const getScoreStyle = () => {
   const num = Number(score.replace('%', ''))
-  if (isNaN(num)) return '#fff'
-  return num >= 100 ? '#22c55e' : '#c2410c'
+
+  if (isNaN(num)) return { backgroundColor: '#FFFFFF' }
+
+  if (num >= 100) return { backgroundColor: '#acf3c3d7' }
+  if (num >= 90) return { backgroundColor: '#fff4ccf3' }
+  return { backgroundColor: '#f3b8b8d8' }
 }
 
   useEffect(() => {
@@ -459,11 +463,11 @@ const handleInitiativeSave = async (
       <div style={row}>
         <span>{labelMap[label] || label}</span>
 
-        <input style={cell} value={lastMonth} readOnly />
+        <input style={prevCell} value={lastMonth} readOnly />
        
   {/* TARGET */}
 <input
-  style={cell}
+  style={targetCell}
   value={isEditing ? target.replace(/[^0-9.]/g, '') : target}
   disabled={!isEditing}
   onChange={(e) => setTarget(e.target.value)}
@@ -472,17 +476,16 @@ const handleInitiativeSave = async (
 
 {/* VALUE */}
 <input
-  style={cell}
+  style={currentCell}
   value={isEditing ? value.replace(/[^0-9.]/g, '') : value}
   disabled={!isEditing}
   onChange={(e) => setValue(e.target.value)}
   onBlur={handleSave}
 />
-        <input
+ <input
   style={{
-    ...cell,
-    color: getScoreColor(),
-    fontWeight: 600
+    ...scoreCellBase,
+    ...getScoreStyle()
   }}
   value={score}
   readOnly
@@ -719,6 +722,25 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
+}
+
+const scoreCellBase: React.CSSProperties = {
+  ...cell,
+  fontWeight: 600
 }
 
 const button: React.CSSProperties = {
