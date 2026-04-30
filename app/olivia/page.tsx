@@ -806,29 +806,43 @@ const getScoreBackground = () => {
           disabled={
   !isEditing && !target
 }
-       onChange={(e) => {
+onChange={async (e) => {
   let val = ''
 
   const raw = e.target.value.replace(/[^0-9.]/g, '')
+  const parts = raw.split('.')
 
-// allow only ONE decimal point
-const parts = raw.split('.')
+  if (parts.length > 2) return
 
-if (parts.length > 2) return
+  val = parts[0]
 
-val = parts[0]
-
-if (parts.length === 2) {
-  val += '.' + parts[1].slice(0, 2)
-}
+  if (parts.length === 2) {
+    val += '.' + parts[1].slice(0, 2)
+  }
 
   setLocalTarget(val)
   setIsDirty(true)
 
-  // 🔥 THIS IS THE FIX
   if (setTarget) {
     setTarget(val)
   }
+
+  // SAVE IMMEDIATELY (THIS IS THE FIX)
+  if (!keyResultId) return
+
+  const y = selectedMonth.getFullYear()
+  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+  const reportingDate = `${y}-${m}-01`
+
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      value: value === '' ? null : Number(value),
+      target_value: val === '' ? null : Number(val),
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
 }}
           onKeyDown={handleEnter}
         />
