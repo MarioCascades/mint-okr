@@ -316,12 +316,6 @@ const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derived
   const [loadedMonth, setLoadedMonth] = useState('')
   const [isDirty, setIsDirty] = useState(false)
 
-  // SYNC MASTER TARGET PROP INTO LOCAL STATE
-useEffect(() => {
-  if (target !== undefined) {
-    setLocalTarget(target)
-  }
-}, [target])
 
   const isPercentage =
   metricType === 'percentage' ||
