@@ -258,11 +258,7 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   const [target, setTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
-  const getScoreColor = () => {
-  const num = Number(score.replace('%', ''))
-  if (isNaN(num)) return '#fff'
-  return num >= 100 ? '#22c55e' : '#c2410c'
-}
+
 
   const isPercentage = percentageFields.includes(label)
   const isCurrency = currencyFields.includes(label)
@@ -504,7 +500,7 @@ useEffect(() => {
 
       {/* LAST MONTH */}
 <input
-  style={cell}
+  style={prevCell}
   value={
     isPercentage && lastMonth
       ? lastMonth + '%'
@@ -517,7 +513,7 @@ useEffect(() => {
 
 {/* TARGET */}
 <input
-  style={cell}
+  style={targetCell}
   value={
     !isEditing
       ? isPercentage && target
@@ -535,7 +531,7 @@ useEffect(() => {
 />
 
 <input
-  style={cell}
+  style={currentCell}
   value={
     !isEditing
       ? isPercentage && value
@@ -552,11 +548,18 @@ useEffect(() => {
   onBlur={handleSave}
 />
 
-      <input
+<input
   style={{
     ...cell,
-    color: getScoreColor(),
-    fontWeight: 600
+    fontWeight: 600,
+    color: (() => {
+      if (!score.includes('%')) return '#9CA3AF' // neutral gray
+
+      const value = Number(score.replace('%', ''))
+      if (isNaN(value)) return '#9CA3AF'
+
+      return value >= 100 ? '#22c55e' : '#c2410c'
+    })()
   }}
   value={score}
   readOnly
@@ -798,6 +801,21 @@ const cell: React.CSSProperties = {
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
+}
+
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#cacacada'
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#9c9dfd'
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: '#FFFFFF'
 }
 
 const button: React.CSSProperties = {
