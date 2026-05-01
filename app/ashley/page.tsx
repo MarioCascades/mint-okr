@@ -677,10 +677,12 @@ setLastMonth(
     ? prevVal !== '' ? String(prevVal * 100) : ''
     : prevVal !== '' ? String(prevVal) : ''
 )
- if (target === '') {
+if (target === '') {
   setTarget(
     currentTarget !== null && currentTarget !== undefined
-      ? String(currentTarget)
+      ? percentageMetrics.includes(label)
+        ? String(Number(currentTarget) * 100)
+        : String(currentTarget)
       : ''
   )
 }
@@ -707,15 +709,20 @@ useEffect(() => {
 
   let percent = 0
 
-  if (direction === 'increase') {
-    percent = Math.round((numericValue / numericTarget) * 100)
-  } else {
-    percent = numericValue === 0
-      ? 100
-      : Math.round((numericTarget / numericValue) * 100)
-  }
+ if (percentageMetrics.includes(label)) {
+  setScore(value ? value + '%' : '—')
+  return
+}
 
-  setScore(percent + '%')
+if (direction === 'increase') {
+  percent = Math.round((numericValue / numericTarget) * 100)
+} else {
+  percent = numericValue === 0
+    ? 100
+    : Math.round((numericTarget / numericValue) * 100)
+}
+
+setScore(percent + '%')
 
 }, [value, target, label])
 
