@@ -172,7 +172,7 @@ export default function Page() {
   isEditing={false}
   isPercent={true}
   sourceUser="Ashley"
-  note="Pulled from Ashley"
+  note="(Pulls from Ashley)"
 />
 
 <KeyResult
@@ -180,7 +180,7 @@ export default function Page() {
   selectedMonth={selectedMonth}
   isEditing={false}
   sourceUser="Ashley"
-  note="Pulled from Ashley"
+  note="(Pulls from Ashley)"
 />
 
 <KeyResult
@@ -188,7 +188,7 @@ export default function Page() {
   selectedMonth={selectedMonth}
   isEditing={false}
   sourceUser="Mari"
-  note="Pulled from Mari"
+  note="(Pulls from Mari)"
 />
 
 <KeyResult
@@ -196,7 +196,7 @@ export default function Page() {
   selectedMonth={selectedMonth}
   isEditing={false}
   sourceUser="Ashley"
-  note="Pulled from Ashley"
+  note="(Pulls from Ashley)"
 />
 
 </Objective>
@@ -404,11 +404,11 @@ const c =
     ? Number(currentData.value)
     : 0
 
-      setTarget(
+setTarget(
   isCurrency
     ? formatCurrency(t)
     : isPercent
-    ? t + '%'
+    ? Math.round(t * 100) + '%'
     : t.toString()
 )
 
@@ -416,9 +416,10 @@ setValue(
   isCurrency
     ? formatCurrency(c)
     : isPercent
-    ? c + '%'
+    ? Math.round(c * 100) + '%'
     : c.toString()
 )
+
 
 
 
@@ -451,7 +452,7 @@ const { data: prevData } = await supabase
   isCurrency
     ? formatCurrency(prevVal)
     : isPercent
-    ? prevVal + '%'
+    ? Math.round(prevVal * 100) + '%'
     : prevVal.toString()
 )
 
@@ -523,7 +524,7 @@ const handleInitiativeSave = async (
        <span>
   {labelMap[label] || label}
   {note && (
-    <span style={{ fontSize: 12, color: '#6B7280', marginLeft: 6 }}>
+    <span style={{ fontSize: 13, color: '#6B7280', marginLeft: 6, fontStyle: 'italic', opacity: 0.9 }}>
       ({note})
     </span>
   )}
