@@ -285,7 +285,7 @@ const getScoreStyle = () => {
         .from('dashboard_okr_data')
         .select('*')
         .eq('user_name', sourceUser || 'Alli')  
-        .ilike('key_result_title', `%${labelMap[label] || label}%`)
+       .eq('key_result_title', label)
         .maybeSingle()
 
       if (!base) return
