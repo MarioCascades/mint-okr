@@ -172,8 +172,8 @@ useEffect(() => {
   selectedMonth={selectedMonth}
   isEditing={false}
   sourceUser="Ashlynn"
-  sourceLabel="# of Orders Missing from Scan Report"
-  note="(Pulls from Ashlynn)"
+  sourceLabel="CO Orders Missing from Scan Report"
+  note="Pulls from Ashlynn"
 />
           <KeyResult label="# of Patients Rescheduled due to delayed case" selectedMonth={selectedMonth} isEditing={isEditing} />
         </Objective>
@@ -255,6 +255,10 @@ const KeyResult = ({
       .maybeSingle()
 
       if (!base) return
+
+      console.log('SOURCE USER:', sourceUser)
+console.log('SOURCE LABEL:', sourceLabel)
+console.log('BASE RESULT:', base)
 
       setKeyResultId(base.key_result_id)
 
