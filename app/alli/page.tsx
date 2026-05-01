@@ -408,7 +408,7 @@ setTarget(
   isCurrency
     ? formatCurrency(t)
     : isPercent
-    ? Math.round(t * 100) + '%'
+    ? Math.round(t) + '%'
     : t.toString()
 )
 
