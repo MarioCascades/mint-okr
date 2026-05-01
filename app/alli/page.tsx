@@ -214,7 +214,7 @@ const labelMap: Record<string, string> = {
   "FD Obs No Show": "Obs No Show",
   "FD Total Active Patients": "Active Patients",
   "FD Total Active Patients Needing Appointment": "Patients Needing Appointment",
-  "FD # of tasks in Lead Sigma": "Tasks in Lead Sigma"
+  "FD # of tasks in Lead Sigma": "Tasks in Lead Sigma",
   "Call Answer Rate": "Call Answer Rate",
   "# of Missed Calls": "# of Missed Calls",
   "# of Patients Waited 10+ Minutes": "Patients Waited 10+ Minutes",
