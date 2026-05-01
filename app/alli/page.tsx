@@ -253,6 +253,11 @@ const Objective = ({ title, children }: any) => (
 const formatCurrency = (val: number) =>
   `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
+const computedTargets: Record<string, (prev: number) => number> = {
+  "FD Amount Due": (prev) => prev * 0.9,
+  "FD Obs Overdue 30+": (prev) => prev * 0.9,
+}
+
 const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false, isPercent = false, sourceUser, note }: any) => {
 
   const [value, setValue] = useState('')
@@ -305,6 +310,8 @@ const nextMonth = new Date(
   selectedMonth.getMonth() + 1,
   1
 )
+
+
 
 const { data: currentInitiatives } = await supabase
   .from('initiatives')
@@ -369,32 +376,58 @@ const { data: currentData } = await supabase
   .maybeSingle()
 
 
-    let t = 0
+  const prevStart = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() - 1,
+  1
+)
 
-// STEP 1 — use current month if exists
-if (
-  currentData &&
-  currentData.target_value !== null &&
-  currentData.target_value !== undefined
-) {
-  t = Number(currentData.target_value)
+const prevEnd = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+)
+
+const { data: prevDataForTarget } = await supabase
+  .from('key_result_updates')
+  .select('value')
+  .eq('key_result_id', base.key_result_id)
+  .gte('reporting_month', prevStart.toISOString())
+  .lt('reporting_month', prevEnd.toISOString())
+  .maybeSingle()
+
+const prevValue = Number(prevDataForTarget?.value ?? 0)
+
+let t = 0
+
+if (computedTargets[label]) {
+  t = computedTargets[label](prevValue)
 } else {
-  // STEP 2 — look for latest previous target
-  const { data: prevTarget } = await supabase
-    .from('key_result_updates')
-    .select('target_value')
-    .eq('key_result_id', base.key_result_id)
-    .lt('reporting_month', currentDate)
-    .not('target_value', 'is', null)
-    .order('reporting_month', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  if (prevTarget?.target_value !== null && prevTarget?.target_value !== undefined) {
-    t = Number(prevTarget.target_value)
+  if (
+    currentData &&
+    currentData.target_value !== null &&
+    currentData.target_value !== undefined
+  ) {
+    t = Number(currentData.target_value)
   } else {
-    // STEP 3 — fallback to base
-    t = Number(base.target_value ?? 0)
+    const { data: prevTarget } = await supabase
+      .from('key_result_updates')
+      .select('target_value')
+      .eq('key_result_id', base.key_result_id)
+      .lt('reporting_month', currentDate)
+      .not('target_value', 'is', null)
+      .order('reporting_month', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (
+      prevTarget?.target_value !== null &&
+      prevTarget?.target_value !== undefined
+    ) {
+      t = Number(prevTarget.target_value)
+    } else {
+      t = Number(base.target_value ?? 0)
+    }
   }
 }
 
@@ -405,7 +438,16 @@ const c =
     : 0
 
 setTarget(
-  isCurrency
+  // ✅ Amount Due → currency formatting
+  label === "FD Amount Due"
+    ? formatCurrency(t)
+
+    // ✅ Obs Overdue → rounded whole number
+    : label === "FD Obs Overdue 30+"
+    ? Math.round(t).toString()
+
+    // ✅ everything else (unchanged)
+    : isCurrency
     ? formatCurrency(t)
     : isPercent
     ? t + '%'
