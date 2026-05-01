@@ -172,7 +172,7 @@ export default function Page() {
   isEditing={false}
   isPercent={true}
   sourceUser="Ashley"
-  note="(Pulls from Ashley)"
+  note="Pulls from Ashley"
 />
 
 <KeyResult
@@ -180,7 +180,7 @@ export default function Page() {
   selectedMonth={selectedMonth}
   isEditing={false}
   sourceUser="Ashley"
-  note="(Pulls from Ashley)"
+  note="Pulls from Ashley"
 />
 
 <KeyResult
@@ -188,7 +188,7 @@ export default function Page() {
   selectedMonth={selectedMonth}
   isEditing={false}
   sourceUser="Mari"
-  note="(Pulls from Mari)"
+  note="Pulls from Mari"
 />
 
 <KeyResult
@@ -196,7 +196,7 @@ export default function Page() {
   selectedMonth={selectedMonth}
   isEditing={false}
   sourceUser="Ashley"
-  note="(Pulls from Ashley)"
+  note="Pulls from Ashley"
 />
 
 </Objective>
@@ -290,7 +290,10 @@ const getScoreStyle = () => {
         .from('dashboard_okr_data')
         .select('*')
         .eq('user_name', sourceUser || 'Alli')  
-       .eq('key_result_title', label)
+       .ilike(
+  'key_result_title',
+  `%${label.includes('Call') || label.includes('Missed') ? 'FD ' + label : label}%`
+)
         .maybeSingle()
 
       if (!base) return
