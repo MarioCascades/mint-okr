@@ -857,7 +857,11 @@ const handleInitiativeSave = async (
 
 <input
   style={targetCell}
-  value={target}
+  value={
+    percentageMetrics.includes(label) && target !== ''
+      ? target + '%'
+      : target
+  }
   disabled={!isEditing}
   onChange={(e) => {
     const val = e.target.value
