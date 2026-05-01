@@ -326,6 +326,14 @@ const prev = new Date(selectedMonth)
 prev.setMonth(prev.getMonth() - 1)
 const prevDate = formatDate(prev)
 
+const { data: prevData } = await supabase
+        .from('key_result_updates')
+        .select('value')
+        .eq('key_result_id', base.key_result_id)
+        .eq('reporting_month', formatDate(prev))
+        .maybeSingle()
+
+
 // CURRENT ROW
 const { data: currentRow } = await supabase
   .from('key_result_updates')
@@ -346,10 +354,23 @@ const { data: prevRow } = await supabase
   .maybeSingle()
 
 // RESOLVE TARGET
-const resolvedTarget =
+let resolvedTarget =
   currentRow?.target_value ??
   prevRow?.target_value ??
-  ''
+  null
+
+// ONLY FOR THIS KR
+if (
+  label === "# of TLC Appts Scheduled" &&
+  (resolvedTarget === null || resolvedTarget === undefined)
+) {
+  const prevValue =
+    prevData?.value !== null && prevData?.value !== undefined
+      ? Number(prevData.value)
+      : 0
+
+  resolvedTarget = Math.round(prevValue * 0.9)
+}
 
 // AUTO CREATE ROW FOR MONTH (carry forward target)
 if (!currentRow && resolvedTarget !== '') {
@@ -385,12 +406,6 @@ setValue(prev => {
   return prev
 })
 
-const { data: prevData } = await supabase
-        .from('key_result_updates')
-        .select('value')
-        .eq('key_result_id', base.key_result_id)
-        .eq('reporting_month', formatDate(prev))
-        .maybeSingle()
 
       setLastMonth(prevData?.value ?? '')
 
