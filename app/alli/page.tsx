@@ -463,22 +463,9 @@ setValue(
 )
 
 
-
-
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
 
-const prevStart = new Date(
-  selectedMonth.getFullYear(),
-  selectedMonth.getMonth() - 1,
-  1
-)
-
-const prevEnd = new Date(
-  selectedMonth.getFullYear(),
-  selectedMonth.getMonth(),
-  1
-)
 
 const { data: prevData } = await supabase
   .from('key_result_updates')
