@@ -674,14 +674,27 @@ if (!hasRow) {
 
 setLastMonth(
   percentageMetrics.includes(label)
-    ? prevVal !== '' ? String(prevVal * 100) : ''
-    : prevVal !== '' ? String(prevVal) : ''
+    ? prevVal !== ''
+      ? String(
+          Number(prevVal) <= 1
+            ? Number(prevVal) * 100
+            : Number(prevVal)
+        )
+      : ''
+    : prevVal !== ''
+    ? String(prevVal)
+    : ''
 )
+
 if (target === '') {
   setTarget(
     currentTarget !== null && currentTarget !== undefined
       ? percentageMetrics.includes(label)
-        ? String(Number(currentTarget) * 100)
+        ? String(
+            Number(currentTarget) <= 1
+              ? Number(currentTarget) * 100
+              : Number(currentTarget)
+          )
         : String(currentTarget)
       : ''
   )
