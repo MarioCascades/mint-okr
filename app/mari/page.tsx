@@ -359,11 +359,8 @@ let resolvedTarget =
   prevRow?.target_value ??
   null
 
-// ONLY FOR THIS KR
-if (
-  label === "# of TLC Appts Scheduled" &&
-  (resolvedTarget === null || resolvedTarget === undefined)
-) {
+// FORCE COMPUTED TARGET FOR TLC APPTS
+if (label === "# of TLC Appts Scheduled") {
   const prevValue =
     prevData?.value !== null && prevData?.value !== undefined
       ? Number(prevData.value)
