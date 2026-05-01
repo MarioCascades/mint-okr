@@ -166,33 +166,38 @@ export default function Page() {
 
        <Objective title="Objective 4: Office Efficiency">
 
-  <KeyResult
-    label="Call Answer Rate"
-    selectedMonth={selectedMonth}
-    isEditing={false}
-    sourceUser="Ashley"
-  />
+<KeyResult
+  label="Call Answer Rate"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  isPercent={true}
+  sourceUser="Ashley"
+  note="Pulled from Ashley"
+/>
 
-  <KeyResult
-    label="# of Missed Calls"
-    selectedMonth={selectedMonth}
-    isEditing={false}
-    sourceUser="Ashley"
-  />
+<KeyResult
+  label="# of Missed Calls"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  sourceUser="Ashley"
+  note="Pulled from Ashley"
+/>
 
-  <KeyResult
-    label="# of Patients Waited 10+ Minutes"
-    selectedMonth={selectedMonth}
-    isEditing={false}
-    sourceUser="Mari"
-  />
+<KeyResult
+  label="# of Patients Waited 10+ Minutes"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  sourceUser="Mari"
+  note="Pulled from Mari"
+/>
 
-  <KeyResult
-    label="FD # of tasks in Lead Sigma"
-    selectedMonth={selectedMonth}
-    isEditing={false}
-    sourceUser="Ashley"
-  />
+<KeyResult
+  label="FD # of tasks in Lead Sigma"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  sourceUser="Ashley"
+  note="Pulled from Ashley"
+/>
 
 </Objective>
 
@@ -248,7 +253,7 @@ const Objective = ({ title, children }: any) => (
 const formatCurrency = (val: number) =>
   `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false, sourceUser }: any) => {
+const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false, isPercent = false, sourceUser, note }: any) => {
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -399,8 +404,23 @@ const c =
     ? Number(currentData.value)
     : 0
 
-      setTarget(isCurrency ? formatCurrency(t) : t.toString())
-      setValue(isCurrency ? formatCurrency(c) : c.toString())
+      setTarget(
+  isCurrency
+    ? formatCurrency(t)
+    : isPercent
+    ? t + '%'
+    : t.toString()
+)
+
+setValue(
+  isCurrency
+    ? formatCurrency(c)
+    : isPercent
+    ? c + '%'
+    : c.toString()
+)
+
+
 
       const prev = new Date(selectedMonth)
       prev.setMonth(prev.getMonth() - 1)
@@ -427,14 +447,22 @@ const { data: prevData } = await supabase
      
 
       const prevVal = Number(prevData?.value ?? 0)
-      setLastMonth(isCurrency ? formatCurrency(prevVal) : prevVal.toString())
+      setLastMonth(
+  isCurrency
+    ? formatCurrency(prevVal)
+    : isPercent
+    ? prevVal + '%'
+    : prevVal.toString()
+)
 
-      if (t > 0) {
-        const percent = Math.round((c / t) * 100)
-        setScore(percent + '%')
-      } else {
-        setScore('—')
-      }
+      if (isPercent) {
+  setScore(c + '%')
+} else if (t > 0) {
+  const percent = Math.round((c / t) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('—')
+}
     }
 
     fetchData()
@@ -492,7 +520,14 @@ const handleInitiativeSave = async (
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
-        <span>{labelMap[label] || label}</span>
+       <span>
+  {labelMap[label] || label}
+  {note && (
+    <span style={{ fontSize: 12, color: '#6B7280', marginLeft: 6 }}>
+      ({note})
+    </span>
+  )}
+</span>
 
         <input style={prevCell} value={lastMonth} readOnly />
        
