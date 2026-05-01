@@ -686,19 +686,17 @@ setLastMonth(
     : ''
 )
 
-if (target === '') {
-  setTarget(
-    currentTarget !== null && currentTarget !== undefined
-      ? percentageMetrics.includes(label)
-        ? String(
-            Number(currentTarget) <= 1
-              ? Number(currentTarget) +"%"
-              : Number(currentTarget)
-          )
-        : String(currentTarget)
-      : ''
-  )
-}
+setTarget(
+  currentTarget !== null && currentTarget !== undefined
+    ? percentageMetrics.includes(label)
+      ? String(
+          Number(currentTarget) <= 1
+            ? Number(currentTarget) * 100
+            : Number(currentTarget)
+        )
+      : String(currentTarget)
+    : ''
+)
   }
   
   loadData()
