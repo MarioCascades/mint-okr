@@ -408,7 +408,7 @@ setTarget(
   isCurrency
     ? formatCurrency(t)
     : isPercent
-    ? Math.round(t) + '%'
+    ? t + '%'
     : t.toString()
 )
 
@@ -416,7 +416,7 @@ setValue(
   isCurrency
     ? formatCurrency(c)
     : isPercent
-    ? Math.round(c * 100) + '%'
+    ? (c * 100).toFixed(2) + '%'
     : c.toString()
 )
 
@@ -452,7 +452,7 @@ const { data: prevData } = await supabase
   isCurrency
     ? formatCurrency(prevVal)
     : isPercent
-    ? Math.round(prevVal * 100) + '%'
+    ? (prevVal * 100).toFixed(2) + '%'
     : prevVal.toString()
 )
 
