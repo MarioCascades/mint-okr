@@ -173,6 +173,7 @@ useEffect(() => {
   isEditing={false}
   sourceUser="Ashlyn"
   sourceLabel="# of Orders Missing from Scan Report"
+  note="(Pulls from Ashlyn)"
 />
           <KeyResult label="# of Patients Rescheduled due to delayed case" selectedMonth={selectedMonth} isEditing={isEditing} />
         </Objective>
@@ -211,7 +212,8 @@ const KeyResult = ({
   selectedMonth,
   isEditing,
   sourceUser,
-  sourceLabel
+  sourceLabel,
+  note
 }: any) => {
 
   const [value, setValue] = useState('')
@@ -249,7 +251,7 @@ const KeyResult = ({
       .from('dashboard_okr_data')
       .select('*')
       .eq('user_name', sourceUser || 'Mari')
-      .eq('key_result_title', sourceLabel || label)
+      .ilike('key_result_title', `%${sourceLabel || label}%`)
       .maybeSingle()
 
       if (!base) return
@@ -480,7 +482,22 @@ const getScoreBackground = () => {
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
-        <span>{label}</span>
+        <span>
+  {label}
+  {note && (
+    <span
+      style={{
+        fontSize: 13,
+        color: '#6B7280',
+        marginLeft: 6,
+        fontStyle: 'italic',
+        opacity: 0.9
+      }}
+    >
+      ({note})
+    </span>
+  )}
+</span>
 
         <input style={prevCell} value={lastMonth} readOnly />
 
