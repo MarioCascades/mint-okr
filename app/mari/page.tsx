@@ -171,9 +171,9 @@ useEffect(() => {
   label="# of Submissions Missed (Scan Report)"
   selectedMonth={selectedMonth}
   isEditing={false}
-  sourceUser="Ashlyn"
+  sourceUser="Ashlynn"
   sourceLabel="# of Orders Missing from Scan Report"
-  note="(Pulls from Ashlyn)"
+  note="(Pulls from Ashlynn)"
 />
           <KeyResult label="# of Patients Rescheduled due to delayed case" selectedMonth={selectedMonth} isEditing={isEditing} />
         </Objective>
@@ -251,7 +251,7 @@ const KeyResult = ({
       .from('dashboard_okr_data')
       .select('*')
       .eq('user_name', sourceUser || 'Mari')
-      .ilike('key_result_title', `%${sourceLabel || label}%`)
+      .eq('key_result_title', sourceLabel || label)
       .maybeSingle()
 
       if (!base) return
