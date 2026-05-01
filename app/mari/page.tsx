@@ -167,7 +167,13 @@ useEffect(() => {
 
         <Objective title="Objective 3: Ensure Complete and On Time Case/Appliance Ordering and Delivery">
           <KeyResult label="# of Submissions Missed (OrthoFi Audit)" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="# of Submissions Missed (Scan Report)" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult
+  label="# of Submissions Missed (Scan Report)"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  sourceUser="Ashlyn"
+  sourceLabel="# of Orders Missing from Scan Report"
+/>
           <KeyResult label="# of Patients Rescheduled due to delayed case" selectedMonth={selectedMonth} isEditing={isEditing} />
         </Objective>
       </div>
@@ -200,7 +206,13 @@ const Objective = ({ title, children }: any) => (
 // KEY RESULT
 // =========================
 
-const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
+const KeyResult = ({
+  label,
+  selectedMonth,
+  isEditing,
+  sourceUser,
+  sourceLabel
+}: any) => {
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -234,11 +246,11 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
     const fetchData = async () => {
 
       const { data: base } = await supabase
-        .from('dashboard_okr_data')
-        .select('*')
-        .eq('user_name', 'Mari')
-        .eq('key_result_title', label)
-        .maybeSingle()
+      .from('dashboard_okr_data')
+      .select('*')
+      .eq('user_name', sourceUser || 'Mari')
+      .eq('key_result_title', sourceLabel || label)
+      .maybeSingle()
 
       if (!base) return
 
