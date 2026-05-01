@@ -677,7 +677,7 @@ setLastMonth(
     ? prevVal !== ''
       ? String(
           Number(prevVal) <= 1
-            ? Number(prevVal) * 100
+            ? Number(prevVal) * 100 +"%"
             : Number(prevVal)
         )
       : ''
@@ -692,7 +692,7 @@ if (target === '') {
       ? percentageMetrics.includes(label)
         ? String(
             Number(currentTarget) <= 1
-              ? Number(currentTarget) * 100
+              ? Number(currentTarget) +"%"
               : Number(currentTarget)
           )
         : String(currentTarget)
