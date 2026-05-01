@@ -164,9 +164,37 @@ export default function Page() {
           <KeyResult label="FD Total Active Patients Needing Appointment" selectedMonth={selectedMonth} isEditing={isEditing} />
         </Objective>
 
-        <Objective title="Objective 4: Tasks">
-          <KeyResult label="FD # of tasks in Lead Sigma" selectedMonth={selectedMonth} isEditing={isEditing} />
-        </Objective>
+       <Objective title="Objective 4: Office Efficiency">
+
+  <KeyResult
+    label="Call Answer Rate"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceUser="Ashley"
+  />
+
+  <KeyResult
+    label="# of Missed Calls"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceUser="Ashley"
+  />
+
+  <KeyResult
+    label="# of Patients Waited 10+ Minutes"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceUser="Mari"
+  />
+
+  <KeyResult
+    label="FD # of tasks in Lead Sigma"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceUser="Ashley"
+  />
+
+</Objective>
 
       </div>
     </div>
@@ -187,6 +215,9 @@ const labelMap: Record<string, string> = {
   "FD Total Active Patients": "Active Patients",
   "FD Total Active Patients Needing Appointment": "Patients Needing Appointment",
   "FD # of tasks in Lead Sigma": "Tasks in Lead Sigma"
+  "Call Answer Rate": "Call Answer Rate",
+  "# of Missed Calls": "# of Missed Calls",
+  "# of Patients Waited 10+ Minutes": "Patients Waited 10+ Minutes",
 }
 
 // =========================
@@ -217,7 +248,7 @@ const Objective = ({ title, children }: any) => (
 const formatCurrency = (val: number) =>
   `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false }: any) => {
+const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false, sourceUser }: any) => {
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -248,8 +279,8 @@ const getScoreStyle = () => {
       const { data: base } = await supabase
         .from('dashboard_okr_data')
         .select('*')
-        .eq('user_name', 'Alli')
-        .eq('key_result_title', label)
+        .eq('user_name', sourceUser || 'Alli')  
+        .ilike('key_result_title', `%${labelMap[label] || label}%`)
         .maybeSingle()
 
       if (!base) return
