@@ -663,7 +663,8 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-if (!rowExists && !isSaving) {
+// ONLY FORWARD if current month has NO target
+if (!hasValidTarget && !isSaving) {
   currentTarget = prevTarget
 
   if (
@@ -673,22 +674,17 @@ if (!rowExists && !isSaving) {
   ) {
     const reportingDate = currentDate
 
-    const payload: any = {
-      key_result_id: baseData[0].key_result_id,
-      reporting_month: reportingDate,
-      target_value: prevTarget,
-      value: 0
-          }
-
-    const { error } = await supabase
+    await supabase
       .from('key_result_updates')
-      .upsert(payload, {
-        onConflict: 'key_result_id,reporting_month',
-      })
-
-    if (error) {
-      console.log('FORWARD ERROR:', label, error)
-    }
+      .upsert(
+        {
+          key_result_id: baseData[0].key_result_id,
+          reporting_month: reportingDate,
+          target_value: prevTarget,
+          value: 0
+        },
+        { onConflict: 'key_result_id,reporting_month' }
+      )
 
     console.log('FORWARDED TARGET →', label, prevTarget, reportingDate)
   }
@@ -699,7 +695,7 @@ setLastMonth(
     ? prevVal !== ''
       ? String(
           Number(prevVal) <= 1
-            ? Number(prevVal) * 100 +"%"
+            ? Number(prevVal) * 100 + "%"
             : Number(prevVal)
         )
       : ''
@@ -719,9 +715,9 @@ setTarget(
       : String(currentTarget)
     : ''
 )
-  }
-  
-  loadData()
+loadData()
+}
+
 }, [label, selectedMonth])
 
 useEffect(() => {
