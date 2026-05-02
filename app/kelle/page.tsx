@@ -186,9 +186,19 @@ export default function Page() {
       </Objective>
 
       <Objective title="Objective 3: Bright Referral">
-        <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
-        <KeyResult label="Reception Rate (inquiry to booked) for Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
-      </Objective>
+  <KeyResult 
+    label="Bright Referral"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceKeyResultId="0dfdddda-c33d-45d8-ae93-69890b517d37"
+  />
+  <KeyResult 
+    label="Reception Rate (inquiry to booked) for Bright Referral"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceKeyResultId="8997f22b-95d1-49db-9085-16d0e3e49da2"
+  />
+</Objective>
 
       <Objective title="Objective 4: Understanding Referral Mix">
         <KeyResult label="Patient Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -198,12 +208,32 @@ export default function Page() {
         <KeyResult label="Community" selectedMonth={selectedMonth} isEditing={isEditing} />
       </Objective>
 
-      <Objective title="Objective 5: Office Efficiency">
-        <KeyResult label="Call Answer Rate" selectedMonth={selectedMonth} isEditing={isEditing} />
-        <KeyResult label="# of Missed Calls" selectedMonth={selectedMonth} isEditing={isEditing} />
-        <KeyResult label="# of patients waited 10+ minutes" selectedMonth={selectedMonth} isEditing={isEditing} />
-        <KeyResult label="# of tasks in Lead Sigma" selectedMonth={selectedMonth} isEditing={isEditing} />
-      </Objective>
+     <Objective title="Objective 5: Office Efficiency">
+  <KeyResult 
+    label="Call Answer Rate"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceKeyResultId="9380ff3b-c4b5-43b1-8fcd-f28968fdb2d6"
+  />
+  <KeyResult 
+    label="# of Missed Calls"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceKeyResultId="6fcecbf1-cf9c-4e12-aa58-f2d7c70bae50"
+  />
+  <KeyResult 
+    label="# of patients waited 10+ minutes"
+    selectedMonth={selectedMonth}
+    isEditing={false}
+    sourceKeyResultId="28e8fea2-1c52-49a5-9eb6-91c23a7c24a8"
+  />
+  <KeyResult 
+    label="# of tasks in Lead Sigma"
+    selectedMonth={selectedMonth}
+    isEditing={isEditing}
+    sourceKeyResultId="7b135619-57d6-4d3d-9cbd-2c91959365f7"
+  />
+</Objective>
     </>
   ) : (
     <>
@@ -270,9 +300,15 @@ const Objective = ({ title, children }: any) => (
 // KEY RESULT
 // =========================
 
-const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
+const KeyResult = ({ 
+  label, 
+  selectedMonth, 
+  isEditing,
+  sourceKeyResultId
+}: any) =>
 
   const KR_MAP: Record<string, string> = {
+
  "Patient Referral": "10354c03-f512-448e-9768-c67403aded87",
 "Dental Referrals": "d55a03a3-ba57-40fe-af0a-b269155e3133",
 "# of Dentists Referred": "dad83ca3-4fab-4b73-8e6a-db873ea0ca2a",
@@ -382,7 +418,7 @@ useEffect(() => {
     let base = null
 
     //  STEP 1 — try ID match
-    const mappedId = KR_MAP[label]
+   const mappedId = sourceKeyResultId || KR_MAP[label]
 
     if (mappedId) {
       const { data } = await supabase
