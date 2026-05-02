@@ -187,16 +187,18 @@ export default function Page() {
 
       <Objective title="Objective 3: Bright Referral">
   <KeyResult 
-    label="Bright Referral"
-    selectedMonth={selectedMonth}
-    isEditing={false}
-    sourceKeyResultId="0dfdddda-c33d-45d8-ae93-69890b517d37"
-  />
+  label="Bright Referral"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  sourceKeyResultId="0dfdddda-c33d-45d8-ae93-69890b517d37"
+  sourceLabel="Eric"
+/>
   <KeyResult 
     label="Reception Rate (inquiry to booked) for Bright Referral"
     selectedMonth={selectedMonth}
     isEditing={false}
     sourceKeyResultId="8997f22b-95d1-49db-9085-16d0e3e49da2"
+    sourceLabel="Eric"
   />
 </Objective>
 
@@ -214,24 +216,28 @@ export default function Page() {
     selectedMonth={selectedMonth}
     isEditing={false}
     sourceKeyResultId="9380ff3b-c4b5-43b1-8fcd-f28968fdb2d6"
+    sourceLabel="Ashley"
   />
   <KeyResult 
     label="# of Missed Calls"
     selectedMonth={selectedMonth}
     isEditing={false}
     sourceKeyResultId="6fcecbf1-cf9c-4e12-aa58-f2d7c70bae50"
+    sourceLabel="Ashley"
   />
   <KeyResult 
     label="# of patients waited 10+ minutes"
     selectedMonth={selectedMonth}
     isEditing={false}
     sourceKeyResultId="28e8fea2-1c52-49a5-9eb6-91c23a7c24a8"
+    sourceLabel="Mari"
   />
   <KeyResult 
     label="# of tasks in Lead Sigma"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
     sourceKeyResultId="7b135619-57d6-4d3d-9cbd-2c91959365f7"
+    sourceLabel="Ashley"
   />
 </Objective>
     </>
@@ -304,7 +310,8 @@ const KeyResult = ({
   label, 
   selectedMonth, 
   isEditing,
-  sourceKeyResultId
+  sourceKeyResultId,
+  sourceLabel
 }: any) => {
 
   const KR_MAP: Record<string, string> = {
@@ -605,7 +612,19 @@ if (finalTarget > 0) {
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
-        <span>{label}</span>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+  <span>{label}</span>
+
+  {sourceLabel && (
+    <span style={{
+      fontSize: 11,
+      color: '#6B7280',
+      fontStyle: 'italic'
+    }}>
+      Pulls from {sourceLabel}
+    </span>
+  )}
+</div>
 
         <input style={prevCell} value={lastMonth} readOnly />
         
