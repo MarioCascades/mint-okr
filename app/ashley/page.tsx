@@ -700,7 +700,9 @@ setTarget(
       : String(currentTarget)
     : ''
 )
-  }
+
+}
+
 loadData()
 
 
