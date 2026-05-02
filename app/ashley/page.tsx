@@ -611,8 +611,10 @@ const { data: currentData } = await supabase
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
+const rowExists = currentData !== null && currentData !== undefined
+
 const hasValidTarget =
-  currentData &&
+  rowExists &&
   currentData.target_value !== null &&
   currentData.target_value !== undefined
 
@@ -661,7 +663,7 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-if (!hasValidTarget) {
+if (!rowExists) {
   currentTarget = prevTarget
 
   if (
