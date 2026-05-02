@@ -441,6 +441,7 @@ const handleInitiativeSave = async (
 useEffect(() => {
 
   const fetchData = async () => {
+    if (!selectedMonth || !label) return
     setIsDirty(false)
 
 
@@ -599,7 +600,11 @@ const prevVal =
     ? Number(prevData.value)
     : 0
 
-setLastMonth(format(prevVal))
+const formattedPrev = format(prevVal)
+
+if (formattedPrev !== lastMonth) {
+  setLastMonth(formattedPrev)
+}
 
   let t = 0
 
@@ -617,8 +622,16 @@ if (currentData?.target_value && currentData.target_value !== 0) {
 
 const c = Number(currentData?.value ?? 0)
 
-    setTarget(format(t))
-    setValue(format(c))
+  const formattedTarget = format(t)
+const formattedValue = format(c)
+
+if (formattedTarget !== target) {
+  setTarget(formattedTarget)
+}
+
+if (formattedValue !== value) {
+  setValue(formattedValue)
+}
 
     const finalTarget = t
 
@@ -663,7 +676,11 @@ if (!numericTarget || numericTarget === 0) {
   }
 
   const percent = Math.round((numericValue / effectiveTarget) * 100)
-  setScore(percent + '%')
+ const newScore = percent + '%'
+
+if (newScore !== score) {
+  setScore(newScore)
+}
 
 }, [value, target, percentIntoPeriod, label])
   }
