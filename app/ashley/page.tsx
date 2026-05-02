@@ -656,13 +656,10 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-const shouldForward =
-  !currentData ||
-  currentData.target_value === null ||
-  currentData.target_value === undefined ||
-  Number(currentData.target_value) === 0
-
-if (shouldForward) {
+if (
+  currentData?.target_value === null ||
+  currentData?.target_value === undefined
+) {
   currentTarget = prevTarget
 
   if (
@@ -673,36 +670,24 @@ if (shouldForward) {
     const reportingDate = currentDate
 
     const payload: any = {
-  key_result_id: baseData[0].key_result_id,
-  reporting_month: reportingDate,
-}
+      key_result_id: baseData[0].key_result_id,
+      reporting_month: reportingDate,
+      target_value: prevTarget,
+      value: 0,
+    }
 
-// Only include target if valid
-if (prevTarget !== null && prevTarget !== undefined) {
-  payload.target_value = prevTarget
-}
+    const { error } = await supabase
+      .from('key_result_updates')
+      .upsert(payload, {
+        onConflict: 'key_result_id,reporting_month',
+      })
 
-// OPTIONAL: include value to satisfy constraints
-payload.value = 0
-
-const { error } = await supabase
-  .from('key_result_updates')
-  .upsert(payload, {
-    onConflict: 'key_result_id,reporting_month'
-  })
-
-if (error) {
-  console.log('FORWARD ERROR:', label, error)
-}
+    if (error) {
+      console.log('FORWARD ERROR:', label, error)
+    }
 
     console.log('FORWARDED TARGET →', label, prevTarget, reportingDate)
   }
-
-  setTarget(
-  prevTarget !== null && prevTarget !== undefined
-    ? String(prevTarget)
-    : ''
-)
 }
 
 setLastMonth(
