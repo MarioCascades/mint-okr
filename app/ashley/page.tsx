@@ -616,7 +616,8 @@ const rowExists = currentData !== null && currentData !== undefined
 const hasValidTarget =
   rowExists &&
   currentData.target_value !== null &&
-  currentData.target_value !== undefined
+  currentData.target_value !== undefined &&
+  Number(currentData.target_value) !== 0
 
 const currentValue =
   currentData &&
