@@ -305,7 +305,7 @@ const KeyResult = ({
   selectedMonth, 
   isEditing,
   sourceKeyResultId
-}: any) =>
+}: any) => {
 
   const KR_MAP: Record<string, string> = {
 
