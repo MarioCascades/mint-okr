@@ -570,7 +570,7 @@ const prevEnd = new Date(
 
 const { data: prevData } = await supabase
   .from('key_result_updates')
-  .select('value')
+  .select('value, target_value')
   .eq('key_result_id', base.key_result_id)
   .gte('reporting_month', prevStart.toISOString())
   .lt('reporting_month', prevEnd.toISOString())
@@ -584,7 +584,12 @@ const prevVal =
 
 setLastMonth(format(prevVal))
 
-    const t = Number(currentData?.target_value ?? base.target_value ?? 0)
+  const t = Number(
+  currentData?.target_value ??
+  prevData?.target_value ??
+  base.target_value ??
+  0
+)
 
     // =========================
     // CURRENT MONTH VALUE 
