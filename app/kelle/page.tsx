@@ -378,25 +378,34 @@ const handleSave = async () => {
 
   if (!keyResultId) return
 
+  // Prevent save if user didn't edit anything
+  if (!isDirty) return
+
   const y = selectedMonth.getFullYear()
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-   const cleanValue = parseFloat(String(value).replace('%', '')) || 0
+  const cleanValue = parseFloat(String(value).replace('%', '')) || 0
   const parsedTarget = parseFloat(String(target).replace('%', ''))
 
-const cleanTarget =
-  isNaN(parsedTarget) ? undefined : parsedTarget
+  const payload: any = {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: cleanValue,
+  }
 
-  await supabase.from('key_result_updates').upsert(
-    {
-      key_result_id: keyResultId,
-      reporting_month: reportingDate,
-      value: cleanValue,
-      ...(cleanTarget !== undefined && { target_value: cleanTarget }),
-    },
-    { onConflict: 'key_result_id,reporting_month' }
-  )
+  // Only include target if valid
+  if (!isNaN(parsedTarget)) {
+    payload.target_value = parsedTarget
+  }
+
+  await supabase
+    .from('key_result_updates')
+    .upsert(payload, {
+      onConflict: 'key_result_id,reporting_month'
+    })
+
+  setIsDirty(false)
 }
 const handleInitiativeSave = async (
   index: number,
