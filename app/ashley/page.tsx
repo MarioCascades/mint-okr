@@ -240,10 +240,11 @@ window.dispatchEvent(event)
 <Objective title="Objective 3: New Patient Process">
 
   <KeyResult
-    label="FD NP Scheduled (GF)"
-    selectedMonth={selectedMonth}
-    isEditing={isEditing}
-  />
+  label="FD NP Scheduled (GF)"
+  selectedMonth={selectedMonth}
+  isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
+/>
 
   <KeyResult
     label="FD NP Scheduled Next Month"
@@ -474,7 +475,12 @@ const Objective = ({ title, children }: any) => (
 
 
 
-const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
+const KeyResult: React.FC<any> = ({ 
+  label, 
+  selectedMonth, 
+  isEditing,
+  percentIntoPeriod
+}) => {
 
   const sourceUserMap: Record<string, string> = {
     "# of Patients Waited 10+ Minutes": "Mari",
@@ -715,6 +721,16 @@ useEffect(() => {
   const numericValue = Number(value)
   const numericTarget = Number(target)
 
+  // =========================
+// TIME-BOUND DETECTION
+// =========================
+
+const isNPScheduled =
+  label === "FD NP Scheduled (GF)"
+
+  const percentIntoPeriodNum =
+  parseFloat(percentIntoPeriod.replace('%', '')) / 100 || 0
+
   if (direction === 'none') {
     setScore('—')
     return
@@ -725,7 +741,13 @@ useEffect(() => {
     return
   }
 
-  let percent = 0
+let percent = 0
+
+let effectiveTarget = numericTarget
+
+if (isNPScheduled && percentIntoPeriodNum > 0) {
+  effectiveTarget = numericTarget * percentIntoPeriodNum
+}
 
  if (percentageMetrics.includes(label)) {
   setScore(value ? value + '%' : '—')
@@ -733,16 +755,17 @@ useEffect(() => {
 }
 
 if (direction === 'increase') {
-  percent = Math.round((numericValue / numericTarget) * 100)
+  percent = Math.round((numericValue / effectiveTarget) * 100)
+
 } else {
-  percent = numericValue === 0
-    ? 100
-    : Math.round((numericTarget / numericValue) * 100)
+percent = numericValue === 0
+  ? 100
+  : Math.round((effectiveTarget / numericValue) * 100)
 }
 
 setScore(percent + '%')
 
-}, [value, target, label])
+}, [value, target, label, percentIntoPeriod])
 
 
   useEffect(() => {
