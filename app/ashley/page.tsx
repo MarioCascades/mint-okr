@@ -663,33 +663,18 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-// ONLY FORWARD if current month has NO target
-if (!hasValidTarget && !isSaving) {
+// FINAL TARGET LOGIC (READ ONLY — NO WRITES)
+if (
+  currentData?.target_value !== null &&
+  currentData?.target_value !== undefined
+) {
+  currentTarget = currentData.target_value
+} else if (
+  prevTarget !== null &&
+  prevTarget !== undefined
+) {
   currentTarget = prevTarget
-
-  if (
-    prevTarget !== null &&
-    prevTarget !== undefined &&
-    baseData[0]?.key_result_id
-  ) {
-    const reportingDate = currentDate
-
-    await supabase
-      .from('key_result_updates')
-      .upsert(
-        {
-          key_result_id: baseData[0].key_result_id,
-          reporting_month: reportingDate,
-          target_value: prevTarget,
-          value: 0
-        },
-        { onConflict: 'key_result_id,reporting_month' }
-      )
-
-    console.log('FORWARDED TARGET →', label, prevTarget, reportingDate)
-  }
 }
-
 setLastMonth(
   percentageMetrics.includes(label)
     ? prevVal !== ''
