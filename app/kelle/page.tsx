@@ -422,10 +422,19 @@ useEffect(() => {
   const fetchData = async () => {
     setIsDirty(false)
 
+
+    
     let base = null
+
+    
 
     //  STEP 1 — try ID match
    const mappedId = sourceKeyResultId || KR_MAP[label]
+
+   // ALWAYS set keyResultId so saving works even if dashboard view is empty
+if (mappedId) {
+  setKeyResultId(mappedId)
+}
 
     if (mappedId) {
       const { data } = await supabase
@@ -449,13 +458,16 @@ const { data: baseData } = await supabase
   .eq('key_result_id', mappedId)
   .maybeSingle()
 
-if (!baseData) return
+if (!baseData) {
+  base = { key_result_id: mappedId, target_value: 0 }
+} else {
+  base = baseData
+}
 
 base = baseData
 
     if (!base) return
 
-    setKeyResultId(base.key_result_id)
     const initiativeDate = `${selectedMonth.getFullYear()}-${String(
   selectedMonth.getMonth() + 1
 ).padStart(2, '0')}-01`
@@ -606,7 +618,7 @@ if (finalTarget > 0) {
 
   fetchData()
 
-}, [label, selectedMonth])
+}, [label, selectedMonth, sourceKeyResultId])
 
 
   return (
