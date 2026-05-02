@@ -794,7 +794,11 @@ if (!finalId) {
 }
 // ALWAYS allow saving if target exists
 if (!keyResultId) return
- const monthToUse = monthOverride || selectedMonth
+ const monthToUse = monthOverride
+  ? new Date(monthOverride)
+  : new Date(selectedMonth)
+
+  console.log('USING MONTH:', monthToUse)
 
 const reportingDate = `${monthToUse.getFullYear()}-${String(
   monthToUse.getMonth() + 1
