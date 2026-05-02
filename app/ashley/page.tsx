@@ -669,16 +669,28 @@ if (!hasRow) {
   ) {
     const reportingDate = currentDate
 
-    await supabase
-      .from('key_result_updates')
-      .upsert(
-        {
-          key_result_id: baseData[0].key_result_id,
-          reporting_month: reportingDate,
-          target_value: prevTarget,
-        },
-        { onConflict: 'key_result_id,reporting_month' }
-      )
+    const payload: any = {
+  key_result_id: baseData[0].key_result_id,
+  reporting_month: reportingDate,
+}
+
+// Only include target if valid
+if (prevTarget !== null && prevTarget !== undefined) {
+  payload.target_value = prevTarget
+}
+
+// OPTIONAL: include value to satisfy constraints
+payload.value = 0
+
+const { error } = await supabase
+  .from('key_result_updates')
+  .upsert(payload, {
+    onConflict: 'key_result_id,reporting_month'
+  })
+
+if (error) {
+  console.log('FORWARD ERROR:', label, error)
+}
 
     console.log('FORWARDED TARGET →', label, prevTarget, reportingDate)
   }
