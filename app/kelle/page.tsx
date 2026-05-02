@@ -174,10 +174,12 @@ export default function Page() {
       {/* NEW OKRs (APRIL+) */}
       {/* ========================= */}
 
-     <Objective title="Objective 1: New Patient Process">
-  <KeyResult label="NP Scheduled (GF) include consult inquiries" selectedMonth={selectedMonth} isEditing={isEditing} />
-  <KeyResult label="NP Incomplete Appointment" selectedMonth={selectedMonth} isEditing={isEditing} />
-</Objective>
+    <Objective title="Objective 1: New Patient Process">
+  <KeyResult label="NP Scheduled (GF)" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="NP Scheduled Next Month" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="NP NSC" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="New Patients Missing Information (EOD NP Prep)" selectedMonth={selectedMonth} isEditing={isEditing} />
+ </Objective>
       <Objective title="Objective 2: DM Engage">
         <KeyResult label="DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
         <KeyResult label="Reception Rate (inquiry to booked) for DM Engage" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -282,7 +284,10 @@ const KeyResult = ({ label, selectedMonth, isEditing }: any) => {
   "Bright Referral": "f73bb83b-a651-4788-96ee-c8b82aeb4ff4",
   "Reception Rate (inquiry to booked) for Bright Referral": "e7e5deb0-5ddf-482b-a50d-18e20476946c",
 
-  "NP Scheduled (GF) include consult inquiries": "cd8194e4-f8cf-479c-91a9-fb013aa4cc9a",
+"NP Scheduled (GF)": "cd8194e4-f8cf-479c-91a9-fb013aa4cc9a",
+"NP Scheduled Next Month": "1a7f597e-ccab-4f95-91bb-e899d24bfaae",
+"NP NSC": "9c4fb95d-0c07-45b9-be85-495760efed8d",
+"New Patients Missing Information (EOD NP Prep)": "a6ddf32f-949c-45fd-9826-497c66e3e955",
   "NP Incomplete Appointment": "e215ac1d-f173-4d58-9286-444dcb3eeeae",
 
   "Call Answer Rate": "4902ee9f-d948-474f-9437-14a0d8976902",
