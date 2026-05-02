@@ -497,7 +497,7 @@ const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
   '',
   ''
 ])
-
+const [isSaving, setIsSaving] = useState(false)
 
   const rowRef = useRef<HTMLDivElement | null>(null)
 
@@ -663,7 +663,7 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-if (!rowExists) {
+if (!rowExists && !isSaving) {
   currentTarget = prevTarget
 
   if (
@@ -785,7 +785,8 @@ console.log('GLOBAL SAVE USING ID:', keyResultId, 'LABEL:', label)
 }, [keyResultId, value, target, selectedMonth])
 
 const handleSave = async (monthOverride?: Date, passedId?: string | null) => {
-  
+
+setIsSaving(true)  
 console.log('HANDLE SAVE FIRED:', label, value, target, passedId, keyResultId)
   const finalId = passedId || keyResultId
   console.log('FINAL ID USED:', finalId)
@@ -844,6 +845,9 @@ const { data, error } = await supabase
   .select()
 
 console.log('SAVE RESULT:', { data, error, value, target, keyResultId, reportingDate })
+setTimeout(() => {
+  setIsSaving(false)
+}, 500)
 }
 const handleInitiativeSave = async (
   index: number,
