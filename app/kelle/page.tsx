@@ -623,13 +623,25 @@ const c = Number(currentData?.value ?? 0)
     const finalTarget = t
 
 useEffect(() => {
-  const numericValue = Number(String(value).replace('%', ''))
-  const numericTarget = Number(String(target).replace('%', ''))
+  const numericValueRaw = String(value).replace('%', '')
+  const numericValue = numericValueRaw === '' ? 0 : Number(numericValueRaw)
+  const numericTargetRaw = String(target).replace('%', '')
+  const numericTarget = numericTargetRaw === '' ? 0 : Number(numericTargetRaw)
 
-  if (!numericTarget || numericTarget === 0) {
-    setScore('—')
-    return
-  }
+  console.log('SCORE DEBUG:', {
+  label,
+  value,
+  target,
+  numericValue,
+  numericTarget,
+  percentIntoPeriod
+})
+
+if (!numericTarget || numericTarget === 0) {
+  // fallback: show 0% instead of blank
+  setScore(value ? '0%' : '—')
+  return
+}
 
   // =========================
   // TIME-BOUND LOGIC
