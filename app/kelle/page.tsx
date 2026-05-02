@@ -384,8 +384,8 @@ const handleSave = async () => {
 
   if (!keyResultId) return
 
-  // Prevent save if user didn't edit anything
-  if (!isDirty) return
+// TEMP FIX — always allow save
+// if (!isDirty) return
 
   const y = selectedMonth.getFullYear()
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
@@ -622,37 +622,43 @@ const c = Number(currentData?.value ?? 0)
 
     const finalTarget = t
 
-// =========================
-// TIME-BOUND SCORING (NP Scheduled only)
-// =========================
+useEffect(() => {
+  const numericValue = Number(String(value).replace('%', ''))
+  const numericTarget = Number(String(target).replace('%', ''))
 
-const timeBoundLabels = [
-  "NP Scheduled (GF)"
-]
+  if (!numericTarget || numericTarget === 0) {
+    setScore('—')
+    return
+  }
 
-const isTimeBound = timeBoundLabels.includes(label)
+  // =========================
+  // TIME-BOUND LOGIC
+  // =========================
 
-// convert "45%" → 45 → 0.45
-const percentIntoPeriodNum =
-  parseFloat(String(percentIntoPeriod).replace('%', '')) / 100
+  const timeBoundLabels = [
+    "NP Scheduled (GF)"
+  ]
 
-let effectiveTarget = finalTarget
+  const isTimeBound = timeBoundLabels.includes(label)
 
-if (isTimeBound && percentIntoPeriodNum > 0) {
-  effectiveTarget = finalTarget * percentIntoPeriodNum
-}
+  const percentIntoPeriodNum =
+    parseFloat(String(percentIntoPeriod).replace('%', '')) / 100
 
-if (effectiveTarget > 0) {
-  const percent = Math.round((c / effectiveTarget) * 100)
+  let effectiveTarget = numericTarget
+
+  if (isTimeBound && percentIntoPeriodNum > 0) {
+    effectiveTarget = numericTarget * percentIntoPeriodNum
+  }
+
+  const percent = Math.round((numericValue / effectiveTarget) * 100)
   setScore(percent + '%')
-} else {
-  setScore('—')
-}
+
+}, [value, target, percentIntoPeriod, label])
   }
 
   fetchData()
 
-}, [label, selectedMonth, sourceKeyResultId])
+}, [label, selectedMonth, sourceKeyResultId, percentIntoPeriod])
 
 
   return (
@@ -689,7 +695,10 @@ if (effectiveTarget > 0) {
             style={currentCell}
             value={value}
             readOnly={!isEditing}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => {
+  setValue(e.target.value)
+  setIsDirty(true)
+}}
             onBlur={handleSave}
 />
 
