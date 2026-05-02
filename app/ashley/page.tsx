@@ -187,24 +187,28 @@ window.dispatchEvent(event)
     label="FD Call Answer Rate"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
   <KeyResult
     label="FD # of Missed Calls"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
   <KeyResult
     label="# of Patients Waited 10+ Minutes"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
   <KeyResult
     label="FD # of tasks in Lead Sigma"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
 </Objective>
@@ -215,24 +219,28 @@ window.dispatchEvent(event)
   label="FD Referring Offices"
   selectedMonth={selectedMonth}
   isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
 />
 
 <KeyResult
   label="FD Bright Referral Users"
   selectedMonth={selectedMonth}
   isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
 />
 
 <KeyResult
   label="FD Bright Referral Inquiries"
   selectedMonth={selectedMonth}
   isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
 />
 
 <KeyResult
   label="FD Bright Referral Reception Rate"
   selectedMonth={selectedMonth}
   isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
 />
 
 </Objective>
@@ -250,18 +258,21 @@ window.dispatchEvent(event)
     label="FD NP Scheduled Next Month"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
   <KeyResult
     label="FD NP NSC"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
   <KeyResult
     label="FD New Patients Missing Information (EOD NP Prep)"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
 </Objective>
@@ -272,12 +283,14 @@ window.dispatchEvent(event)
     label="Retain Invited"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
   <KeyResult
     label="Retain Subscribed"
     selectedMonth={selectedMonth}
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 
 </Objective>
@@ -292,24 +305,28 @@ window.dispatchEvent(event)
         label="FD Patient Referral"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
       <KeyResult
         label="FD Dental Referrals"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
       <KeyResult
         label="FD # of Dentists Referred"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
       <KeyResult
         label="FD Digital Marketing"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
     </Objective>
@@ -321,18 +338,21 @@ window.dispatchEvent(event)
         label="FD DM Engage"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
       <KeyResult
         label="FD Reception Rate DM Engage"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
       <KeyResult
         label="FD Bright Referral"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
     </Objective>
@@ -344,12 +364,14 @@ window.dispatchEvent(event)
         label="FD NP Scheduled (GF)"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
       <KeyResult
         label="FD NP Incomplete Appointment"
         selectedMonth={selectedMonth}
         isEditing={isEditing}
+        percentIntoPeriod={percentIntoPeriod}
       />
 
     </Objective>
