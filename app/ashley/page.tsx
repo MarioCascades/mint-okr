@@ -613,8 +613,7 @@ const { data: currentData } = await supabase
 
 const isEmptyRow =
   currentData?.target_value === null ||
-  currentData?.target_value === undefined ||
-  Number(currentData?.target_value) === 0
+  currentData?.target_value === undefined
 
 const currentValue =
   currentData && !isEmptyRow && currentData.value !== null && currentData.value !== undefined
