@@ -673,7 +673,7 @@ if (
       key_result_id: baseData[0].key_result_id,
       reporting_month: reportingDate,
       target_value: prevTarget,
-      value: 0,
+      
     }
 
     const { error } = await supabase
