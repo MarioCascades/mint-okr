@@ -175,7 +175,12 @@ export default function Page() {
       {/* ========================= */}
 
     <Objective title="Objective 1: New Patient Process">
-  <KeyResult label="NP Scheduled (GF)" selectedMonth={selectedMonth} isEditing={isEditing} />
+ <KeyResult 
+  label="NP Scheduled (GF)" 
+  selectedMonth={selectedMonth} 
+  isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
+/>
   <KeyResult label="NP Scheduled Next Month" selectedMonth={selectedMonth} isEditing={isEditing} />
   <KeyResult label="NP NSC" selectedMonth={selectedMonth} isEditing={isEditing} />
   <KeyResult label="New Patients Missing Information (EOD NP Prep)" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -311,7 +316,8 @@ const KeyResult = ({
   selectedMonth, 
   isEditing,
   sourceKeyResultId,
-  sourceLabel
+  sourceLabel,
+  percentIntoPeriod
 }: any) => {
 
   const KR_MAP: Record<string, string> = {
@@ -616,8 +622,28 @@ const c = Number(currentData?.value ?? 0)
 
     const finalTarget = t
 
-if (finalTarget > 0) {
-  const percent = Math.round((c / finalTarget) * 100)
+// =========================
+// TIME-BOUND SCORING (NP Scheduled only)
+// =========================
+
+const timeBoundLabels = [
+  "NP Scheduled (GF)"
+]
+
+const isTimeBound = timeBoundLabels.includes(label)
+
+// convert "45%" → 45 → 0.45
+const percentIntoPeriodNum =
+  parseFloat(String(percentIntoPeriod).replace('%', '')) / 100
+
+let effectiveTarget = finalTarget
+
+if (isTimeBound && percentIntoPeriodNum > 0) {
+  effectiveTarget = finalTarget * percentIntoPeriodNum
+}
+
+if (effectiveTarget > 0) {
+  const percent = Math.round((c / effectiveTarget) * 100)
   setScore(percent + '%')
 } else {
   setScore('—')
