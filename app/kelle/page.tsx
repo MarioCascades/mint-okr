@@ -635,35 +635,28 @@ if (formattedValue !== value) {
 
     const finalTarget = t
 
-useEffect(() => {
-  const numericValueRaw = String(value).replace('%', '')
-  const numericValue = numericValueRaw === '' ? 0 : Number(numericValueRaw)
-  const numericTargetRaw = String(target).replace('%', '')
-  const numericTarget = numericTargetRaw === '' ? 0 : Number(numericTargetRaw)
 
-  console.log('SCORE DEBUG:', {
-  label,
-  value,
-  target,
-  numericValue,
-  numericTarget,
-  percentIntoPeriod
-})
 
-if (!numericTarget || numericTarget === 0) {
-  // fallback: show 0% instead of blank
-  setScore(value ? '0%' : '—')
-  return
 }
 
-  // =========================
-  // TIME-BOUND LOGIC
-  // =========================
+  fetchData()
 
-  const timeBoundLabels = [
-    "NP Scheduled (GF)"
-  ]
+}, [label, selectedMonth, sourceKeyResultId])
 
+// =========================
+// SCORE CALCULATION (SAFE)
+// =========================
+
+useEffect(() => {
+  const numericValue = Number(String(value).replace('%', '')) || 0
+  const numericTarget = Number(String(target).replace('%', '')) || 0
+
+  if (!numericTarget) {
+    setScore(value ? '0%' : '—')
+    return
+  }
+
+  const timeBoundLabels = ["NP Scheduled (GF)"]
   const isTimeBound = timeBoundLabels.includes(label)
 
   const percentIntoPeriodNum =
@@ -676,19 +669,13 @@ if (!numericTarget || numericTarget === 0) {
   }
 
   const percent = Math.round((numericValue / effectiveTarget) * 100)
- const newScore = percent + '%'
+  const newScore = percent + '%'
 
-if (newScore !== score) {
-  setScore(newScore)
-}
-
-}, [value, target, percentIntoPeriod, label])
+  if (newScore !== score) {
+    setScore(newScore)
   }
 
-  fetchData()
-
-}, [label, selectedMonth, sourceKeyResultId, percentIntoPeriod])
-
+}, [value, target, percentIntoPeriod, label])
 
   return (
     <div style={{ marginBottom: 10 }}>
