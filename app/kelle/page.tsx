@@ -374,7 +374,7 @@ const isPercent = percentLabels.includes(label)
   return num >= 100 ? '#22c55e' : '#c2410c'
 }
 
-  const handleSave = async () => {
+const handleSave = async () => {
 
   if (!keyResultId) return
 
@@ -382,12 +382,15 @@ const isPercent = percentLabels.includes(label)
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
+   const cleanValue = parseFloat(String(value).replace('%', '')) || 0
+  const cleanTarget = parseFloat(String(target).replace('%', '')) || 0
+
   await supabase.from('key_result_updates').upsert(
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
-      value: Number(value),
-      target_value: Number(target),
+      value: cleanValue,
+      target_value: cleanTarget,
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
