@@ -555,7 +555,7 @@ console.log('NEXT MONTH:', nextMonth.toISOString())
 
 const { data: currentData } = await supabase
   .from('key_result_updates')
-  .select('value')
+  .select('value, target_value')
   .eq('key_result_id', base.key_result_id)
   .gte('reporting_month', currentStart.toISOString())
   .lt('reporting_month', nextMonth.toISOString())
@@ -584,17 +584,7 @@ const prevVal =
 
 setLastMonth(format(prevVal))
 
-    let t = Number(base.target_value ?? 0)
-
-    if (!t || t === 0) {
-      const { data: kr } = await supabase
-        .from('key_results')
-        .select('target_value')
-        .eq('id', base.key_result_id)
-        .maybeSingle()
-
-      t = Number(kr?.target_value ?? 0)
-    }
+    const t = Number(currentData?.target_value ?? base.target_value ?? 0)
 
     // =========================
     // CURRENT MONTH VALUE 
@@ -606,7 +596,7 @@ setLastMonth(format(prevVal))
 
 const c = Number(currentData?.value ?? 0)
 
-        setTarget(format(t))
+    setTarget(format(t))
     setValue(format(c))
 
     const finalTarget = t
