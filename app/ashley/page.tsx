@@ -476,6 +476,16 @@ const Objective = ({ title, children }: any) => (
 
 const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
 
+  const sourceUserMap: Record<string, string> = {
+    "# of Patients Waited 10+ Minutes": "Mari",
+
+    "FD NP Scheduled (GF)": "Kelle",
+    "FD NP Scheduled Next Month": "Kelle",
+    "FD NP NSC": "Kelle",
+  }
+
+  const sourceUser = sourceUserMap[label] || 'Ashley'
+
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
   const [target, setTarget] = useState('')
@@ -501,7 +511,7 @@ const KeyResult: React.FC<any> = ({ label, selectedMonth, isEditing }) => {
     const { data: baseData } = await supabase
   .from('dashboard_okr_data')
   .select('*')
-  .eq('user_name', 'Ashley')
+  .eq('user_name', sourceUser)
   .eq('key_result_title', queryLabelMap[label] || label)
   .limit(1)
 
@@ -851,7 +861,19 @@ const handleInitiativeSave = async (
   rowRef.current = el
 }}
 >
-       <span>{displayLabelMap[label] || label}</span>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+  <span>{displayLabelMap[label] || label}</span>
+
+  {sourceUser !== 'Ashley' && (
+    <span style={{
+      fontSize: 11,
+      color: '#6B7280',
+      fontStyle: 'italic'
+    }}>
+      Pulls from {sourceUser}
+    </span>
+  )}
+</div>
 
         <input style={prevCell} value={lastMonth} readOnly />
 
