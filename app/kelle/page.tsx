@@ -479,7 +479,6 @@ if (!baseData) {
   base = baseData
 }
 
-base = baseData
 
     if (!base) return
 
@@ -596,20 +595,19 @@ const prevVal =
 
 setLastMonth(format(prevVal))
 
-  const t = Number(
-  currentData?.target_value ??
-  prevData?.target_value ??
-  base.target_value ??
-  0
-)
+  let t = 0
+
+if (currentData?.target_value && currentData.target_value !== 0) {
+  t = Number(currentData.target_value)
+} else if (prevData?.target_value) {
+  t = Number(prevData.target_value)
+} else {
+  t = Number(base.target_value ?? 0)
+}
 
     // =========================
     // CURRENT MONTH VALUE 
     // =========================
-
-
-
-
 
 const c = Number(currentData?.value ?? 0)
 
