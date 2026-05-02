@@ -715,8 +715,9 @@ setTarget(
       : String(currentTarget)
     : ''
 )
+  }
 loadData()
-}
+
 
 }, [label, selectedMonth])
 
