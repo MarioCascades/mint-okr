@@ -383,14 +383,17 @@ const handleSave = async () => {
   const reportingDate = `${y}-${m}-01`
 
    const cleanValue = parseFloat(String(value).replace('%', '')) || 0
-  const cleanTarget = parseFloat(String(target).replace('%', '')) || 0
+  const parsedTarget = parseFloat(String(target).replace('%', ''))
+
+const cleanTarget =
+  isNaN(parsedTarget) ? undefined : parsedTarget
 
   await supabase.from('key_result_updates').upsert(
     {
       key_result_id: keyResultId,
       reporting_month: reportingDate,
       value: cleanValue,
-      target_value: cleanTarget,
+      ...(cleanTarget !== undefined && { target_value: cleanTarget }),
     },
     { onConflict: 'key_result_id,reporting_month' }
   )
