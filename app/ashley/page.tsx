@@ -612,7 +612,9 @@ const { data: currentData } = await supabase
   .maybeSingle()
 
 const isEmptyRow =
-  currentData?.target_value === null || currentData?.target_value === undefined
+  currentData?.target_value === null ||
+  currentData?.target_value === undefined ||
+  Number(currentData?.target_value) === 0
 
 const currentValue =
   currentData && !isEmptyRow && currentData.value !== null && currentData.value !== undefined
@@ -655,7 +657,7 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-const hasRow = !!currentData
+const hasRow = currentData && !isEmptyRow
 
 if (!hasRow) {
   currentTarget = prevTarget
