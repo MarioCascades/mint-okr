@@ -657,9 +657,13 @@ const prevIsEmpty =
 
 const prevVal = prevIsEmpty ? '' : prevRow?.value
 
-const hasRow = currentData && !isEmptyRow
+const shouldForward =
+  !currentData ||
+  currentData.target_value === null ||
+  currentData.target_value === undefined ||
+  Number(currentData.target_value) === 0
 
-if (!hasRow) {
+if (shouldForward) {
   currentTarget = prevTarget
 
   if (
@@ -694,6 +698,12 @@ if (error) {
 
     console.log('FORWARDED TARGET →', label, prevTarget, reportingDate)
   }
+
+  setTarget(
+  prevTarget !== null && prevTarget !== undefined
+    ? String(prevTarget)
+    : ''
+)
 }
 
 setLastMonth(
