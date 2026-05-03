@@ -40,6 +40,19 @@ const computedLabels = [
   "Total Whitening Kits"
 ]
 
+const timeBoundSet = new Set([
+  'Collections from Starts',
+  'Kept New Patients',
+  'Scheduled New Patients',
+  'Starts @ Home',
+  'Total Production',
+  'Total Production (Individual)',
+  'Total Starts',
+  'Total Starts (Individual)',
+  'Total Whitening Kits',
+  'Whitening Kits'
+])
+
 // =========================
 // PAGE
 // =========================
@@ -60,7 +73,7 @@ export default function Page() {
   })
 
   const [lastUpdated, setLastUpdated] = useState('')
-  const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+  const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   
 
@@ -79,7 +92,7 @@ export default function Page() {
       percent = 100
     }
 
-    setPercentIntoPeriod(Math.round(percent) + '%')
+    setPercentIntoPeriod(percent)
   }, [selectedMonth])
 
   useEffect(() => {
@@ -143,7 +156,7 @@ export default function Page() {
       <label style={label}>% Into Period</label>
       <input
         style={inputSmall}
-        value={percentIntoPeriod}
+        value={(percentIntoPeriod || 0).toFixed(2) + '%'}
         readOnly
       />
     </div>
@@ -202,30 +215,32 @@ export default function Page() {
 
         {/* OBJECTIVE 1 */}
         <Objective title="Objective 1: Patient Starts">
-          <KeyResult label="Starts @ Home" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Starts @ Home" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
           <KeyResult 
   label="Total Starts (Individual)" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
  derivedTarget={undefined}
   setParentValue={setHeatherStarts}
+  percentIntoPeriod={percentIntoPeriod}
 />
-          <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
           <KeyResult 
   label="Total Production (Individual)" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
 derivedTarget={undefined}
-  setParentValue={setHeatherProduction}
+  setParentValue={setHeatherProduction} 
+  percentIntoPeriod={percentIntoPeriod}
 />
-          <KeyResult label="Collections from Starts" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Collections from Starts" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
         </Objective>
 
         {/* OBJECTIVE 2 */}
         <Objective title="Objective 2: New Patient Conversion">
-          <KeyResult label="Scheduled New Patients" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="Kept New Patients" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="Conversion Rate" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Scheduled New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
+          <KeyResult label="Kept New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
+          <KeyResult label="Conversion Rate" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
         </Objective>
 
         {/* OBJECTIVE 3 */}
@@ -234,7 +249,8 @@ derivedTarget={undefined}
   label="Whitening Kits" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
-  setParentValue={setHeatherWhitening}
+  setParentValue={setHeatherWhitening} 
+  percentIntoPeriod={percentIntoPeriod}
 />
         </Objective>
 
@@ -245,12 +261,14 @@ derivedTarget={undefined}
   label="Total Starts"
   selectedMonth={selectedMonth}
   isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
 />
 
           <KeyResult
   label="Total Production"
   selectedMonth={selectedMonth}
-  isEditing={isEditing}
+  isEditing={isEditing} 
+  percentIntoPeriod={percentIntoPeriod}
 />
           
         </Objective>
@@ -261,6 +279,7 @@ derivedTarget={undefined}
     label="Total Whitening Kits" 
     selectedMonth={selectedMonth} 
     isEditing={isEditing}
+    percentIntoPeriod={percentIntoPeriod}
   />
 </Objective>
   
@@ -295,10 +314,18 @@ const Objective = ({ title, children }: any) => (
 // KEY RESULT (FULL LOGIC)
 // =========================
 
+const KeyResult = ({ 
+  label, 
+  selectedMonth, 
+  isEditing, 
+  percentIntoPeriod,
+  target, 
+  setTarget, 
+  derivedTarget, 
+  setParentValue, 
+  forcedValue 
+}: any) => {
 
-
-
-const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derivedTarget, setParentValue, forcedValue }: any) => {
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -611,14 +638,23 @@ if (
 setValue(total.toString())
 
 // =========================
-// SCORE CALCULATION (ADD THIS)
+// SCORE CALCULATION
 // =========================
 const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (t <= 0) {
+let effectiveTarget = t
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = t * (adjustedPercent / 100)
+}
+
+if (effectiveTarget <= 0) {
   setScore('0%')
 } else {
-  setScore(Math.round((total / t) * 100) + '%')
+  setScore(Math.round((total / effectiveTarget) * 100) + '%')
 }
 
 // =========================
@@ -688,17 +724,47 @@ return
 const c = Number(currentValue || 0)
 const t = Number(resolvedTarget ?? kr?.target_value ?? 0)
 
-if (t === 0) {
+let effectiveTarget = t
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = t * (adjustedPercent / 100)
+}
+
+if (effectiveTarget <= 0) {
   setScore('0%')
 } else {
-  const percent = Math.round((c / t) * 100)
+  const percent = Math.round((c / effectiveTarget) * 100)
   setScore(percent + '%')
 }
     }
 
     fetchData()
 
-  }, [label, selectedMonth])
+}, [label, selectedMonth, percentIntoPeriod])
+
+  useEffect(() => {
+  const numericVal = Number(value || 0)
+  const numericTarget = Number(localTarget || 0)
+
+  let effectiveTarget = numericTarget
+
+  const isTimeBound = timeBoundSet.has(label)
+
+  if (isTimeBound && percentIntoPeriod > 0) {
+    const adjustedPercent = Math.max(percentIntoPeriod, 25)
+    effectiveTarget = numericTarget * (adjustedPercent / 100)
+  }
+
+  if (effectiveTarget > 0) {
+    const percent = Math.round((numericVal / effectiveTarget) * 100)
+    setScore(percent + '%')
+  } else {
+    setScore('0%')
+  }
+}, [value, localTarget, percentIntoPeriod])
 
   const handleSave = async () => {
 
@@ -817,9 +883,28 @@ onChange={(e) => {
 
   setLocalTarget(val)
   setIsDirty(true)
+  const numericVal = Number(value || 0)
+const numericTarget = Number(val || 0)
+
+let effectiveTarget = numericTarget
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = numericTarget * (adjustedPercent / 100)
+}
+
+if (effectiveTarget > 0) {
+  const percent = Math.round((numericVal / effectiveTarget) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('0%')
+}
 }}
 onBlur={handleSave}
 onKeyDown={handleEnter}
+
 />
 
         <input
@@ -856,6 +941,25 @@ setIsDirty(true)
   if (setParentValue) {
     setParentValue(Number(val))
   }
+
+  const numericVal = Number(val || 0)
+const numericTarget = Number(localTarget || 0)
+
+let effectiveTarget = numericTarget
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = numericTarget * (adjustedPercent / 100)
+}
+
+if (effectiveTarget > 0) {
+  const percent = Math.round((numericVal / effectiveTarget) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('0%')
+}
 }}
           onBlur={handleSave}
           onKeyDown={handleEnter}
