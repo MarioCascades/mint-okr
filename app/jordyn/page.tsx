@@ -32,6 +32,18 @@ const computedLabels = [
   "Total Production",
   "Total Whitening Kits"
 ]
+const timeBoundSet = new Set([
+  'Collections from Starts',
+  'Kept New Patients',
+  'Scheduled New Patients',
+  'Starts @ Home',
+  'Total Production',
+  'Total Production (Individual)',
+  'Total Starts',
+  'Total Starts (Individual)',
+  'Total Whitening Kits',
+  'Whitening Kits'
+])
 
 // =========================
 // PAGE
@@ -515,7 +527,10 @@ setLocalTarget(
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
-      const currentValue = current?.value ?? ''
+      const currentValue =
+  current?.value !== null && current?.value !== undefined
+    ? current.value
+    : null
         
 // =========================
 // PREVIOUS MONTH (NORMAL KRs)
@@ -590,28 +605,13 @@ if (
 
   const total = jordyn + partner
 
-
   setValue(total.toString())
 
-  const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
- 
-const timeBoundLabels = [
-  'NP Scheduled',
-  'Collections from Starts',
-  'Kept New Patients',
-  'Scheduled New Patients',
-  'Starts @ Home',
-  'Total Production',
-  'Total Production (Individual)',
-  'Total Starts',
-  'Total Starts (Individual)',
-  'Total Whitening Kits',
-  'Whitening Kits'
-]
-
-const isTimeBound = timeBoundLabels.includes(label)
+const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
 
 let effectiveTarget = t
+
+const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
   const adjustedPercent = Math.max(percentIntoPeriod, 25)
@@ -680,37 +680,36 @@ if (effectiveTarget <= 0) {
 
 }
 if (!isDirty) {
+  setValue(currentValue ? String(currentValue) : '')
+}
+
  if (!isDirty) {
   setValue(currentValue ? String(currentValue) : '')
 }
 
-  if (setParentValue && currentValue !== undefined) {
-    setParentValue(Number(currentValue))
-  }
+if (setParentValue && currentValue !== undefined) {
+  setParentValue(Number(currentValue))
 }
 
+// =========================
+// SCORE CALC (INSIDE fetchData)
+// =========================
 
-const effectiveValue = isDirty ? value : currentValue
-const c = Number(effectiveValue || 0)
+let c = 0
+
+if (isDirty) {
+  c = Number(value || 0)
+} else if (currentValue !== null) {
+  c = Number(currentValue)
+}
+
 const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
 
 let effectiveTarget = t
 
-if (
-  [
-    'NP Scheduled',
-    'Collections from Starts',
-    'Kept New Patients',
-    'Scheduled New Patients',
-    'Starts @ Home',
-    'Total Production',
-    'Total Production (Individual)',
-    'Total Starts',
-    'Total Starts (Individual)',
-    'Total Whitening Kits',
-    'Whitening Kits'
-  ].includes(label) && percentIntoPeriod > 0
-) {
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
   const adjustedPercent = Math.max(percentIntoPeriod, 25)
   effectiveTarget = t * (adjustedPercent / 100)
 }
@@ -719,14 +718,14 @@ if (effectiveTarget <= 0) {
   setScore('0%')
 } else {
   const percent = Math.round((c / effectiveTarget) * 100)
-  setScore(percent + '%')
+setScore(percent + '%')
 }
 
-    }
+} 
 
-    fetchData()
+fetchData()
 
-  }, [label, selectedMonth])
+}, [label, selectedMonth, percentIntoPeriod])
 
   const handleSave = async () => {
 
@@ -781,13 +780,24 @@ const isLowerBetter = (label: string) => {
     l.includes('wait')
   )
 }
+
 const getScoreBackground = () => {
   const num = Number(score.replace('%', ''))
 
-  if (!num && num !== 0) return '#FFFFFF'
+  // no target → no color
+  if (!localTarget || Number(localTarget) === 0) return '#FFFFFF'
 
-  // 🚨 PREVENT RED WHEN NO TARGET
-  if (num === 0 && Number(localTarget) === 0) return '#FFFFFF'
+  // use SAME value used in score calc (c)
+  let actualValue = 0
+
+ if (isDirty) {
+  actualValue = Number(value || 0)
+} else {
+  actualValue = Number(value || 0)
+}
+
+  // no actual value → no color
+  if (actualValue === 0) return '#FFFFFF'
 
   if (isLowerBetter(label)) {
     if (num <= 100) return '#acf3c3d7'
