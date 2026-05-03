@@ -141,7 +141,7 @@ export default function Page() {
       <label style={label}>% Into Period</label>
       <input
         style={inputSmall}
-        value={percentIntoPeriod + '%'}
+        value={(percentIntoPeriod || 0).toFixed(2) + '%'}
         readOnly
       />
     </div>
@@ -680,7 +680,9 @@ if (effectiveTarget <= 0) {
 
 }
 if (!isDirty) {
-  setValue(currentValue || '')
+ if (!isDirty) {
+  setValue(currentValue ? String(currentValue) : '')
+}
 
   if (setParentValue && currentValue !== undefined) {
     setParentValue(Number(currentValue))
@@ -688,7 +690,8 @@ if (!isDirty) {
 }
 
 
-const c = Number(currentValue || 0)
+const effectiveValue = isDirty ? value : currentValue
+const c = Number(effectiveValue || 0)
 const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
 
 let effectiveTarget = t
