@@ -53,7 +53,7 @@ export default function Page() {
   })
 
   const [lastUpdated, setLastUpdated] = useState('')
-  const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+  const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   
 
@@ -77,7 +77,7 @@ export default function Page() {
       percent = 100
     }
 
-    setPercentIntoPeriod(Math.round(percent) + '%')
+  setPercentIntoPeriod(percent)
   }, [selectedMonth])
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function Page() {
       <label style={label}>% Into Period</label>
       <input
         style={inputSmall}
-        value={percentIntoPeriod}
+        value={percentIntoPeriod + '%'}
         readOnly
       />
     </div>
@@ -200,13 +200,19 @@ export default function Page() {
 
         {/* OBJECTIVE 1 */}
         <Objective title="Objective 1: Patient Starts">
-          <KeyResult label="Starts @ Home" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult 
+  label="Starts @ Home" 
+  selectedMonth={selectedMonth} 
+  isEditing={isEditing} 
+  percentIntoPeriod={percentIntoPeriod}
+/>
           <KeyResult 
   label="Total Starts (Individual)" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
   derivedTarget={Number(masterStartsTarget) / 2}
   setParentValue={setJordynStarts}
+  percentIntoPeriod={percentIntoPeriod}
 />
           <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult 
@@ -215,15 +221,16 @@ export default function Page() {
   isEditing={isEditing} 
   derivedTarget={Number(masterProductionTarget) > 0 ? Number(masterProductionTarget) / 2 : undefined}
   setParentValue={setJordynProduction}
+  percentIntoPeriod={percentIntoPeriod}
 />
-          <KeyResult label="Collections from Starts" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Collections from Starts" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
         </Objective>
 
         {/* OBJECTIVE 2 */}
         <Objective title="Objective 2: New Patient Conversion">
-          <KeyResult label="Scheduled New Patients" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="Kept New Patients" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="Conversion Rate" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Scheduled New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
+          <KeyResult label="Kept New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
+          <KeyResult label="Conversion Rate" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
         </Objective>
 
         {/* OBJECTIVE 3 */}
@@ -233,6 +240,7 @@ export default function Page() {
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
   setParentValue={setJordynWhitening}
+  percentIntoPeriod={percentIntoPeriod}
 />
         </Objective>
 
@@ -244,6 +252,7 @@ export default function Page() {
   isEditing={isEditing}
   target={masterStartsTarget}
   setTarget={setMasterStartsTarget}
+  percentIntoPeriod={percentIntoPeriod}
 />
 
 
@@ -253,6 +262,7 @@ export default function Page() {
   isEditing={isEditing}
   target={masterProductionTarget}
   setTarget={setMasterProductionTarget}
+  percentIntoPeriod={percentIntoPeriod}
  
 />
           
@@ -264,6 +274,7 @@ export default function Page() {
   label="Total Whitening Kits" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
 />
         </Objective>
 
@@ -298,7 +309,17 @@ const Objective = ({ title, children }: any) => (
 // =========================
 
 
-const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derivedTarget, setParentValue, forcedValue }: any) => {
+const KeyResult = ({ 
+  label, 
+  selectedMonth, 
+  isEditing, 
+  percentIntoPeriod,
+  target, 
+  setTarget, 
+  derivedTarget, 
+  setParentValue, 
+  forcedValue 
+}: any) => {
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -569,16 +590,41 @@ if (
 
   const total = jordyn + partner
 
-  // CURRENT
+
   setValue(total.toString())
 
   const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
+ 
+const timeBoundLabels = [
+  'NP Scheduled',
+  'Collections from Starts',
+  'Kept New Patients',
+  'Scheduled New Patients',
+  'Starts @ Home',
+  'Total Production',
+  'Total Production (Individual)',
+  'Total Starts',
+  'Total Starts (Individual)',
+  'Total Whitening Kits',
+  'Whitening Kits'
+]
 
-  if (t <= 0) {
-    setScore('0%')
-  } else {
-    setScore(Math.round((total / t) * 100) + '%')
-  }
+const isTimeBound = timeBoundLabels.includes(label)
+
+let effectiveTarget = t
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = t * (adjustedPercent / 100)
+}
+
+if (effectiveTarget <= 0) {
+  setScore('0%')
+} else {
+  setScore(Math.round((total / effectiveTarget) * 100) + '%')
+}
+
+
 
   // PREVIOUS MONTH
   const prevDateObj = new Date(selectedMonth)
@@ -643,16 +689,36 @@ if (!isDirty) {
 
 
 const c = Number(currentValue || 0)
-
-// USE DIRECT VALUE — NOT STATE
 const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
 
-if (t === 0) {
+let effectiveTarget = t
+
+if (
+  [
+    'NP Scheduled',
+    'Collections from Starts',
+    'Kept New Patients',
+    'Scheduled New Patients',
+    'Starts @ Home',
+    'Total Production',
+    'Total Production (Individual)',
+    'Total Starts',
+    'Total Starts (Individual)',
+    'Total Whitening Kits',
+    'Whitening Kits'
+  ].includes(label) && percentIntoPeriod > 0
+) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = t * (adjustedPercent / 100)
+}
+
+if (effectiveTarget <= 0) {
   setScore('0%')
 } else {
-  const percent = Math.round((c / t) * 100)
+  const percent = Math.round((c / effectiveTarget) * 100)
   setScore(percent + '%')
 }
+
     }
 
     fetchData()
