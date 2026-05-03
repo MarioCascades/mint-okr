@@ -727,6 +727,27 @@ fetchData()
 
 }, [label, selectedMonth, percentIntoPeriod])
 
+useEffect(() => {
+  const numericVal = Number(value || 0)
+  const numericTarget = Number(localTarget || 0)
+
+  let effectiveTarget = numericTarget
+
+  const isTimeBound = timeBoundSet.has(label)
+
+  if (isTimeBound && percentIntoPeriod > 0) {
+    const adjustedPercent = Math.max(percentIntoPeriod, 25)
+    effectiveTarget = numericTarget * (adjustedPercent / 100)
+  }
+
+  if (effectiveTarget > 0) {
+    const percent = Math.round((numericVal / effectiveTarget) * 100)
+    setScore(percent + '%')
+  } else {
+    setScore('0%')
+  }
+}, [value, localTarget, percentIntoPeriod])
+
   const handleSave = async () => {
 
     if (!keyResultId) return
@@ -782,19 +803,14 @@ const isLowerBetter = (label: string) => {
 }
 
 const getScoreBackground = () => {
-  const num = Number(score.replace('%', ''))
+const num = Number(score?.replace('%', '') || 0)
 
   // no target → no color
   if (!localTarget || Number(localTarget) === 0) return '#FFFFFF'
 
   // use SAME value used in score calc (c)
-  let actualValue = 0
-
- if (isDirty) {
-  actualValue = Number(value || 0)
-} else {
-  actualValue = Number(value || 0)
-}
+  
+const actualValue = Number(value || 0)
 
   // no actual value → no color
   if (actualValue === 0) return '#FFFFFF'
@@ -854,6 +870,24 @@ if (parts.length > 1) {
 }
 
   setLocalTarget(val)
+  const numericVal = Number(value || 0)
+const numericTarget = Number(val || 0)
+
+let effectiveTarget = numericTarget
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = numericTarget * (adjustedPercent / 100)
+}
+
+if (effectiveTarget > 0) {
+  const percent = Math.round((numericVal / effectiveTarget) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('0%')
+}
 
   if (!keyResultId) return
 
@@ -913,6 +947,25 @@ setIsDirty(true)
 
 if (setParentValue) {
   setParentValue(Number(val))
+}
+
+const numericVal = Number(val || 0)
+const numericTarget = Number(localTarget || 0)
+
+let effectiveTarget = numericTarget
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = numericTarget * (adjustedPercent / 100)
+}
+
+if (effectiveTarget > 0) {
+  const percent = Math.round((numericVal / effectiveTarget) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('0%')
 }
 }}
           onBlur={handleSave}
