@@ -266,7 +266,7 @@ const getJordynSharedTarget = async (title: string) => {
 
   if (!row) return 0
 
-  // 1. Try exact current month
+  // 1. Try current month
   const { data: current } = await supabase
     .from('key_result_updates')
     .select('target_value')
@@ -278,10 +278,10 @@ const getJordynSharedTarget = async (title: string) => {
     return Number(current.target_value)
   }
 
-  // 2. Fallback to most recent previous
+  // 2. Get most recent previous target
   const { data: prev } = await supabase
     .from('key_result_updates')
-    .select('target_value')
+    .select('target_value, reporting_month')
     .eq('key_result_id', row.key_result_id)
     .lt('reporting_month', reportingDate)
     .not('target_value', 'is', null)
@@ -289,7 +289,23 @@ const getJordynSharedTarget = async (title: string) => {
     .limit(1)
     .maybeSingle()
 
-  return Number(prev?.target_value ?? 0)
+  const resolvedTarget = Number(prev?.target_value ?? 0)
+
+  // 3.  AUTO-BACKFILL 
+  if (resolvedTarget > 0) {
+    await supabase
+      .from('key_result_updates')
+      .upsert(
+        {
+          key_result_id: row.key_result_id,
+          reporting_month: reportingDate,
+          target_value: resolvedTarget,
+        },
+        { onConflict: 'key_result_id,reporting_month' }
+      )
+  }
+
+  return resolvedTarget
 }
 
 const fetchData = async () => {
