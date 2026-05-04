@@ -262,6 +262,31 @@ setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
 setStartsTarget(startsTargetValue)
 
+
+
+// =========================
+// SCHEDULED NEW PATIENTS (JORDYN)
+// =========================
+
+const scheduledValue = await getValue(
+  'Jordyn',
+  labelMap["Scheduled New Patients"]
+)
+
+const prevScheduledValue = await getPrevValue(
+  'Jordyn',
+  labelMap["Scheduled New Patients"]
+)
+
+const scheduledTargetValue = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Scheduled New Patients"]
+)
+
+setScheduled(scheduledValue)
+setPrevScheduled(prevScheduledValue)
+setScheduledTarget(scheduledTargetValue)
+
 }
 
 // =========================
