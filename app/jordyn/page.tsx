@@ -385,63 +385,7 @@ const isSharedKR =
   // =========================
 // SHARED KRs (Obj 4 & 5)
 // =========================
-if (isSharedKR) {
 
-  const isAfterApril2026 =
-    selectedMonth.getFullYear() > 2026 ||
-    (selectedMonth.getFullYear() === 2026 && selectedMonth.getMonth() >= 3)
-
-  const partnerName = isAfterApril2026 ? "Heather" : "Olivia"
-
-  const getValue = async (user: string, krTitle: string) => {
-    const { data: row } = await supabase
-      .from('dashboard_okr_data')
-      .select('key_result_id')
-      .eq('user_name', user)
-      .eq('key_result_title', krTitle)
-      .maybeSingle()
-
-    if (!row) return 0
-
-    const y = selectedMonth.getFullYear()
-    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
-    const reportingDate = `${y}-${m}-01`
-
-    const { data: update } = await supabase
-      .from('key_result_updates')
-      .select('value')
-      .eq('key_result_id', row.key_result_id)
-      .eq('reporting_month', reportingDate)
-      .maybeSingle()
-
-    return Number(update?.value ?? 0)
-  }
-
-  let jordyn = 0
-  let partner = 0
-
-  if (label === "Total Starts") {
-    jordyn = await getValue("Jordyn", labelMap["Total Starts (Individual)"])
-    partner = await getValue(partnerName, labelMap["Total Starts (Individual)"])
-  }
-
-  if (label === "Total Production") {
-    jordyn = await getValue("Jordyn", labelMap["Total Production (Individual)"])
-    partner = await getValue(partnerName, labelMap["Total Production (Individual)"])
-  }
-
-  if (label === "Total Whitening Kits") {
-    jordyn = await getValue("Jordyn", labelMap["Whitening Kits"])
-    partner = await getValue(partnerName, labelMap["Whitening Kits"])
-  }
-
-  const total = jordyn + partner
-  setValue(total.toString())
-
-  setLastMonth('') // optional
-
-  return
-}
 
 if (isSharedKR) {
   const sharedTitle =
