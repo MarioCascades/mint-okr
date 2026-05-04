@@ -287,6 +287,42 @@ setScheduled(scheduledValue)
 setPrevScheduled(prevScheduledValue)
 setScheduledTarget(scheduledTargetValue)
 
+// =========================
+// KEPT NEW PATIENTS (TEAM SUM)
+// =========================
+
+const jordynKept = await getValue(
+  'Jordyn',
+  labelMap["Kept New Patients"]
+)
+
+const secondKept = await getValue(
+  secondTC,
+  labelMap["Kept New Patients"]
+)
+
+const keptValue = jordynKept + secondKept
+
+const prevJordynKept = await getPrevValue(
+  'Jordyn',
+  labelMap["Kept New Patients"]
+)
+
+const prevSecondKept = await getPrevValue(
+  secondTC,
+  labelMap["Kept New Patients"]
+)
+
+const prevKeptValue = prevJordynKept + prevSecondKept
+
+const keptTargetValue = 
+  (await getTargetWithCarryForward('Jordyn', labelMap["Kept New Patients"])) +
+  (await getTargetWithCarryForward(secondTC, labelMap["Kept New Patients"]))
+
+setKept(keptValue)
+setPrevKept(prevKeptValue)
+setKeptTarget(keptTargetValue)
+
 }
 
 // =========================
