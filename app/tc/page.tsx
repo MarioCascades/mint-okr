@@ -47,7 +47,7 @@ export default function Page() {
   const [kitsTarget, setKitsTarget] = useState(0)
 
   const [lastUpdated, setLastUpdated] = useState('')
-  const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+ const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
 
   const [totalStarts, setTotalStarts] = useState(0)
   const [prevStarts, setPrevStarts] = useState(0)
@@ -267,11 +267,15 @@ const prevSecondStarts = await getPrevValue(
 
 const prevStartsValue = prevJordynStarts + prevSecondStarts
 
-const startsTargetValue = await getTargetWithCarryForward(
-  'Jordyn',
+let startsTargetValue = await getSharedTarget(
   labelMap["Total Starts"]
 )
 
+if (percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  startsTargetValue =
+    startsTargetValue * (adjustedPercent / 100)
+}
 setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
 setStartsTarget(startsTargetValue)
@@ -303,10 +307,15 @@ const prevSecondProduction = await getPrevValue(
 
 const prevProductionValue = prevJordynProduction + prevSecondProduction
 
-const productionTargetValue = await getTargetWithCarryForward(
-  'Jordyn',
+let productionTargetValue = await getSharedTarget(
   labelMap["Total Production"]
 )
+
+if (percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  productionTargetValue =
+    productionTargetValue * (adjustedPercent / 100)
+}
 
 setTotalProduction(totalProductionValue)
 setPrevProduction(prevProductionValue)
@@ -315,7 +324,6 @@ setProductionTarget(productionTargetValue)
 // =========================
 // SCHEDULED NEW PATIENTS (JORDYN)
 // =========================
-
 const scheduledValue = await getValue(
   'Jordyn',
   labelMap["Scheduled New Patients"]
@@ -326,10 +334,16 @@ const prevScheduledValue = await getPrevValue(
   labelMap["Scheduled New Patients"]
 )
 
-const scheduledTargetValue = await getTargetWithCarryForward(
+let scheduledTargetValue = await getTargetWithCarryForward(
   'Jordyn',
   labelMap["Scheduled New Patients"]
 )
+
+if (percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  scheduledTargetValue =
+    scheduledTargetValue * (adjustedPercent / 100)
+}
 
 setScheduled(scheduledValue)
 setPrevScheduled(prevScheduledValue)
@@ -440,14 +454,26 @@ const prevSecondKits = await getPrevValue(
 
 const prevKitsValue = prevJordynKits + prevSecondKits
 
-const kitsTargetValue = await getTargetWithCarryForward(
-  'Jordyn',
+let kitsTargetValue = await getSharedTarget(
   labelMap["Total Whitening Kits"]
 )
+
+if (percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  kitsTargetValue =
+    kitsTargetValue * (adjustedPercent / 100)
+}
 
 setKits(kitsValue)
 setPrevKits(prevKitsValue)
 setKitsTarget(kitsTargetValue)
+
+console.log("CHECK TARGET KEYS:", {
+  starts: labelMap["Total Starts"],
+  production: labelMap["Total Production"],
+  kits: labelMap["Total Whitening Kits"],
+  reportingDate
+})
 }
 
 // =========================
@@ -468,7 +494,7 @@ useEffect(() => {
     percent = 100
   }
 
-  setPercentIntoPeriod(Math.round(percent) + '%')
+  setPercentIntoPeriod(Math.round(percent))
 }, [selectedMonth])
 
 useEffect(() => {
@@ -546,7 +572,7 @@ const conversion =
       <div>
         <div style={headerLabel}>% Into Period</div>
         <input
-          value={percentIntoPeriod}
+          value={percentIntoPeriod + '%'}
           readOnly
           style={metaInput}
         />
