@@ -358,6 +358,35 @@ const KeyResult = ({
   metricType === 'currency' ||
   label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
+  const isLowerBetter = (label: string) => {
+  const l = label.toLowerCase()
+
+  return (
+    l.includes('call out') ||
+    l.includes('conversion') ||
+    l.includes('wait')
+  )
+}
+
+const getScoreBackground = () => {
+  const num = Number(score?.replace('%', '') || 0)
+
+  if (!localTarget || Number(localTarget) === 0) return '#FFFFFF'
+
+  const actualValue = Number(value || 0)
+
+  if (actualValue === 0) return '#FFFFFF'
+
+  if (isLowerBetter(label)) {
+    if (num <= 100) return '#acf3c3d7'
+    if (num <= 110) return '#fff4ccf3'
+    return '#f3b8b8d8'
+  }
+
+  if (num >= 100) return '#acf3c3d7'
+  if (num >= 90) return '#fff4ccf3'
+  return '#f3b8b8d8'
+}
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
@@ -516,14 +545,15 @@ const prevValue = prevValueRow?.value ?? ''
 
 setLastMonth(prevValue !== '' && prevValue !== null ? prevValue.toString() : '')
 
-// =======================
-// SET CURRENT VALUE
-// =======================
-
+// =========================
+// SET CURRENT VALUE (FIX EMPTY UI)
+// =========================
 if (!isDirty) {
-  setValue(currentValue || '')
+  if (currentValue !== null && currentValue !== undefined) {
+    setValue(String(currentValue))
+  }
 
-  if (setParentValue && currentValue !== undefined) {
+  if (setParentValue && currentValue !== null && currentValue !== undefined) {
     setParentValue(Number(currentValue))
   }
 }
@@ -685,7 +715,15 @@ if (effectiveTarget > 0) {
 }}
       />
 
-      <input style={cell} value={score} readOnly />
+      <input
+  style={{
+    ...cell,
+    backgroundColor: getScoreBackground(),
+    fontWeight: 800
+  }}
+  value={score}
+  readOnly
+/>
 
       <button style={button}>
         + Initiatives
