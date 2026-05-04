@@ -159,14 +159,30 @@ const getSharedTarget = async (title: string) => {
 
   if (!row) return 0
 
-  const { data } = await supabase
-    .from('key_result_updates')
-    .select('target_value')
-    .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', reportingDate)
-    .maybeSingle()
+// try current month first
+const { data: current } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', row.key_result_id)
+  .eq('reporting_month', reportingDate)
+  .maybeSingle()
 
-  return Number(data?.target_value ?? 0)
+if (current?.target_value !== null && current?.target_value !== undefined) {
+  return Number(current.target_value)
+}
+
+// fallback to previous
+const { data: prev } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', row.key_result_id)
+  .lt('reporting_month', reportingDate)
+  .not('target_value', 'is', null)
+  .order('reporting_month', { ascending: false })
+  .limit(1)
+  .maybeSingle()
+
+return Number(prev?.target_value ?? 0)
 }
 
 // =========================
@@ -236,6 +252,32 @@ const getTargetWithCarryForward = async (user: string, title: string) => {
   return Number(prev?.target_value ?? 0)
 }
 
+// =========================
+// SHARED TARGET (JORDYN LOCKED)
+// =========================
+const getJordynSharedTarget = async (title: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', 'Jordyn') // 🔥 THIS IS THE FIX
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) {
+    console.warn("Missing shared target row:", title)
+    return 0
+  }
+
+  const { data } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingDate)
+    .maybeSingle()
+
+  return Number(data?.target_value ?? 0)
+}
 
 const fetchData = async () => {
 
@@ -267,9 +309,10 @@ const prevSecondStarts = await getPrevValue(
 
 const prevStartsValue = prevJordynStarts + prevSecondStarts
 
-let startsTargetValue = await getSharedTarget(
+let startsTargetValue = await getJordynSharedTarget(
   labelMap["Total Starts"]
 )
+
 
 if (percentIntoPeriod > 0) {
   const adjustedPercent = Math.max(percentIntoPeriod, 25)
@@ -307,7 +350,7 @@ const prevSecondProduction = await getPrevValue(
 
 const prevProductionValue = prevJordynProduction + prevSecondProduction
 
-let productionTargetValue = await getSharedTarget(
+let productionTargetValue = await getJordynSharedTarget(
   labelMap["Total Production"]
 )
 
@@ -454,7 +497,7 @@ const prevSecondKits = await getPrevValue(
 
 const prevKitsValue = prevJordynKits + prevSecondKits
 
-let kitsTargetValue = await getSharedTarget(
+let kitsTargetValue = await getJordynSharedTarget(
   labelMap["Total Whitening Kits"]
 )
 
