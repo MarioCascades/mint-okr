@@ -356,6 +356,10 @@ const KeyResult = ({
   metricType === 'currency' ||
   label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
+  const isMasterTarget =
+  label === "Total Starts" ||
+  label === "Total Production" ||
+  label === "Total Whitening Kits"
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
@@ -514,11 +518,26 @@ const resolvedTarget =
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(krData?.metric_type ?? '')
 
-setLocalTarget(
-  resolvedTarget !== null && resolvedTarget !== undefined
-    ? String(resolvedTarget)
-    : ''
-)
+if (label === "Total Starts" && setTarget) {
+  setTarget(resolvedTarget ? String(resolvedTarget) : '')
+}
+
+if (label === "Total Production" && setTarget) {
+  setTarget(resolvedTarget ? String(resolvedTarget) : '')
+}
+
+// DO NOT override master targets from DB
+if (
+  label !== "Total Starts" &&
+  label !== "Total Production" &&
+  label !== "Total Whitening Kits"
+) {
+  setLocalTarget(
+    resolvedTarget !== null && resolvedTarget !== undefined
+      ? String(resolvedTarget)
+      : ''
+  )
+}
 
       const { data: current } = await supabase
         .from('key_result_updates')
@@ -844,65 +863,79 @@ const actualValue = Number(value || 0)
         <input
           style={targetCell}
           value={
- isCurrency && localTarget
+ isMasterTarget
+  ? target
+  : isCurrency && localTarget
   ? '$' + Number(localTarget).toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     })
-
   : isPercentage && localTarget
-    ? localTarget + '%'
+  ? localTarget + '%'
   : localTarget
 }
           disabled={!isEditing}
+
 onChange={async (e) => {
   let val = ''
 
-const raw = e.target.value.replace(/[^0-9.]/g, '')
-const parts = raw.split('.').slice(0, 2)
+  const raw = e.target.value.replace(/[^0-9.]/g, '')
+  const parts = raw.split('.').slice(0, 2)
 
-val = parts[0]
+  val = parts[0]
 
-if (parts.length > 1) {
-  val += '.' + parts[1].slice(0, 2)
-}
+  if (parts.length > 1) {
+    val += '.' + parts[1].slice(0, 2)
+  }
 
-  setLocalTarget(val)
+  // ✅ MASTER TARGET CONTROL (THIS IS THE FIX)
+  if (
+    label === "Total Starts" ||
+    label === "Total Production" ||
+    label === "Total Whitening Kits"
+  ) {
+    if (setTarget) setTarget(val)
+  } else {
+    setLocalTarget(val)
+  }
+
+  // keep score calc SAME (unchanged logic)
   const numericVal = Number(value || 0)
-const numericTarget = Number(val || 0)
+  const numericTarget = Number(val || 0)
 
-let effectiveTarget = numericTarget
+  let effectiveTarget = numericTarget
+  const isTimeBound = timeBoundSet.has(label)
 
-const isTimeBound = timeBoundSet.has(label)
+  if (isTimeBound && percentIntoPeriod > 0) {
+    const adjustedPercent = Math.max(percentIntoPeriod, 25)
+    effectiveTarget = numericTarget * (adjustedPercent / 100)
+  }
 
-if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = numericTarget * (adjustedPercent / 100)
-}
+  if (effectiveTarget > 0) {
+    const percent = Math.round((numericVal / effectiveTarget) * 100)
+    setScore(percent + '%')
+  } else {
+    setScore('0%')
+  }
 
-if (effectiveTarget > 0) {
-  const percent = Math.round((numericVal / effectiveTarget) * 100)
-  setScore(percent + '%')
-} else {
-  setScore('0%')
-}
-
+  // SAVE (unchanged)
   if (!keyResultId) return
 
   const y = selectedMonth.getFullYear()
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
- await supabase.from('key_result_updates').upsert(
-  {
-    key_result_id: keyResultId,
-    reporting_month: reportingDate,
-    value: Number(value) || 0,
-    target_value: val ? Number(val) : null,
-  },
-  { onConflict: 'key_result_id,reporting_month' }
-)
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      value: Number(value) || 0,
+      target_value: val ? Number(val) : null,
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
 }}
+
 onKeyDown={handleEnter}
 />
 
