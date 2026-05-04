@@ -517,7 +517,13 @@ let kitsTargetValue = await getJordynSharedTarget(
   labelMap["Total Whitening Kits"]
 )
 
-if (percentIntoPeriod > 0) {
+const today = new Date()
+
+const isCurrentMonth =
+  today.getFullYear() === selectedMonth.getFullYear() &&
+  today.getMonth() === selectedMonth.getMonth()
+
+if (isCurrentMonth && percentIntoPeriod > 0) {
   const adjustedPercent = Math.max(percentIntoPeriod, 25)
   kitsTargetValue =
     kitsTargetValue * (adjustedPercent / 100)
