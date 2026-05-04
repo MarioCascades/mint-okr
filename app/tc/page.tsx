@@ -160,7 +160,27 @@ export default function Page() {
     .limit(1)
     .maybeSingle()
 
-  return Number(prev?.target_value ?? 0)
+  const resolved =
+  prev?.target_value !== null && prev?.target_value !== undefined
+    ? Number(prev.target_value)
+    : 0
+
+// ==============================
+// AUTO-CREATE CURRENT MONTH ROW
+// ==============================
+
+if (resolved > 0) {
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: row.key_result_id,
+      reporting_month: formatDate(selectedMonth),
+      target_value: resolved,
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
+}
+
+return resolved
 }
    
 
@@ -649,6 +669,26 @@ setKitsTarget(
 // CARD
 // =========================
 const Card = ({ title, value, prev = 0, target = 0 }: any) => {
+  
+  const isCurrency = title.toLowerCase().includes('production')
+const isPercent = title.toLowerCase().includes('conversion')
+
+const formatValue = (val: any) => {
+  const num = Number(val || 0)
+
+  if (isCurrency) {
+    return '$' + num.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })
+  }
+
+  if (isPercent) {
+    return `${Math.round(num)}%`
+  }
+
+  return num
+}
   const numericValue = Number(
     String(value).replace(/[^0-9.-]+/g, '')
   )
@@ -684,19 +724,19 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) => {
       <div style={cardRow}>
         <input
           style={prevCardCell}
-          value={prev}
+          value={formatValue(prev)}
           readOnly
         />
 
         <input
           style={targetCardCell}
-          value={target}
+          value={formatValue(target)}
           readOnly
         />
 
         <input
           style={currentCardCell}
-          value={value}
+          value={formatValue(value)}
           readOnly
         />
 
