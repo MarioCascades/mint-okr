@@ -258,11 +258,10 @@ const getJordynSharedTarget = async (title: string) => {
 
 const { data: rows } = await supabase
   .from('dashboard_okr_data')
-  .select('key_result_id, user_name')
+  .select('key_result_id')
   .eq('key_result_title', title)
 
-const row =
-  rows?.find(r => r.user_name === 'Jordyn') || rows?.[0]
+const row = rows?.[0]
 
   console.log("TARGET ROW FOUND:", row)
   if (!row) return 0
