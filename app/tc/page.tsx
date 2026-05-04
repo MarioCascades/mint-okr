@@ -72,12 +72,12 @@ export default function Page() {
 
 const reportingDate = formatDate(selectedMonth)
 
-const switchMonth = new Date(2026, 3, 1)
+const isAfterMarch2026 =
+  selectedMonth.getFullYear() > 2026 ||
+  (selectedMonth.getFullYear() === 2026 && selectedMonth.getMonth() > 2)
 
-const secondTC =
-  selectedMonth >= switchMonth
-    ? 'Heather'
-    : 'Olivia'
+const secondTC = isAfterMarch2026 ? 'Heather' : 'Olivia'
+
 
 // =========================
 // HELPERS (CLEAN)
@@ -382,8 +382,31 @@ const conversionTargetValue =
 setPrevConversion(prevConversionValue)
 setConversionTarget(conversionTargetValue)
 
-// ⚠️ IMPORTANT: DO NOT set "conversion" here
+// IMPORTANT: DO NOT set "conversion" here
 // your UI already calculates it below
+
+// =========================
+// TOTAL WHITENING KITS (JORDYN MIRROR)
+// =========================
+
+const kitsValue = await getValue(
+  'Jordyn',
+  labelMap["Total Whitening Kits"]
+)
+
+const prevKitsValue = await getPrevValue(
+  'Jordyn',
+  labelMap["Total Whitening Kits"]
+)
+
+const kitsTargetValue = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Total Whitening Kits"]
+)
+
+setKits(kitsValue)
+setPrevKits(prevKitsValue)
+setKitsTarget(kitsTargetValue)
 
 }
 
