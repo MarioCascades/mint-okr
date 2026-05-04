@@ -341,6 +341,8 @@ const prevStartsValue = prevJordynStarts + prevSecondStarts
 let startsTargetValue = await getJordynSharedTarget(
   labelMap["Total Starts"]
 )
+console.log("STARTS TARGET RAW:", startsTargetValue)
+console.log("REPORTING DATE:", reportingDate)
 
 
 const today = new Date()
@@ -595,7 +597,7 @@ useEffect(() => {
 
 useEffect(() => {
   fetchData()
-}, [selectedMonth])
+}, [selectedMonth, percentIntoPeriod])
 
   // =========================
   // MONTH NAV
