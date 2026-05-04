@@ -34,6 +34,19 @@ const computedLabels = [
   "Total Whitening Kits"
 ]
 
+const timeBoundSet = new Set([
+  'Collections from Starts',
+  'Kept New Patients',
+  'Scheduled New Patients',
+  'Starts @ Home',
+  'Total Production',
+  'Total Production (Individual)',
+  'Total Starts',
+  'Total Starts (Individual)',
+  'Total Whitening Kits',
+  'Whitening Kits'
+])
+
 // =========================
 // PAGE
 // =========================
@@ -54,7 +67,7 @@ export default function Page() {
   })
 
   const [lastUpdated, setLastUpdated] = useState('')
-  const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+  const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   
 
@@ -77,7 +90,7 @@ export default function Page() {
       percent = 100
     }
 
-    setPercentIntoPeriod(Math.round(percent) + '%')
+    setPercentIntoPeriod(percent)
   }, [selectedMonth])
 
   useEffect(() => {
@@ -141,7 +154,7 @@ export default function Page() {
       <label style={label}>% Into Period</label>
       <input
         style={inputSmall}
-        value={percentIntoPeriod}
+        value={(percentIntoPeriod || 0).toFixed(2) + '%'}
         readOnly
       />
     </div>
@@ -200,30 +213,37 @@ export default function Page() {
 
         {/* OBJECTIVE 1 */}
         <Objective title="Objective 1: Patient Starts">
-          <KeyResult label="Starts @ Home" selectedMonth={selectedMonth} isEditing={isEditing} />
+         <KeyResult 
+  label="Starts @ Home" 
+  selectedMonth={selectedMonth} 
+  isEditing={isEditing}
+  percentIntoPeriod={percentIntoPeriod}
+/>
           <KeyResult 
   label="Total Starts (Individual)" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
   derivedTarget={Number(masterStartsTarget) / 2}
   setParentValue={setOliviaStarts}
+  percentIntoPeriod={percentIntoPeriod}
 />
-          <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
           <KeyResult 
   label="Total Production (Individual)" 
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
   derivedTarget={Number(masterProductionTarget) / 2}
   setParentValue={setOliviaProduction}
+  percentIntoPeriod={percentIntoPeriod}
 />
-          <KeyResult label="Collections from Starts" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Collections from Starts" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
         </Objective>
 
         {/* OBJECTIVE 2 */}
         <Objective title="Objective 2: New Patient Conversion">
-          <KeyResult label="Scheduled New Patients" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="Kept New Patients" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="Conversion Rate" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Scheduled New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
+          <KeyResult label="Kept New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
+          <KeyResult label="Conversion Rate" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
         </Objective>
 
         {/* OBJECTIVE 3 */}
@@ -233,6 +253,7 @@ export default function Page() {
   selectedMonth={selectedMonth} 
   isEditing={isEditing} 
   setParentValue={setOliviaWhitening}
+  percentIntoPeriod={percentIntoPeriod}
 />
         </Objective>
 
@@ -244,6 +265,7 @@ export default function Page() {
   isEditing={isEditing}
   target={masterStartsTarget}
   setTarget={setMasterStartsTarget}
+  percentIntoPeriod={percentIntoPeriod}
   
 />
 
@@ -253,6 +275,7 @@ export default function Page() {
  isEditing={isEditing}
   target={masterProductionTarget}
   setTarget={setMasterProductionTarget}
+  percentIntoPeriod={percentIntoPeriod}
  
 />
           
@@ -264,6 +287,7 @@ export default function Page() {
   label="Total Whitening Kits" 
   selectedMonth={selectedMonth} 
  isEditing={isEditing}
+ percentIntoPeriod={percentIntoPeriod}
 />
   
         </Objective>
@@ -299,7 +323,17 @@ const Objective = ({ title, children }: any) => (
 // =========================
 
 
-const KeyResult = ({ label, selectedMonth, isEditing, target, setTarget, derivedTarget, setParentValue, forcedValue }: any) => {
+const KeyResult = ({ 
+  label, 
+  selectedMonth, 
+  isEditing, 
+  percentIntoPeriod,
+  target, 
+  setTarget, 
+  derivedTarget, 
+  setParentValue, 
+  forcedValue 
+}: any) => {
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
@@ -501,16 +535,45 @@ if (!isDirty) {
 const c = Number(currentValue || 0)
 const t = Number(resolvedTarget || 0)
 
-if (t === 0) {
+let effectiveTarget = t
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = t * (adjustedPercent / 100)
+}
+
+if (effectiveTarget <= 0) {
   setScore('0%')
 } else {
-  setScore(Math.round((c / t) * 100) + '%')
+  setScore(Math.round((c / effectiveTarget) * 100) + '%')
 }
   }
 
 fetchData()
 
-}, [label, selectedMonth])
+}, [label, selectedMonth, percentIntoPeriod])
+useEffect(() => {
+  const numericVal = Number(value || 0)
+  const numericTarget = Number(localTarget || 0)
+
+  let effectiveTarget = numericTarget
+
+  const isTimeBound = timeBoundSet.has(label)
+
+  if (isTimeBound && percentIntoPeriod > 0) {
+    const adjustedPercent = Math.max(percentIntoPeriod, 25)
+    effectiveTarget = numericTarget * (adjustedPercent / 100)
+  }
+
+  if (effectiveTarget > 0) {
+    const percent = Math.round((numericVal / effectiveTarget) * 100)
+    setScore(percent + '%')
+  } else {
+    setScore('0%')
+  }
+}, [value, localTarget, percentIntoPeriod])
 
 return (
   <div style={{ marginBottom: 10 }}>
@@ -534,7 +597,27 @@ return (
   disabled={!isEditing}
   onChange={async (e) => {
     const val = e.target.value.replace(/[^0-9.]/g, '')
+
     setLocalTarget(val)
+
+const numericVal = Number(value || 0)
+const numericTarget = Number(val || 0)
+
+let effectiveTarget = numericTarget
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = numericTarget * (adjustedPercent / 100)
+}
+
+if (effectiveTarget > 0) {
+  const percent = Math.round((numericVal / effectiveTarget) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('0%')
+}
 
     if (!keyResultId) return
 
@@ -580,6 +663,25 @@ await supabase.from('key_result_updates').upsert(
   }
 
   setValue(val)
+
+const numericVal = Number(val || 0)
+const numericTarget = Number(localTarget || 0)
+
+let effectiveTarget = numericTarget
+
+const isTimeBound = timeBoundSet.has(label)
+
+if (isTimeBound && percentIntoPeriod > 0) {
+  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+  effectiveTarget = numericTarget * (adjustedPercent / 100)
+}
+
+if (effectiveTarget > 0) {
+  const percent = Math.round((numericVal / effectiveTarget) * 100)
+  setScore(percent + '%')
+} else {
+  setScore('0%')
+}
 }}
       />
 
