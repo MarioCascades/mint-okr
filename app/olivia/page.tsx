@@ -659,8 +659,7 @@ await supabase.from('key_result_updates').upsert(
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
-    value: 0, // REQUIRED (fixes 400 error)
-    target_value: val ? Number(val) : 0,
+    target_value: val ? Number(val) : null,
   },
   { onConflict: 'key_result_id,reporting_month' }
 )
@@ -712,6 +711,22 @@ if (effectiveTarget > 0) {
 } else {
   setScore('0%')
 }
+}}
+onBlur={async () => {
+  if (!keyResultId) return
+
+  const y = selectedMonth.getFullYear()
+  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+  const reportingDate = `${y}-${m}-01`
+
+  await supabase.from('key_result_updates').upsert(
+    {
+      key_result_id: keyResultId,
+      reporting_month: reportingDate,
+      value: value ? Number(value) : null,
+    },
+    { onConflict: 'key_result_id,reporting_month' }
+  )
 }}
       />
 
