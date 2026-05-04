@@ -737,7 +737,7 @@ const conversion =
 // =========================
 // CARD
 // =========================
-const Card = ({ title, value, prev = 0, target = 0 }: any) => {
+const Card = ({ title, value, prev = 0, target = 0, percentIntoPeriod = 100 }: any) => {
   
   const isCurrency = title.toLowerCase().includes('production')
 const isPercent = title.toLowerCase().includes('conversion')
@@ -765,10 +765,17 @@ const cleaned = Number(
 
 const numericValue = isNaN(cleaned) ? 0 : cleaned
 
-  const percent =
-    Number(target) > 0
-      ? (numericValue / Number(target)) * 100
-      : 0
+let adjustedTarget = Number(target)
+
+// apply timebound ONLY for current month
+if (percentIntoPeriod > 0 && percentIntoPeriod < 100) {
+  adjustedTarget = target * (percentIntoPeriod / 100)
+}
+
+const percent =
+  adjustedTarget > 0
+    ? (numericValue / adjustedTarget) * 100
+    : 0
 
   const getResultBackground = () => {
     if (percent >= 100) {
