@@ -669,13 +669,13 @@ const conversion =
       {/* CARDS */}
       <div style={grid}>
 
-        <Card 
+  <Card 
   title="Total Start Performance" 
   value={totalStarts} 
   prev={prevStarts}
   target={startsTarget}
   percentIntoPeriod={localPercent}
- 
+  isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
 />
         <Card
   title="Total Production"
@@ -683,6 +683,7 @@ const conversion =
   prev={`$${Number(prevProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
   target={productionTarget}
   percentIntoPeriod={localPercent}
+  isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
  
 
 />
@@ -692,6 +693,7 @@ const conversion =
   prev={prevScheduled}
   target={scheduledTarget}
   percentIntoPeriod={localPercent}
+  isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
   
 
 />
@@ -701,6 +703,7 @@ const conversion =
   prev={prevKept}
   target={keptTarget}
   percentIntoPeriod={localPercent}
+  isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
   
 
 />
@@ -711,6 +714,7 @@ const conversion =
   prev={`${prevConversion.toFixed(0)}%`}
   target={conversionTarget}
   percentIntoPeriod={localPercent}
+  isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
   
 />
         <Card 
@@ -719,6 +723,7 @@ const conversion =
   prev={prevKits}
   target={kitsTarget}
   percentIntoPeriod={localPercent}
+  isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
 
 />
 
@@ -737,7 +742,7 @@ const conversion =
 // =========================
 // CARD
 // =========================
-const Card = ({ title, value, prev = 0, target = 0, percentIntoPeriod = 100 }: any) => {
+const Card = ({ title, value, prev = 0, target = 0, percentIntoPeriod = 100, isCurrentMonth = false }: any) => {
   
   const isCurrency = title.toLowerCase().includes('production')
 const isPercent = title.toLowerCase().includes('conversion')
@@ -767,8 +772,8 @@ const numericValue = isNaN(cleaned) ? 0 : cleaned
 
 let adjustedTarget = Number(target)
 
-// apply timebound ONLY for current month
-if (percentIntoPeriod > 0 && percentIntoPeriod < 100) {
+// ONLY adjust if it's the current month
+if (isCurrentMonth && percentIntoPeriod > 0 && percentIntoPeriod < 100) {
   adjustedTarget = target * (percentIntoPeriod / 100)
 }
 
