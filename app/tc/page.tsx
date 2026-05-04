@@ -66,7 +66,122 @@ export default function Page() {
   const [kits, setKits] = useState(0)
   const [prevKits, setPrevKits] = useState(0)
   
+// =========================
+// CORE VARIABLES
+// =========================
 
+const reportingDate = formatDate(selectedMonth)
+
+const switchMonth = new Date(2026, 3, 1)
+
+const secondTC =
+  selectedMonth >= switchMonth
+    ? 'Heather'
+    : 'Olivia'
+
+// =========================
+// HELPERS (CLEAN)
+// =========================
+
+const getValue = async (user: string, title: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', user)
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data } = await supabase
+    .from('key_result_updates')
+    .select('value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingDate)
+    .maybeSingle()
+
+  return Number(data?.value ?? 0)
+}
+
+const getSharedValue = async (title: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data } = await supabase
+    .from('key_result_updates')
+    .select('value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingDate)
+    .maybeSingle()
+
+  return Number(data?.value ?? 0)
+}
+
+const getSharedPrevValue = async (title: string) => {
+
+  const prevDate = new Date(selectedMonth)
+  prevDate.setMonth(prevDate.getMonth() - 1)
+
+  const prevReportingDate = formatDate(prevDate)
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data } = await supabase
+    .from('key_result_updates')
+    .select('value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', prevReportingDate)
+    .maybeSingle()
+
+  return Number(data?.value ?? 0)
+}
+
+const getSharedTarget = async (title: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingDate)
+    .maybeSingle()
+
+  return Number(data?.target_value ?? 0)
+}
+
+
+
+const fetchData = async () => {
+
+  // TOTAL STARTS (TEMP - still shared, we fix logic next)
+  const totalStartsValue = await getSharedValue(labelMap["Total Starts"])
+  const prevStartsValue = await getSharedPrevValue(labelMap["Total Starts"])
+  const startsTargetValue = await getSharedTarget(labelMap["Total Starts"])
+
+  setTotalStarts(totalStartsValue)
+  setPrevStarts(prevStartsValue)
+  setStartsTarget(startsTargetValue)
+}
 
   // =========================
   // % INTO PERIOD
@@ -106,13 +221,9 @@ export default function Page() {
   fetchLastUpdated()
 }, [])
 
-  // =========================
-  // FETCH DATA TRIGGER
-  // =========================
-
-   // =========================
-  // FETCH DATA (TEAM TOTALS)
-  // =========================
+useEffect(() => {
+  fetchData()
+}, [selectedMonth])
 
 
 
