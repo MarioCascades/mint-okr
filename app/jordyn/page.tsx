@@ -356,10 +356,7 @@ const KeyResult = ({
   metricType === 'currency' ||
   label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
-  const isMasterTarget =
-  label === "Total Starts" ||
-  label === "Total Production" ||
-  label === "Total Whitening Kits"
+
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
@@ -863,15 +860,13 @@ const actualValue = Number(value || 0)
         <input
           style={targetCell}
           value={
- isMasterTarget
-  ? target
-  : isCurrency && localTarget
-  ? '$' + Number(localTarget).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })
+  isCurrency && localTarget
+    ? '$' + Number(localTarget).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
   : isPercentage && localTarget
-  ? localTarget + '%'
+    ? localTarget + '%'
   : localTarget
 }
           disabled={!isEditing}
