@@ -265,6 +265,17 @@ const getJordynSharedTarget = async (title: string) => {
 
   if (!row) return 0
 
+const getJordynSharedTarget = async (title: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', 'Jordyn')
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) return 0
+
   // 1. Try current month
   const { data: current } = await supabase
     .from('key_result_updates')
@@ -277,34 +288,22 @@ const getJordynSharedTarget = async (title: string) => {
     return Number(current.target_value)
   }
 
-  // 2. Get most recent previous target
-  const { data: prev } = await supabase
+  // 2. SAFE fallback (fixed)
+  const { data: prevRows } = await supabase
     .from('key_result_updates')
     .select('target_value, reporting_month')
     .eq('key_result_id', row.key_result_id)
-    .lt('reporting_month', reportingDate)
+    .lte('reporting_month', reportingDate)
     .not('target_value', 'is', null)
     .order('reporting_month', { ascending: false })
     .limit(1)
-    .maybeSingle()
 
-  const resolvedTarget = Number(prev?.target_value ?? 0)
+  console.log("PREV ROWS FOUND:", prevRows)
 
-  // 3.  AUTO-BACKFILL 
-  if (resolvedTarget > 0) {
-    await supabase
-      .from('key_result_updates')
-      .upsert(
-        {
-          key_result_id: row.key_result_id,
-          reporting_month: reportingDate,
-          target_value: resolvedTarget,
-        },
-        { onConflict: 'key_result_id,reporting_month' }
-      )
-  }
+  const resolvedTarget = Number(prevRows?.[0]?.target_value ?? 0)
 
   return resolvedTarget
+
 }
 
 const fetchData = async () => {
