@@ -393,7 +393,7 @@ if (isSharedKR) {
   const { data: sharedBase } = await supabase
     .from('dashboard_okr_data')
     .select('key_result_id')
-    .eq('user_name', 'Jordyn')
+    .eq('user_id', '83b4a979-bef3-4418-9f71-fa7a77f53ed8')
     .eq('key_result_title', sharedTitle)
     .maybeSingle()
 
