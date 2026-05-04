@@ -47,7 +47,7 @@ export default function Page() {
   const [kitsTarget, setKitsTarget] = useState(0)
 
   const [lastUpdated, setLastUpdated] = useState('')
- const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
+ const [localPercent, setPercentIntoPeriod] = useState(0)
 
   const [totalStarts, setTotalStarts] = useState(0)
   const [prevStarts, setPrevStarts] = useState(0)
@@ -167,10 +167,9 @@ const { data: current } = await supabase
   .eq('reporting_month', reportingDate)
   .maybeSingle()
 
-if (current?.target_value !== null && current?.target_value !== undefined) {
+if (current && current.target_value !== null) {
   return Number(current.target_value)
 }
-
 // fallback to previous
 const { data: prev } = await supabase
   .from('key_result_updates')
@@ -310,6 +309,22 @@ const getJordynSharedTarget = async (title: string) => {
 
 const fetchData = async () => {
 
+const today = new Date()
+const year = selectedMonth.getFullYear()
+const month = selectedMonth.getMonth()
+const endOfMonth = new Date(year, month + 1, 0)
+
+let localPercent = 0
+
+if (today.getFullYear() === year && today.getMonth() === month) {
+  localPercent = (today.getDate() / endOfMonth.getDate()) * 100
+} else if (today > endOfMonth) {
+  localPercent = 100
+}
+
+localPercent = Math.round(localPercent)
+setPercentIntoPeriod(localPercent)
+
 // =========================
 // TOTAL STARTS (TEAM COMPUTED)
 // =========================
@@ -344,21 +359,20 @@ let startsTargetValue = await getJordynSharedTarget(
 console.log("STARTS TARGET RAW:", startsTargetValue)
 console.log("REPORTING DATE:", reportingDate)
 
-
-const today = new Date()
-
 const isCurrentMonth =
   today.getFullYear() === selectedMonth.getFullYear() &&
   today.getMonth() === selectedMonth.getMonth()
 
-if (isCurrentMonth && percentIntoPeriod > 0) {
-  startsTargetValue =
-    startsTargetValue * (percentIntoPeriod / 100)
+if (isCurrentMonth && localPercent > 0) {
+  startsTargetValue = Math.round(
+    startsTargetValue * (localPercent / 100)
+  )
 }
 
 setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
-setStartsTarget(startsTargetValue)
+
+setStartsTarget(startsTargetValue || 0)
 // =========================
 // TOTAL PRODUCTION (TEAM COMPUTED)
 // =========================
@@ -391,9 +405,10 @@ let productionTargetValue = await getJordynSharedTarget(
   labelMap["Total Production"]
 )
 
-if (isCurrentMonth && percentIntoPeriod > 0) {
-  productionTargetValue =
-    productionTargetValue * (percentIntoPeriod / 100)
+if (isCurrentMonth && localPercent > 0) {
+productionTargetValue = Math.round(
+  productionTargetValue * (localPercent / 100)
+)
 }
 
 setTotalProduction(totalProductionValue)
@@ -418,10 +433,10 @@ let scheduledTargetValue = await getTargetWithCarryForward(
   labelMap["Scheduled New Patients"]
 )
 
-if (percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  scheduledTargetValue =
-    scheduledTargetValue * (adjustedPercent / 100)
+if (isCurrentMonth && localPercent > 0){
+   scheduledTargetValue = Math.round(
+   scheduledTargetValue * (localPercent / 100)
+)
 }
 
 setScheduled(scheduledValue)
@@ -539,10 +554,11 @@ let kitsTargetValue = await getJordynSharedTarget(
 
 
 
-if (isCurrentMonth && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  kitsTargetValue =
-    kitsTargetValue * (adjustedPercent / 100)
+if (isCurrentMonth && localPercent > 0) {
+ 
+  kitsTargetValue = Math.round(
+  kitsTargetValue * (localPercent / 100)
+)
 }
 
 setKits(kitsValue)
@@ -560,23 +576,6 @@ console.log("CHECK TARGET KEYS:", {
 // =========================
 // EFFECTS (CORRECT LOCATION)
 // =========================
-
-useEffect(() => {
-  const today = new Date()
-  const year = selectedMonth.getFullYear()
-  const month = selectedMonth.getMonth()
-  const endOfMonth = new Date(year, month + 1, 0)
-
-  let percent = 0
-
-  if (today.getFullYear() === year && today.getMonth() === month) {
-    percent = (today.getDate() / endOfMonth.getDate()) * 100
-  } else if (today > endOfMonth) {
-    percent = 100
-  }
-
-  setPercentIntoPeriod(Math.round(percent))
-}, [selectedMonth])
 
 useEffect(() => {
   const fetchLastUpdated = async () => {
@@ -597,7 +596,7 @@ useEffect(() => {
 
 useEffect(() => {
   fetchData()
-}, [selectedMonth, percentIntoPeriod])
+}, [selectedMonth])
 
   // =========================
   // MONTH NAV
@@ -653,7 +652,7 @@ const conversion =
       <div>
         <div style={headerLabel}>% Into Period</div>
         <input
-          value={percentIntoPeriod + '%'}
+          value={localPercent + '%'}
           readOnly
           style={metaInput}
         />
