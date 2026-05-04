@@ -262,8 +262,10 @@ setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
 setStartsTarget(startsTargetValue)
 
+}
+
 // =========================
-// EFFECTS (TOP LEVEL ONLY)
+// EFFECTS (CORRECT LOCATION)
 // =========================
 
 useEffect(() => {
@@ -303,7 +305,6 @@ useEffect(() => {
 useEffect(() => {
   fetchData()
 }, [selectedMonth])
-
 
   // =========================
   // MONTH NAV
