@@ -422,12 +422,12 @@ setKeptTarget(
 // CONVERSION RATE
 // =========================
 
+const safePrevScheduled = Number(prevJScheduled + prevSecondScheduled) || 0
+const safePrevKept = Number(prevJKept + prevSecondKept) || 0
+
 const prevConversionValue =
-  (prevJScheduled + prevSecondScheduled) > 0
-    ? (
-        (prevJKept + prevSecondKept) /
-        (prevJScheduled + prevSecondScheduled)
-      ) * 100
+  safePrevScheduled > 0
+    ? (safePrevKept / safePrevScheduled) * 100
     : 0
 
 setPrevConversion(prevConversionValue)
@@ -511,7 +511,14 @@ setKitsTarget(
   const formatMonth = (date: Date) =>
     date.toLocaleString('default', { month: 'short', year: 'numeric' })
 
- const conversion = scheduledTarget ? (kept / scheduledTarget) * 100 : 0
+const safeKept = Number(kept) || 0
+const safeScheduled = Number(scheduledTarget) || 0
+
+const conversion =
+  safeScheduled > 0
+    ? (safeKept / safeScheduled) * 100
+    : 0
+
  console.log("Conversion label:", labelMap["Conversion Rate"])
 
   // =========================
@@ -674,7 +681,8 @@ const Card = ({ title, value, prev = 0, target = 0 }: any) => {
 const isPercent = title.toLowerCase().includes('conversion')
 
 const formatValue = (val: any) => {
-  const num = Number(val || 0)
+  const parsed = Number(val)
+  const num = isNaN(parsed) ? 0 : parsed
 
   if (isCurrency) {
     return '$' + num.toLocaleString(undefined, {
@@ -689,9 +697,11 @@ const formatValue = (val: any) => {
 
   return num
 }
-  const numericValue = Number(
-    String(value).replace(/[^0-9.-]+/g, '')
-  )
+const cleaned = Number(
+  String(value).replace(/[^0-9.-]+/g, '')
+)
+
+const numericValue = isNaN(cleaned) ? 0 : cleaned
 
   const percent =
     Number(target) > 0
