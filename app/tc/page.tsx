@@ -260,7 +260,7 @@ const getJordynSharedTarget = async (title: string) => {
   const { data: row } = await supabase
     .from('dashboard_okr_data')
     .select('key_result_id')
-    .eq('user_name', 'Jordyn') // 🔥 THIS IS THE FIX
+    .eq('user_name', 'Jordyn')
     .eq('key_result_title', title)
     .maybeSingle()
 
@@ -269,14 +269,30 @@ const getJordynSharedTarget = async (title: string) => {
     return 0
   }
 
-  const { data } = await supabase
+  // TRY CURRENT MONTH
+  const { data: current } = await supabase
     .from('key_result_updates')
     .select('target_value')
     .eq('key_result_id', row.key_result_id)
     .eq('reporting_month', reportingDate)
     .maybeSingle()
 
-  return Number(data?.target_value ?? 0)
+  if (current?.target_value !== null && current?.target_value !== undefined) {
+    return Number(current.target_value)
+  }
+
+  // FALLBACK TO PREVIOUS MONTHS
+  const { data: prev } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .lt('reporting_month', reportingDate)
+    .not('target_value', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  return Number(prev?.target_value ?? 0)
 }
 
 const fetchData = async () => {
