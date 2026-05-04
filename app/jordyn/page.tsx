@@ -509,6 +509,18 @@ const resolvedTarget =
   prevRow?.target_value ??
   krData?.target_value ??
   ''
+if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
+  await supabase
+    .from('key_result_updates')
+    .upsert(
+      {
+        key_result_id: keyResultIdLocal,
+        reporting_month: currentDate,
+        target_value: resolvedTarget,
+      },
+      { onConflict: 'key_result_id,reporting_month' }
+    )
+}
 
   console.log("TARGET ROWS:", { currentRow, prevRow, krData })
 
