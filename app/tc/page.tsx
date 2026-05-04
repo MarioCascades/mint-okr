@@ -266,20 +266,30 @@ const getJordynSharedTarget = async (title: string) => {
 
   if (!row) return 0
 
-  const { data: all } = await supabase
+  // 1. Try exact current month
+  const { data: current } = await supabase
     .from('key_result_updates')
-    .select('target_value, reporting_month')
+    .select('target_value')
     .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingDate)
+    .maybeSingle()
+
+  if (current?.target_value !== null && current?.target_value !== undefined) {
+    return Number(current.target_value)
+  }
+
+  // 2. Fallback to most recent previous
+  const { data: prev } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .lt('reporting_month', reportingDate)
     .not('target_value', 'is', null)
     .order('reporting_month', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
-  if (!all || all.length === 0) return 0
-
- const match = all.find(r => {
-  return r.reporting_month <= reportingDate
-})
-
-  return Number(match?.target_value ?? 0)
+  return Number(prev?.target_value ?? 0)
 }
 
 const fetchData = async () => {
