@@ -556,7 +556,20 @@ if (!isDirty) {
         .eq('reporting_month', currentDate)
         .maybeSingle()
 
-      const currentValue = current?.value ?? ''
+      const currentValue = current?.value
+
+// =========================
+// SET CURRENT VALUE (FIX MISSING UI STATE)
+// =========================
+if (!isDirty) {
+  if (currentValue !== null && currentValue !== undefined) {
+    setValue(String(currentValue))
+  }
+
+  if (setParentValue && currentValue !== null && currentValue !== undefined) {
+    setParentValue(Number(currentValue))
+  }
+}
         
 // =========================
 // PREVIOUS MONTH (NORMAL KRs)
