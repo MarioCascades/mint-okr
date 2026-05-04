@@ -448,6 +448,7 @@ const kitsTargetValue = await getTargetWithCarryForward(
 setKits(kitsValue)
 setPrevKits(prevKitsValue)
 setKitsTarget(kitsTargetValue)
+}
 
 // =========================
 // EFFECTS (CORRECT LOCATION)
