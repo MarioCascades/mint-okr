@@ -262,7 +262,28 @@ setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
 setStartsTarget(startsTargetValue)
 
+// =========================
+// TOTAL PRODUCTION (JORDYN)
+// =========================
 
+const totalProductionValue = await getValue(
+  'Jordyn',
+  labelMap["Total Production"]
+)
+
+const prevProductionValue = await getPrevValue(
+  'Jordyn',
+  labelMap["Total Production"]
+)
+
+const productionTargetValue = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Total Production"]
+)
+
+setTotalProduction(totalProductionValue)
+setPrevProduction(prevProductionValue)
+setProductionTarget(productionTargetValue)
 
 // =========================
 // SCHEDULED NEW PATIENTS (JORDYN)
@@ -322,6 +343,47 @@ const keptTargetValue =
 setKept(keptValue)
 setPrevKept(prevKeptValue)
 setKeptTarget(keptTargetValue)
+
+// =========================
+// CONVERSION RATE (TEAM AVG)
+// =========================
+
+const jordynConversion = await getValue(
+  'Jordyn',
+  labelMap["Conversion Rate"]
+)
+
+const secondConversion = await getValue(
+  secondTC,
+  labelMap["Conversion Rate"]
+)
+
+const conversionValue = (jordynConversion + secondConversion) / 2
+
+const prevJordynConversion = await getPrevValue(
+  'Jordyn',
+  labelMap["Conversion Rate"]
+)
+
+const prevSecondConversion = await getPrevValue(
+  secondTC,
+  labelMap["Conversion Rate"]
+)
+
+const prevConversionValue =
+  (prevJordynConversion + prevSecondConversion) / 2
+
+const conversionTargetValue =
+  (
+    (await getTargetWithCarryForward('Jordyn', labelMap["Conversion Rate"])) +
+    (await getTargetWithCarryForward(secondTC, labelMap["Conversion Rate"]))
+  ) / 2
+
+setPrevConversion(prevConversionValue)
+setConversionTarget(conversionTargetValue)
+
+// ⚠️ IMPORTANT: DO NOT set "conversion" here
+// your UI already calculates it below
 
 }
 
