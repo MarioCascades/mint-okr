@@ -262,28 +262,28 @@ setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
 setStartsTarget(startsTargetValue)
 
-  // =========================
-  // % INTO PERIOD
-  // =========================
+// =========================
+// EFFECTS (TOP LEVEL ONLY)
+// =========================
 
-  useEffect(() => {
-    const today = new Date()
-    const year = selectedMonth.getFullYear()
-    const month = selectedMonth.getMonth()
-    const endOfMonth = new Date(year, month + 1, 0)
+useEffect(() => {
+  const today = new Date()
+  const year = selectedMonth.getFullYear()
+  const month = selectedMonth.getMonth()
+  const endOfMonth = new Date(year, month + 1, 0)
 
-    let percent = 0
+  let percent = 0
 
-    if (today.getFullYear() === year && today.getMonth() === month) {
-      percent = (today.getDate() / endOfMonth.getDate()) * 100
-    } else if (today > endOfMonth) {
-      percent = 100
-    }
+  if (today.getFullYear() === year && today.getMonth() === month) {
+    percent = (today.getDate() / endOfMonth.getDate()) * 100
+  } else if (today > endOfMonth) {
+    percent = 100
+  }
 
-    setPercentIntoPeriod(Math.round(percent) + '%')
-  }, [selectedMonth])
+  setPercentIntoPeriod(Math.round(percent) + '%')
+}, [selectedMonth])
 
-  useEffect(() => {
+useEffect(() => {
   const fetchLastUpdated = async () => {
     const { data } = await supabase
       .from('key_result_updates')
@@ -303,7 +303,6 @@ setStartsTarget(startsTargetValue)
 useEffect(() => {
   fetchData()
 }, [selectedMonth])
-
 
 
   // =========================
