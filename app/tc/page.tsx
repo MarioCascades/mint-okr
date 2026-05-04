@@ -256,13 +256,13 @@ const getTargetWithCarryForward = async (user: string, title: string) => {
 // =========================
 const getJordynSharedTarget = async (title: string) => {
 
-  const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', 'Jordyn')
-    .eq('key_result_title', title)
-    .maybeSingle()
+const { data: row } = await supabase
+  .from('dashboard_okr_data')
+  .select('key_result_id')
+  .ilike('key_result_title', `%${title}%`)
+  .maybeSingle()
 
+  console.log("TARGET ROW FOUND:", row)
   if (!row) return 0
 
   // 1. Try current month
