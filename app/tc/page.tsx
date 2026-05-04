@@ -278,18 +278,20 @@ const getJordynSharedTarget = async (title: string) => {
   }
 
   // 2. SAFE fallback (fixed)
-  const { data: prevRows } = await supabase
-    .from('key_result_updates')
-    .select('target_value, reporting_month')
-    .eq('key_result_id', row.key_result_id)
-    .lte('reporting_month', reportingDate)
-    .not('target_value', 'is', null)
-    .order('reporting_month', { ascending: false })
-    .limit(1)
+const { data: prevRows } = await supabase
+  .from('key_result_updates')
+  .select('target_value, reporting_month')
+  .eq('key_result_id', row.key_result_id)
+  .not('target_value', 'is', null)
+  .order('reporting_month', { ascending: false })
 
-  console.log("PREV ROWS FOUND:", prevRows)
+console.log("ALL TARGET ROWS:", prevRows)
 
-  const resolvedTarget = Number(prevRows?.[0]?.target_value ?? 0)
+const resolvedRow = prevRows?.find(r => {
+  return new Date(r.reporting_month) <= new Date(reportingDate)
+})
+
+const resolvedTarget = Number(resolvedRow?.target_value ?? 0)
 
   return resolvedTarget
 }
