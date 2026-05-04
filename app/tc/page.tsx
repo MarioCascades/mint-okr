@@ -169,19 +169,98 @@ const getSharedTarget = async (title: string) => {
   return Number(data?.target_value ?? 0)
 }
 
+// =========================
+// PREVIOUS VALUE (USER)
+// =========================
+const getPrevValue = async (user: string, title: string) => {
+
+  const prevDate = new Date(selectedMonth)
+  prevDate.setMonth(prevDate.getMonth() - 1)
+
+  const prevReportingDate = formatDate(prevDate)
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', user)
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data } = await supabase
+    .from('key_result_updates')
+    .select('value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', prevReportingDate)
+    .maybeSingle()
+
+  return Number(data?.value ?? 0)
+}
+
+// =========================
+// TARGET (CARRY FORWARD)
+// =========================
+const getTargetWithCarryForward = async (user: string, title: string) => {
+
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', user)
+    .eq('key_result_title', title)
+    .maybeSingle()
+
+  if (!row) return 0
+
+  const { data: current } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .eq('reporting_month', reportingDate)
+    .maybeSingle()
+
+  if (current?.target_value !== null && current?.target_value !== undefined) {
+    return Number(current.target_value)
+  }
+
+  const { data: prev } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', row.key_result_id)
+    .lt('reporting_month', reportingDate)
+    .not('target_value', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  return Number(prev?.target_value ?? 0)
+}
 
 
 const fetchData = async () => {
 
-  // TOTAL STARTS (TEMP - still shared, we fix logic next)
-  const totalStartsValue = await getSharedValue(labelMap["Total Starts"])
-  const prevStartsValue = await getSharedPrevValue(labelMap["Total Starts"])
-  const startsTargetValue = await getSharedTarget(labelMap["Total Starts"])
+ // =========================
+// TOTAL STARTS (JORDYN ONLY)
+// =========================
 
-  setTotalStarts(totalStartsValue)
-  setPrevStarts(prevStartsValue)
-  setStartsTarget(startsTargetValue)
-}
+const totalStartsValue = await getValue(
+  'Jordyn',
+  labelMap["Total Starts"]
+)
+
+const prevStartsValue = await getPrevValue(
+  'Jordyn',
+  labelMap["Total Starts"]
+)
+
+const startsTargetValue = await getTargetWithCarryForward(
+  'Jordyn',
+  labelMap["Total Starts"]
+)
+
+setTotalStarts(totalStartsValue)
+setPrevStarts(prevStartsValue)
+setStartsTarget(startsTargetValue)
 
   // =========================
   // % INTO PERIOD
