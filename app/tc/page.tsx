@@ -239,19 +239,33 @@ const getTargetWithCarryForward = async (user: string, title: string) => {
 
 const fetchData = async () => {
 
- // =========================
-// TOTAL STARTS (JORDYN ONLY)
+// =========================
+// TOTAL STARTS (TEAM COMPUTED)
 // =========================
 
-const totalStartsValue = await getValue(
+const jordynStarts = await getValue(
   'Jordyn',
-  labelMap["Total Starts"]
+  labelMap["Total Starts (Individual)"]
 )
 
-const prevStartsValue = await getPrevValue(
-  'Jordyn',
-  labelMap["Total Starts"]
+const secondStarts = await getValue(
+  secondTC,
+  labelMap["Total Starts (Individual)"]
 )
+
+const totalStartsValue = jordynStarts + secondStarts
+
+const prevJordynStarts = await getPrevValue(
+  'Jordyn',
+  labelMap["Total Starts (Individual)"]
+)
+
+const prevSecondStarts = await getPrevValue(
+  secondTC,
+  labelMap["Total Starts (Individual)"]
+)
+
+const prevStartsValue = prevJordynStarts + prevSecondStarts
 
 const startsTargetValue = await getTargetWithCarryForward(
   'Jordyn',
@@ -261,20 +275,33 @@ const startsTargetValue = await getTargetWithCarryForward(
 setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
 setStartsTarget(startsTargetValue)
-
 // =========================
-// TOTAL PRODUCTION (JORDYN)
+// TOTAL PRODUCTION (TEAM COMPUTED)
 // =========================
 
-const totalProductionValue = await getValue(
+const jordynProduction = await getValue(
   'Jordyn',
-  labelMap["Total Production"]
+  labelMap["Total Production (Individual)"]
 )
 
-const prevProductionValue = await getPrevValue(
-  'Jordyn',
-  labelMap["Total Production"]
+const secondProduction = await getValue(
+  secondTC,
+  labelMap["Total Production (Individual)"]
 )
+
+const totalProductionValue = jordynProduction + secondProduction
+
+const prevJordynProduction = await getPrevValue(
+  'Jordyn',
+  labelMap["Total Production (Individual)"]
+)
+
+const prevSecondProduction = await getPrevValue(
+  secondTC,
+  labelMap["Total Production (Individual)"]
+)
+
+const prevProductionValue = prevJordynProduction + prevSecondProduction
 
 const productionTargetValue = await getTargetWithCarryForward(
   'Jordyn',
@@ -386,18 +413,32 @@ setConversionTarget(conversionTargetValue)
 // your UI already calculates it below
 
 // =========================
-// TOTAL WHITENING KITS (JORDYN MIRROR)
+// TOTAL WHITENING KITS (TEAM COMPUTED)
 // =========================
 
-const kitsValue = await getValue(
+const jordynKits = await getValue(
   'Jordyn',
-  labelMap["Total Whitening Kits"]
+  labelMap["Whitening Kits"]
 )
 
-const prevKitsValue = await getPrevValue(
-  'Jordyn',
-  labelMap["Total Whitening Kits"]
+const secondKits = await getValue(
+  secondTC,
+  labelMap["Whitening Kits"]
 )
+
+const kitsValue = jordynKits + secondKits
+
+const prevJordynKits = await getPrevValue(
+  'Jordyn',
+  labelMap["Whitening Kits"]
+)
+
+const prevSecondKits = await getPrevValue(
+  secondTC,
+  labelMap["Whitening Kits"]
+)
+
+const prevKitsValue = prevJordynKits + prevSecondKits
 
 const kitsTargetValue = await getTargetWithCarryForward(
   'Jordyn',
@@ -407,8 +448,6 @@ const kitsTargetValue = await getTargetWithCarryForward(
 setKits(kitsValue)
 setPrevKits(prevKitsValue)
 setKitsTarget(kitsTargetValue)
-
-}
 
 // =========================
 // EFFECTS (CORRECT LOCATION)
