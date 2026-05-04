@@ -265,17 +265,6 @@ const getJordynSharedTarget = async (title: string) => {
 
   if (!row) return 0
 
-const getJordynSharedTarget = async (title: string) => {
-
-  const { data: row } = await supabase
-    .from('dashboard_okr_data')
-    .select('key_result_id')
-    .eq('user_name', 'Jordyn')
-    .eq('key_result_title', title)
-    .maybeSingle()
-
-  if (!row) return 0
-
   // 1. Try current month
   const { data: current } = await supabase
     .from('key_result_updates')
@@ -303,7 +292,6 @@ const getJordynSharedTarget = async (title: string) => {
   const resolvedTarget = Number(prevRows?.[0]?.target_value ?? 0)
 
   return resolvedTarget
-
 }
 
 const fetchData = async () => {
@@ -362,11 +350,6 @@ const isCurrentMonth =
   today.getFullYear() === selectedMonth.getFullYear() &&
   today.getMonth() === selectedMonth.getMonth()
 
-if (isCurrentMonth && localPercent > 0) {
-  startsTargetValue = Math.round(
-    startsTargetValue * (localPercent / 100)
-  )
-}
 
 setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
@@ -404,11 +387,6 @@ let productionTargetValue = await getJordynSharedTarget(
   labelMap["Total Production"]
 )
 
-if (isCurrentMonth && localPercent > 0) {
-productionTargetValue = Math.round(
-  productionTargetValue * (localPercent / 100)
-)
-}
 
 setTotalProduction(totalProductionValue)
 setPrevProduction(prevProductionValue)
@@ -432,11 +410,6 @@ let scheduledTargetValue = await getTargetWithCarryForward(
   labelMap["Scheduled New Patients"]
 )
 
-if (isCurrentMonth && localPercent > 0){
-   scheduledTargetValue = Math.round(
-   scheduledTargetValue * (localPercent / 100)
-)
-}
 
 setScheduled(scheduledValue)
 setPrevScheduled(prevScheduledValue)
@@ -550,15 +523,6 @@ const prevKitsValue = prevJordynKits + prevSecondKits
 let kitsTargetValue = await getJordynSharedTarget(
   labelMap["Total Whitening Kits"]
 )
-
-
-
-if (isCurrentMonth && localPercent > 0) {
- 
-  kitsTargetValue = Math.round(
-  kitsTargetValue * (localPercent / 100)
-)
-}
 
 setKits(kitsValue)
 setPrevKits(prevKitsValue)
@@ -710,7 +674,7 @@ const conversion =
   value={totalStarts} 
   prev={prevStarts}
   target={startsTarget}
-  setTarget={setStartsTarget}
+  percentIntoPeriod={localPercent}
  
 />
         <Card
@@ -718,7 +682,7 @@ const conversion =
   value={`$${Number(totalProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
   prev={`$${Number(prevProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
   target={productionTarget}
-  setTarget={setProductionTarget}
+  percentIntoPeriod={localPercent}
  
 
 />
@@ -727,7 +691,7 @@ const conversion =
   value={scheduled}
   prev={prevScheduled}
   target={scheduledTarget}
-  setTarget={setScheduledTarget}
+  percentIntoPeriod={localPercent}
   
 
 />
@@ -736,7 +700,7 @@ const conversion =
   value={kept}
   prev={prevKept}
   target={keptTarget}
-  setTarget={setKeptTarget}
+  percentIntoPeriod={localPercent}
   
 
 />
@@ -746,7 +710,7 @@ const conversion =
   value={`${conversion.toFixed(0)}%`}
   prev={`${prevConversion.toFixed(0)}%`}
   target={conversionTarget}
-  setTarget={setConversionTarget}
+  percentIntoPeriod={localPercent}
   
 />
         <Card 
@@ -754,7 +718,7 @@ const conversion =
   value={kits}
   prev={prevKits}
   target={kitsTarget}
-  setTarget={setKitsTarget}
+  percentIntoPeriod={localPercent}
 
 />
 
