@@ -256,16 +256,16 @@ const getTargetWithCarryForward = async (user: string, title: string) => {
 // =========================
 const getJordynSharedTarget = async (title: string) => {
 
-const { data: row } = await supabase
-  .from('dashboard_okr_data')
-  .select('key_result_id')
-  .ilike('key_result_title', `%${title}%`)
-  .maybeSingle()
+  const { data: row } = await supabase
+    .from('dashboard_okr_data')
+    .select('key_result_id')
+    .eq('user_name', 'Jordyn')
+    .eq('key_result_title', title)
+    .maybeSingle()
 
   console.log("TARGET ROW FOUND:", row)
   if (!row) return 0
 
-  // 1. Try current month
   const { data: current } = await supabase
     .from('key_result_updates')
     .select('target_value')
@@ -277,21 +277,16 @@ const { data: row } = await supabase
     return Number(current.target_value)
   }
 
-  // 2. SAFE fallback (fixed)
-const { data: prevRows } = await supabase
-  .from('key_result_updates')
-  .select('target_value, reporting_month')
-  .eq('key_result_id', row.key_result_id)
-  .not('target_value', 'is', null)
-  .order('reporting_month', { ascending: false })
+  const { data: prevRows } = await supabase
+    .from('key_result_updates')
+    .select('target_value, reporting_month')
+    .eq('key_result_id', row.key_result_id)
+    .lte('reporting_month', reportingDate)
+    .not('target_value', 'is', null)
+    .order('reporting_month', { ascending: false })
+    .limit(1)
 
-console.log("ALL TARGET ROWS:", prevRows)
-
-const resolvedRow = prevRows?.find(r => {
-  return new Date(r.reporting_month) <= new Date(reportingDate)
-})
-
-const resolvedTarget = Number(resolvedRow?.target_value ?? 0)
+  const resolvedTarget = Number(prevRows?.[0]?.target_value ?? 0)
 
   return resolvedTarget
 }
