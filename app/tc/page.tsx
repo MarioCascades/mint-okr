@@ -256,13 +256,13 @@ const getTargetWithCarryForward = async (user: string, title: string) => {
 // =========================
 const getJordynSharedTarget = async (title: string) => {
 
-  const { data: row } = await supabase
+const { data: rows } = await supabase
   .from('dashboard_okr_data')
-  .select('key_result_id')
-  .eq('user_name', 'Jordyn')
+  .select('key_result_id, user_name')
   .eq('key_result_title', title)
-.limit(1)
-.single()
+
+const row =
+  rows?.find(r => r.user_name === 'Jordyn') || rows?.[0]
 
   console.log("TARGET ROW FOUND:", row)
   if (!row) return 0
