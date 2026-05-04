@@ -264,35 +264,22 @@ const getJordynSharedTarget = async (title: string) => {
     .eq('key_result_title', title)
     .maybeSingle()
 
-  if (!row) {
-    console.warn("Missing shared target row:", title)
-    return 0
-  }
+  if (!row) return 0
 
-  // TRY CURRENT MONTH
-  const { data: current } = await supabase
+  const { data: all } = await supabase
     .from('key_result_updates')
-    .select('target_value')
+    .select('target_value, reporting_month')
     .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', reportingDate)
-    .maybeSingle()
-
-  if (current?.target_value !== null && current?.target_value !== undefined) {
-    return Number(current.target_value)
-  }
-
-  // FALLBACK TO PREVIOUS MONTHS
-  const { data: prev } = await supabase
-    .from('key_result_updates')
-    .select('target_value')
-    .eq('key_result_id', row.key_result_id)
-    .lt('reporting_month', reportingDate)
     .not('target_value', 'is', null)
     .order('reporting_month', { ascending: false })
-    .limit(1)
-    .maybeSingle()
 
-  return Number(prev?.target_value ?? 0)
+  if (!all || all.length === 0) return 0
+
+ const match = all.find(r => {
+  return r.reporting_month <= reportingDate
+})
+
+  return Number(match?.target_value ?? 0)
 }
 
 const fetchData = async () => {
@@ -330,11 +317,17 @@ let startsTargetValue = await getJordynSharedTarget(
 )
 
 
-if (percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+const today = new Date()
+
+const isCurrentMonth =
+  today.getFullYear() === selectedMonth.getFullYear() &&
+  today.getMonth() === selectedMonth.getMonth()
+
+if (isCurrentMonth && percentIntoPeriod > 0) {
   startsTargetValue =
-    startsTargetValue * (adjustedPercent / 100)
+    startsTargetValue * (percentIntoPeriod / 100)
 }
+
 setTotalStarts(totalStartsValue)
 setPrevStarts(prevStartsValue)
 setStartsTarget(startsTargetValue)
@@ -370,10 +363,9 @@ let productionTargetValue = await getJordynSharedTarget(
   labelMap["Total Production"]
 )
 
-if (percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
+if (isCurrentMonth && percentIntoPeriod > 0) {
   productionTargetValue =
-    productionTargetValue * (adjustedPercent / 100)
+    productionTargetValue * (percentIntoPeriod / 100)
 }
 
 setTotalProduction(totalProductionValue)
@@ -517,11 +509,7 @@ let kitsTargetValue = await getJordynSharedTarget(
   labelMap["Total Whitening Kits"]
 )
 
-const today = new Date()
 
-const isCurrentMonth =
-  today.getFullYear() === selectedMonth.getFullYear() &&
-  today.getMonth() === selectedMonth.getMonth()
 
 if (isCurrentMonth && percentIntoPeriod > 0) {
   const adjustedPercent = Math.max(percentIntoPeriod, 25)
