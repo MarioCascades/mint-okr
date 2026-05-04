@@ -683,9 +683,6 @@ if (!isDirty) {
   setValue(currentValue ? String(currentValue) : '')
 }
 
- if (!isDirty) {
-  setValue(currentValue ? String(currentValue) : '')
-}
 
 if (setParentValue && currentValue !== undefined) {
   setParentValue(Number(currentValue))
@@ -749,6 +746,7 @@ useEffect(() => {
 }, [value, localTarget, percentIntoPeriod])
 
   const handleSave = async () => {
+  if (isComputed) return
 
     if (!keyResultId) return
     
@@ -931,8 +929,9 @@ onKeyDown={handleEnter}
         : value
     )
 }
-          disabled={!isEditing || (isComputed && label !== "Total Whitening Kits")}
+          disabled={!isEditing || isComputed}
           onChange={(e) => {
+  if (isComputed) return
               const raw = e.target.value.replace(/[^0-9.]/g, '')
 const parts = raw.split('.').slice(0, 2)
 
