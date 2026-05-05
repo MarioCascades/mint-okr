@@ -795,8 +795,8 @@ useEffect(() => {
   }
 }, [value, localTarget, percentIntoPeriod])
 
-  const handleSave = async () => {
-  if (isComputed) return
+ const handleSave = async () => {
+  if (isComputed && !isMasterTarget) return
 
     if (!keyResultId) return
     
