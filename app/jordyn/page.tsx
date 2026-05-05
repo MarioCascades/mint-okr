@@ -377,18 +377,22 @@ const KeyResult = ({
 
   const isTimeBound = timeBoundSet.has(label)
 
-  const calculateScore = (actual: number, targetVal: number) => {
-  if (!targetVal || targetVal <= 0) return '0%'
+const calculateScore = (actual: number, targetVal: number) => {
+  const safeActual = Number(actual)
+  const safeTarget = Number(targetVal)
+
+  if (isNaN(safeActual) || safeActual === 0) return '0%'
+  if (isNaN(safeTarget) || safeTarget === 0) return '0%'
 
   const isTimeBound = timeBoundSet.has(label)
 
   const effectiveTarget = isTimeBound
-    ? targetVal * (percentIntoPeriod / 100)
-    : targetVal
+    ? safeTarget * (percentIntoPeriod / 100)
+    : safeTarget
 
-  if (effectiveTarget <= 0) return '0%'
+  if (isNaN(effectiveTarget) || effectiveTarget === 0) return '0%'
 
-  return Math.round((actual / effectiveTarget) * 100) + '%'
+  return Math.round((safeActual / effectiveTarget) * 100) + '%'
 }
 
   const handleEnter = (e: any) => {
@@ -889,17 +893,17 @@ const actualValue = Number(value || 0)
   {label}
 
   {isTimeBound && (
-    <span style={{
-      fontSize: 10,
-      padding: '2px 6px',
-      borderRadius: 6,
-      backgroundColor: '#e0f2fe',
-      color: '#0369a1',
-      fontWeight: 600,
-      whiteSpace: 'nowrap'
-    }}>
-      time-bound
-    </span>
+    <span
+  title="Score is adjusted based on % of month completed"
+  style={{
+    fontSize: 11,
+    color: '#0369a1',
+    fontWeight: 600,
+    whiteSpace: 'nowrap'
+  }}
+>
+  (time-bound score)
+</span>
   )}
 </span>
 
