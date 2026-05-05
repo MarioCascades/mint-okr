@@ -261,34 +261,35 @@ const { data: rows } = await supabase
   .select('key_result_id')
   .eq('key_result_title', title)
 
-const row = rows?.[0]
+const keyResultIds = rows?.map(r => r.key_result_id) || []
 
-  console.log("TARGET ROW FOUND:", row)
-  if (!row) return 0
+if (keyResultIds.length === 0) return 0
 
-  const { data: current } = await supabase
-    .from('key_result_updates')
-    .select('target_value')
-    .eq('key_result_id', row.key_result_id)
-    .eq('reporting_month', reportingDate)
-    .maybeSingle()
+// GET current month (ALL matches)
+const { data: currentRows } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .in('key_result_id', keyResultIds)
+  .eq('reporting_month', reportingDate)
 
-  if (current?.target_value !== null && current?.target_value !== undefined) {
-    return Number(current.target_value)
-  }
+// if ANY row exists, use first valid
+if (currentRows && currentRows.length > 0) {
+  const valid = currentRows.find(r => r.target_value !== null)
+  if (valid) return Number(valid.target_value)
+}
 
-  const { data: prevRows } = await supabase
-    .from('key_result_updates')
-    .select('target_value, reporting_month')
-    .eq('key_result_id', row.key_result_id)
-    .lte('reporting_month', reportingDate)
-    .not('target_value', 'is', null)
-    .order('reporting_month', { ascending: false })
-    .limit(1)
+const { data: prevRows } = await supabase
+  .from('key_result_updates')
+  .select('target_value, reporting_month')
+  .in('key_result_id', keyResultIds)
+  .lte('reporting_month', reportingDate)
+  .not('target_value', 'is', null)
+  .order('reporting_month', { ascending: false })
 
-  const resolvedTarget = Number(prevRows?.[0]?.target_value ?? 0)
+if (!prevRows || prevRows.length === 0) return 0
 
-  return resolvedTarget
+return Number(prevRows[0].target_value)
+
 }
 
 const fetchData = async () => {
