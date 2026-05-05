@@ -198,7 +198,16 @@ export default function Page() {
 
     <button
       style={editButton}
-      onClick={() => setIsEditing(!isEditing)}
+      onClick={() => {
+  if (isEditing) {
+    // exiting edit mode → clear dirty state globally
+    setTimeout(() => {
+      document.dispatchEvent(new Event('force-refresh'))
+    }, 0)
+  }
+
+  setIsEditing(!isEditing)
+}}
     >
       {isEditing ? 'Save' : 'Edit'}
     </button>
@@ -356,6 +365,10 @@ const KeyResult = ({
   metricType === 'currency' ||
   label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
+  const isMasterTarget =
+  label === "Total Starts" ||
+  label === "Total Production" ||
+  label === "Total Whitening Kits"
 
 
   const handleEnter = (e: any) => {
@@ -872,9 +885,13 @@ const actualValue = Number(value || 0)
 
         <input
           style={targetCell}
-          value={
+         value={
   (() => {
     const displayVal = target ?? localTarget
+
+    if (isEditing && isMasterTarget) {
+      return displayVal
+    }
 
     if (isCurrency && displayVal) {
       return '$' + Number(displayVal).toLocaleString(undefined, {
