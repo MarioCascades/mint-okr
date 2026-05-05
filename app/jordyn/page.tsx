@@ -818,6 +818,21 @@ await supabase.from('key_result_updates').upsert(
   { onConflict: 'key_result_id,reporting_month' }
 )
   }
+
+  useEffect(() => {
+  const saveFn = () => {
+    console.log('TRIGGERED SAVE FOR:', label)
+    handleSave()
+  }
+
+  document.addEventListener(`save-${label}`, saveFn)
+
+  return () => {
+    document.removeEventListener(`save-${label}`, saveFn)
+  }
+}, [handleSave])
+
+
 const handleInitiativeSave = async (
   index: number,
   text: string
@@ -919,6 +934,7 @@ const actualValue = Number(value || 0)
   })()
 }
           disabled={!isEditing}
+          onBlur={handleSave}
 
 onChange={async (e) => {
   let val = ''
