@@ -373,6 +373,19 @@ const KeyResult = ({
   label === "Total Production" ||
   label === "Total Whitening Kits"
 
+  const calculateScore = (actual: number, targetVal: number) => {
+  if (!targetVal || targetVal <= 0) return '0%'
+
+  const isTimeBound = timeBoundSet.has(label)
+
+  const effectiveTarget = isTimeBound
+    ? targetVal * (percentIntoPeriod / 100)
+    : targetVal
+
+  if (effectiveTarget <= 0) return '0%'
+
+  return Math.round((actual / effectiveTarget) * 100) + '%'
+}
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
@@ -659,21 +672,9 @@ if (
 
 const baseTarget = isMasterTarget
   ? Number(target || 0)
-  : Number(resolvedTarget ?? krData?.target_value ?? 0)
+  : Number(localTarget || resolvedTarget || 0)
 
-let effectiveTarget = baseTarget
-
-const isTimeBound = timeBoundSet.has(label)
-
-if (isTimeBound && percentIntoPeriod > 0) {
-  effectiveTarget = baseTarget * (percentIntoPeriod / 100)
-}
-
-if (effectiveTarget <= 0) {
-  setScore('0%')
-} else {
-  setScore(Math.round((total / effectiveTarget) * 100) + '%')
-}
+setScore(calculateScore(total, baseTarget))
 
 
 
@@ -751,22 +752,11 @@ if (isDirty) {
   c = Number(currentValue)
 }
 
-const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
+const baseTarget = isMasterTarget
+  ? Number(target || 0)
+  : Number(localTarget || resolvedTarget || 0)
 
-let effectiveTarget = t
-
-const isTimeBound = timeBoundSet.has(label)
-
-if (isTimeBound && percentIntoPeriod > 0) {
-  effectiveTarget = t * (percentIntoPeriod / 100)
-}
-
-if (effectiveTarget <= 0) {
-  setScore('0%')
-} else {
-  const percent = Math.round((c / effectiveTarget) * 100)
-setScore(percent + '%')
-}
+setScore(calculateScore(c, baseTarget))
 }
 
 fetchData();
@@ -775,24 +765,13 @@ fetchData();
 useEffect(() => {
   const numericVal = Number(value || 0)
 
-  const actualTarget = isMasterTarget ? target : localTarget
-  const numericTarget = Number(actualTarget || 0)
+  const numericTarget = isMasterTarget
+    ? Number(target || 0)
+    : Number(localTarget || 0)
 
-  let effectiveTarget = numericTarget
-
-  const isTimeBound = timeBoundSet.has(label)
-
-  if (isTimeBound && percentIntoPeriod > 0) {
-   effectiveTarget = numericTarget * (percentIntoPeriod / 100)
-  }
-
-  if (effectiveTarget > 0) {
-    const percent = Math.round((numericVal / effectiveTarget) * 100)
-    setScore(percent + '%')
-  } else {
-    setScore('0%')
-  }
+  setScore(calculateScore(numericVal, numericTarget))
 }, [value, localTarget, target, percentIntoPeriod])
+
 
  const handleSave = async () => {
   if (isComputed && !isMasterTarget) return
@@ -975,13 +954,7 @@ setIsDirty(true)
     effectiveTarget = numericTarget * (percentIntoPeriod / 100)
   }
 
-  if (effectiveTarget > 0) {
-    const percent = Math.round((numericVal / effectiveTarget) * 100)
-    setScore(percent + '%')
-  } else {
-    setScore('0%')
-  }
-
+setScore(calculateScore(numericVal, numericTarget))
 }}
 
 onKeyDown={handleEnter}
@@ -1040,12 +1013,7 @@ if (isTimeBound && percentIntoPeriod > 0) {
   effectiveTarget = numericTarget * (percentIntoPeriod / 100)
 }
 
-if (effectiveTarget > 0) {
-  const percent = Math.round((numericVal / effectiveTarget) * 100)
-  setScore(percent + '%')
-} else {
-  setScore('0%')
-}
+setScore(calculateScore(numericVal, numericTarget))
 }}
           onBlur={handleSave}
           onKeyDown={handleEnter}
