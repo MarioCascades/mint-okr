@@ -199,12 +199,10 @@ export default function Page() {
     <button
       style={editButton}
 
-      onClick={async () => {
+   onClick={async () => {
   if (isEditing) {
-    const inputs = document.querySelectorAll('input')
-
-    inputs.forEach((input) => {
-      (input as HTMLInputElement).blur()
+    document.querySelectorAll('input').forEach((input) => {
+      input.dispatchEvent(new Event('blur', { bubbles: true }))
     })
   }
 
