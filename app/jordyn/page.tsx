@@ -798,6 +798,8 @@ useEffect(() => {
  const handleSave = async () => {
   if (isComputed && !isMasterTarget) return
 
+  if (!localTarget && !isMasterTarget) return
+
     if (!keyResultId) return
     
 const y = selectedMonth.getFullYear()
@@ -826,7 +828,7 @@ await supabase.from('key_result_updates').upsert(
 )
   }
 
-  useEffect(() => {
+    useEffect(() => {
   const saveFn = () => {
     console.log('TRIGGERED SAVE FOR:', label)
     handleSave()
@@ -837,7 +839,7 @@ await supabase.from('key_result_updates').upsert(
   return () => {
     document.removeEventListener(`save-${label}`, saveFn)
   }
-}, [handleSave])
+}, [label, value, localTarget, keyResultId])
 
 
 const handleInitiativeSave = async (
