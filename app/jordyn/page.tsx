@@ -539,7 +539,8 @@ if (label === "Total Starts" && setTarget) {
 if (
   (label === "Total Production" || label === "Total Starts") &&
   setTarget &&
-  !isDirty
+  !isDirty &&
+  !isEditing
 ) {
   setTarget(resolvedTarget ? String(resolvedTarget) : '')
 }
@@ -875,14 +876,22 @@ const actualValue = Number(value || 0)
         <input
           style={targetCell}
           value={
-  isCurrency && localTarget
-    ? '$' + Number(localTarget).toLocaleString(undefined, {
+  (() => {
+    const displayVal = target ?? localTarget
+
+    if (isCurrency && displayVal) {
+      return '$' + Number(displayVal).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       })
-  : isPercentage && localTarget
-    ? localTarget + '%'
-  : localTarget
+    }
+
+    if (isPercentage && displayVal) {
+      return displayVal + '%'
+    }
+
+    return displayVal
+  })()
 }
           disabled={!isEditing}
 
@@ -897,16 +906,18 @@ onChange={async (e) => {
   if (parts.length > 1) {
     val += '.' + parts[1].slice(0, 2)
   }
-
-  // MASTER TARGET CONTROL (THIS IS THE FIX)
- if (
+  
+if (
   label === "Total Starts" ||
   label === "Total Production" ||
   label === "Total Whitening Kits"
 ) {
   if (setTarget) setTarget(val)
-  setIsDirty(true)
+} else {
+  setLocalTarget(val)
 }
+
+setIsDirty(true)
 
   // keep score calc SAME (unchanged logic)
   const numericVal = Number(value || 0)
