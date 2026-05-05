@@ -776,7 +776,9 @@ fetchData();
 
 useEffect(() => {
   const numericVal = Number(value || 0)
-  const numericTarget = Number(localTarget || 0)
+
+  const actualTarget = isMasterTarget ? target : localTarget
+  const numericTarget = Number(actualTarget || 0)
 
   let effectiveTarget = numericTarget
 
@@ -793,7 +795,7 @@ useEffect(() => {
   } else {
     setScore('0%')
   }
-}, [value, localTarget, percentIntoPeriod])
+}, [value, localTarget, target, percentIntoPeriod])
 
  const handleSave = async () => {
   if (isComputed && !isMasterTarget) return
