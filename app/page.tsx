@@ -413,20 +413,63 @@ const pPartnerStarts = await getPrevValue(
   'Total Starts (Individual)'
 )
 
+
 setPrevStarts(pjStarts + pPartnerStarts)
 
-const jt = await getTargetWithCarryForward(
-  'Jordyn',
-  'Total Starts (Individual)'
-)
+// =========================
+// STARTS TARGET (SHARED KR)
+// =========================
 
-const partnerTarget = await getTargetWithCarryForward(
-  tcPartner,
-  'Total Starts (Individual)'
-)
+// STEP 1: Get shared KR ID (via Jordyn)
+const { data: sharedStarts } = await supabase
+  .from('dashboard_okr_data')
+  .select('key_result_id')
+  .eq('user_name', 'Jordyn')
+  .eq('key_result_title', 'Total TC Starts')
+  .maybeSingle()
 
-setStartsTarget(jt + partnerTarget)
+if (sharedStarts?.key_result_id) {
 
+  const krId = sharedStarts.key_result_id
+
+  // STEP 2: dates
+  const currentDate = formatDate(selectedMonth)
+
+  const prevDateObj = new Date(selectedMonth)
+  prevDateObj.setMonth(prevDateObj.getMonth() - 1)
+  const prevDate = formatDate(prevDateObj)
+
+  // STEP 3: current month target
+  const { data: currentRow } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', krId)
+    .eq('reporting_month', currentDate)
+    .maybeSingle()
+
+  // STEP 4: previous month fallback
+  const { data: prevRow } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', krId)
+    .eq('reporting_month', prevDate)
+    .maybeSingle()
+
+  // STEP 5: base KR fallback
+  const { data: baseKr } = await supabase
+    .from('key_results')
+    .select('target_value')
+    .eq('id', krId)
+    .maybeSingle()
+
+  const resolvedTarget =
+    currentRow?.target_value ??
+    prevRow?.target_value ??
+    baseKr?.target_value ??
+    0
+
+  setStartsTarget(Number(resolvedTarget))
+}
 
 // PRODUCTION
 const jProd = await getValue(
@@ -453,18 +496,60 @@ const pPartnerProd = await getPrevValue(
 
 setPrevProduction(pjProd + pPartnerProd)
 
-const jtProd = await getTargetWithCarryForward(
-  'Jordyn',
-  'Total Production (Individual)'
-)
+// =========================
+// PRODUCTION TARGET (SHARED KR)
+// =========================
 
-const partnerProdTarget = await getTargetWithCarryForward(
-  tcPartner,
-  'Total Production (Individual)'
-)
+// STEP 1: Get shared KR ID (via Jordyn)
+const { data: sharedProduction } = await supabase
+  .from('dashboard_okr_data')
+  .select('key_result_id')
+  .eq('user_name', 'Jordyn')
+  .eq('key_result_title', 'TC Total Production after Discounts')
+  .maybeSingle()
 
-setProductionTarget(jtProd + partnerProdTarget)
+if (sharedProduction?.key_result_id) {
 
+  const krId = sharedProduction.key_result_id
+
+  // STEP 2: dates
+  const currentDate = formatDate(selectedMonth)
+
+  const prevDateObj = new Date(selectedMonth)
+  prevDateObj.setMonth(prevDateObj.getMonth() - 1)
+  const prevDate = formatDate(prevDateObj)
+
+  // STEP 3: current month target
+  const { data: currentRow } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', krId)
+    .eq('reporting_month', currentDate)
+    .maybeSingle()
+
+  // STEP 4: previous month fallback
+  const { data: prevRow } = await supabase
+    .from('key_result_updates')
+    .select('target_value')
+    .eq('key_result_id', krId)
+    .eq('reporting_month', prevDate)
+    .maybeSingle()
+
+  // STEP 5: base KR fallback
+  const { data: baseKr } = await supabase
+    .from('key_results')
+    .select('target_value')
+    .eq('id', krId)
+    .maybeSingle()
+
+  const resolvedTarget =
+    currentRow?.target_value ??
+    prevRow?.target_value ??
+    baseKr?.target_value ??
+    0
+
+  setProductionTarget(Number(resolvedTarget))
+}
 
 // SCHEDULED
 const jScheduled = await getValue(
