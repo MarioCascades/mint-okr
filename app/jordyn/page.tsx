@@ -547,15 +547,12 @@ if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(krData?.metric_type ?? '')
 
-
-if (
-  (label === "Total Production" || label === "Total Starts") &&
-  setTarget &&
-  !isDirty &&
-  !isEditing
-) {
+// ONLY load master target ON FIRST LOAD
+if (isMasterTarget && setTarget && !isDirty) {
   setTarget(resolvedTarget ? String(resolvedTarget) : '')
 }
+
+
 // DO NOT override master targets from DB
 
  if (!isDirty) {
@@ -798,6 +795,13 @@ const y = selectedMonth.getFullYear()
 const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
 const reportingDate = `${y}-${m}-01`
 
+console.log('SAVING TARGET:', {
+  label,
+  target,
+  localTarget,
+  isMasterTarget
+})
+
 await supabase.from('key_result_updates').upsert(
   {
     key_result_id: keyResultId,
@@ -806,7 +810,10 @@ await supabase.from('key_result_updates').upsert(
     target_value: isMasterTarget
       ? (target ? Number(target) : null)
       : (localTarget ? Number(localTarget) : null),
+      
   },
+
+  
   
   { onConflict: 'key_result_id,reporting_month' }
 )
