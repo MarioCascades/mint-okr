@@ -348,7 +348,7 @@ const KeyResult = ({
 
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
-  const [dbTarget, setDbTarget] = useState('')
+ 
   const [localTarget, setLocalTarget] = useState('')
   const [score, setScore] = useState('')
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
@@ -360,7 +360,6 @@ const KeyResult = ({
   ''
 ])
   const [isDirty, setIsDirty] = useState(false)
-  const [loadedMonth, setLoadedMonth] = useState('')
 
   const isPercentage =
   metricType === 'percentage' ||
@@ -392,7 +391,6 @@ const KeyResult = ({
 
       const dbLabel = labelMap[label]
 let keyResultIdLocal: string | null = null
-let kr: any = null
 
 const isSharedKR =
   label === "Total Starts" ||
@@ -659,15 +657,16 @@ if (
 
   setValue(total.toString())
 
-const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
+const baseTarget = isMasterTarget
+  ? Number(target || 0)
+  : Number(resolvedTarget ?? krData?.target_value ?? 0)
 
-let effectiveTarget = t
+let effectiveTarget = baseTarget
 
 const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = t * (adjustedPercent / 100)
+  effectiveTarget = baseTarget * (percentIntoPeriod / 100)
 }
 
 if (effectiveTarget <= 0) {
@@ -759,8 +758,7 @@ let effectiveTarget = t
 const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = t * (adjustedPercent / 100)
+  effectiveTarget = t * (percentIntoPeriod / 100)
 }
 
 if (effectiveTarget <= 0) {
@@ -785,8 +783,7 @@ useEffect(() => {
   const isTimeBound = timeBoundSet.has(label)
 
   if (isTimeBound && percentIntoPeriod > 0) {
-    const adjustedPercent = Math.max(percentIntoPeriod, 25)
-    effectiveTarget = numericTarget * (adjustedPercent / 100)
+   effectiveTarget = numericTarget * (percentIntoPeriod / 100)
   }
 
   if (effectiveTarget > 0) {
@@ -975,8 +972,7 @@ setIsDirty(true)
   const isTimeBound = timeBoundSet.has(label)
 
   if (isTimeBound && percentIntoPeriod > 0) {
-    const adjustedPercent = Math.max(percentIntoPeriod, 25)
-    effectiveTarget = numericTarget * (adjustedPercent / 100)
+    effectiveTarget = numericTarget * (percentIntoPeriod / 100)
   }
 
   if (effectiveTarget > 0) {
@@ -1041,8 +1037,7 @@ let effectiveTarget = numericTarget
 const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = numericTarget * (adjustedPercent / 100)
+  effectiveTarget = numericTarget * (percentIntoPeriod / 100)
 }
 
 if (effectiveTarget > 0) {
