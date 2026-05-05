@@ -34,8 +34,10 @@ const computedLabels = [
 ]
 const timeBoundSet = new Set([
   'Collections from Starts',
+  'Conversion Rate',
   'Kept New Patients',
   'Scheduled New Patients',
+  'SDS',
   'Starts @ Home',
   'Total Production',
   'Total Production (Individual)',
@@ -372,6 +374,8 @@ const KeyResult = ({
   label === "Total Starts" ||
   label === "Total Production" ||
   label === "Total Whitening Kits"
+
+  const isTimeBound = timeBoundSet.has(label)
 
   const calculateScore = (actual: number, targetVal: number) => {
   if (!targetVal || targetVal <= 0) return '0%'
@@ -881,7 +885,23 @@ const actualValue = Number(value || 0)
   return (
     <div style={{ marginBottom: 10 }} data-kr={label}>
       <div style={row}>
-        <span>{label}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  {label}
+
+  {isTimeBound && (
+    <span style={{
+      fontSize: 10,
+      padding: '2px 6px',
+      borderRadius: 6,
+      backgroundColor: '#e0f2fe',
+      color: '#0369a1',
+      fontWeight: 600,
+      whiteSpace: 'nowrap'
+    }}>
+      time-bound
+    </span>
+  )}
+</span>
 
         <input
           style={prevCell}
