@@ -204,7 +204,7 @@ export default function Page() {
     const inputs = document.querySelectorAll('input')
 
     inputs.forEach((input) => {
-      input.dispatchEvent(new Event('blur'))
+      (input as HTMLInputElement).blur()
     })
   }
 
