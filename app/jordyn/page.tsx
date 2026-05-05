@@ -536,10 +536,13 @@ if (label === "Total Starts" && setTarget) {
   setTarget(resolvedTarget ? String(resolvedTarget) : '')
 }
 
-if (label === "Total Production" && setTarget) {
+if (
+  (label === "Total Production" || label === "Total Starts") &&
+  setTarget &&
+  !isDirty
+) {
   setTarget(resolvedTarget ? String(resolvedTarget) : '')
 }
-
 // DO NOT override master targets from DB
 
  if (!isDirty) {
@@ -895,16 +898,15 @@ onChange={async (e) => {
     val += '.' + parts[1].slice(0, 2)
   }
 
-  // ✅ MASTER TARGET CONTROL (THIS IS THE FIX)
-  if (
-    label === "Total Starts" ||
-    label === "Total Production" ||
-    label === "Total Whitening Kits"
-  ) {
-    if (setTarget) setTarget(val)
-  } else {
-    setLocalTarget(val)
-  }
+  // MASTER TARGET CONTROL (THIS IS THE FIX)
+ if (
+  label === "Total Starts" ||
+  label === "Total Production" ||
+  label === "Total Whitening Kits"
+) {
+  if (setTarget) setTarget(val)
+  setIsDirty(true)
+}
 
   // keep score calc SAME (unchanged logic)
   const numericVal = Number(value || 0)
@@ -925,22 +927,6 @@ onChange={async (e) => {
     setScore('0%')
   }
 
-  // SAVE (unchanged)
-  if (!keyResultId) return
-
-  const y = selectedMonth.getFullYear()
-  const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
-  const reportingDate = `${y}-${m}-01`
-
-  await supabase.from('key_result_updates').upsert(
-    {
-      key_result_id: keyResultId,
-      reporting_month: reportingDate,
-      value: Number(value) || 0,
-      target_value: val ? Number(val) : null,
-    },
-    { onConflict: 'key_result_id,reporting_month' }
-  )
 }}
 
 onKeyDown={handleEnter}
