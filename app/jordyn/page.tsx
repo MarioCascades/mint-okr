@@ -508,27 +508,34 @@ const prevDate = formatDate(prev)
 // =======================
 // TARGET (MONTHLY SYSTEM)
 // =======================
-const { data: currentRows } = await supabase
+const { data: currentRow } = await supabase
   .from('key_result_updates')
   .select('target_value')
   .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', currentDate)
+  .maybeSingle()
 
-const currentRow = currentRows?.[0] ?? null
-
-  const { data: prevRows } = await supabase
+ const { data: prevRow } = await supabase
   .from('key_result_updates')
   .select('target_value')
   .eq('key_result_id', keyResultIdLocal)
   .eq('reporting_month', prevDate)
+  .maybeSingle()
 
-const prevRow = prevRows?.[0] ?? null
 
 const resolvedTarget =
   currentRow?.target_value ??
   prevRow?.target_value ??
   krData?.target_value ??
   ''
+console.log('FINAL TARGET USED:', {
+  label,
+  currentRow,
+  prevRow,
+  resolvedTarget
+})
+
+  
 if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
   await supabase
     .from('key_result_updates')
@@ -807,7 +814,9 @@ await supabase.from('key_result_updates').upsert(
     key_result_id: keyResultId,
     reporting_month: reportingDate,
     value: Number(value) || 0,
-  target_value: localTarget ? Number(localTarget) : null,
+ target_value: isMasterTarget
+  ? (target ? Number(target) : null)
+  : (localTarget ? Number(localTarget) : null),
       
   },
     
