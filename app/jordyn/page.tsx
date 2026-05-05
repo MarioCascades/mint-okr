@@ -807,14 +807,10 @@ await supabase.from('key_result_updates').upsert(
     key_result_id: keyResultId,
     reporting_month: reportingDate,
     value: Number(value) || 0,
-    target_value: isMasterTarget
-      ? (target ? Number(target) : null)
-      : (localTarget ? Number(localTarget) : null),
+  target_value: localTarget ? Number(localTarget) : null,
       
   },
-
-  
-  
+    
   { onConflict: 'key_result_id,reporting_month' }
 )
   }
@@ -948,15 +944,11 @@ onChange={async (e) => {
     val += '.' + parts[1].slice(0, 2)
   }
 
-if (
-  label === "Total Starts" ||
-  label === "Total Production" ||
-  label === "Total Whitening Kits"
-) {
+if (isMasterTarget) {
   if (setTarget) setTarget(val)
-} else {
-  setLocalTarget(val)
 }
+
+setLocalTarget(val)
 
 setIsDirty(true)
 
