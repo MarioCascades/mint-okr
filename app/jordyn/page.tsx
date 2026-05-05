@@ -199,10 +199,14 @@ export default function Page() {
     <button
       style={editButton}
 
-   onClick={async () => {
+ onClick={async () => {
   if (isEditing) {
-    document.querySelectorAll('input').forEach((input) => {
-      input.dispatchEvent(new Event('blur', { bubbles: true }))
+    // FORCE SAVE ALL KEY RESULTS
+    document.querySelectorAll('[data-kr]').forEach((el) => {
+      const label = el.getAttribute('data-kr')
+      if (label) {
+        document.dispatchEvent(new Event(`save-${label}`))
+      }
     })
   }
 
@@ -896,7 +900,7 @@ const actualValue = Number(value || 0)
 }
 
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ marginBottom: 10 }} data-kr={label}>
       <div style={row}>
         <span>{label}</span>
 
