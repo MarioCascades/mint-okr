@@ -564,7 +564,6 @@ if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
 
   console.log("TARGET ROWS:", { currentRow, prevRow, krData })
 
-setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(krData?.metric_type ?? '')
 
 // ONLY load master target ON FIRST LOAD
