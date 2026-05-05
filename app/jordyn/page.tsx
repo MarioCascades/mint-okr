@@ -198,12 +198,14 @@ export default function Page() {
 
     <button
       style={editButton}
-      onClick={() => {
+
+      onClick={async () => {
   if (isEditing) {
-    // exiting edit mode → clear dirty state globally
-    setTimeout(() => {
-      document.dispatchEvent(new Event('force-refresh'))
-    }, 0)
+    const inputs = document.querySelectorAll('input')
+
+    inputs.forEach((input) => {
+      input.dispatchEvent(new Event('blur'))
+    })
   }
 
   setIsEditing(!isEditing)
@@ -796,12 +798,14 @@ const y = selectedMonth.getFullYear()
 const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
 const reportingDate = `${y}-${m}-01`
 
- await supabase.from('key_result_updates').upsert(
+await supabase.from('key_result_updates').upsert(
   {
     key_result_id: keyResultId,
     reporting_month: reportingDate,
     value: Number(value) || 0,
-    target_value: localTarget ? Number(localTarget) : null,
+    target_value: isMasterTarget
+      ? (target ? Number(target) : null)
+      : (localTarget ? Number(localTarget) : null),
   },
   
   { onConflict: 'key_result_id,reporting_month' }
