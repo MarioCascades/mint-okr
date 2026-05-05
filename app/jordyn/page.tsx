@@ -532,9 +532,6 @@ if (!currentRow && resolvedTarget !== null && resolvedTarget !== '') {
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(krData?.metric_type ?? '')
 
-if (label === "Total Starts" && setTarget) {
-  setTarget(resolvedTarget ? String(resolvedTarget) : '')
-}
 
 if (
   (label === "Total Production" || label === "Total Starts") &&
@@ -906,7 +903,7 @@ onChange={async (e) => {
   if (parts.length > 1) {
     val += '.' + parts[1].slice(0, 2)
   }
-  
+
 if (
   label === "Total Starts" ||
   label === "Total Production" ||
