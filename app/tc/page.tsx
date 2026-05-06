@@ -678,10 +678,10 @@ const conversion =
   percentIntoPeriod={localPercent}
   isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
 />
-        <Card
+       <Card
   title="Total Production"
-  value={`$${Number(totalProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-  prev={`$${Number(prevProduction || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+  value={totalProduction}
+  prev={prevProduction}
   target={productionTarget}
   percentIntoPeriod={localPercent}
   isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
