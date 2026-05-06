@@ -75,6 +75,10 @@ export default function Page() {
   const [lastUpdated, setLastUpdated] = useState('')
   const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
+
+  // MASTER TARGETS (UI CONTROLLED)
+  const [masterStartsTarget, setMasterStartsTarget] = useState('0')
+  const [masterProductionTarget, setMasterProductionTarget] = useState('0')
   
 
 
@@ -201,7 +205,18 @@ export default function Page() {
 
     <button
       style={editButton}
-      onClick={() => setIsEditing(!isEditing)}
+      onClick={async () => {
+  if (isEditing) {
+    document.querySelectorAll('[data-kr]').forEach((el) => {
+      const label = el.getAttribute('data-kr')
+      if (label) {
+        document.dispatchEvent(new Event(`save-${label}`))
+      }
+    })
+  }
+
+  setIsEditing(!isEditing)
+}}
     >
       {isEditing ? 'Save' : 'Edit'}
     </button>
@@ -255,19 +270,25 @@ derivedTarget={undefined}
         </Objective>
 
         {/* OBJECTIVE 4 (MASTER) */}
+
+
         <Objective title="Objective 4: TC Total Start Performance">
 
      <KeyResult
   label="Total Starts"
   selectedMonth={selectedMonth}
   isEditing={isEditing}
+  target={masterStartsTarget}
+  setTarget={setMasterStartsTarget}
   percentIntoPeriod={percentIntoPeriod}
 />
 
-          <KeyResult
+<KeyResult
   label="Total Production"
   selectedMonth={selectedMonth}
   isEditing={isEditing} 
+  target={masterProductionTarget}
+  setTarget={setMasterProductionTarget}
   percentIntoPeriod={percentIntoPeriod}
 />
           
@@ -350,6 +371,10 @@ const KeyResult = ({
   metricType === 'currency' ||
   label === 'Collections from Starts'
   const isComputed = computedLabels.includes(label)
+  const isMasterTarget =
+  label === "Total Starts" ||
+  label === "Total Production" ||
+  label === "Total Whitening Kits"
 
   const handleEnter = (e: any) => {
     if (e.key === 'Enter') {
@@ -540,6 +565,10 @@ const resolvedTarget =
 
 setDbTarget(resolvedTarget ? resolvedTarget.toString() : '')
 setMetricType(kr?.metric_type ?? '')
+
+if (isMasterTarget && setTarget && !isDirty) {
+  setTarget(resolvedTarget ? String(resolvedTarget) : '')
+}
 
 if (!isDirty) {
   setLocalTarget(
@@ -792,7 +821,9 @@ const reportingDate = `${y}-${m}-01`
     key_result_id: keyResultId,
     reporting_month: reportingDate,
     value: value ? Number(value) : null,
-    target_value: localTarget ? Number(localTarget) : null,
+    target_value: isMasterTarget
+  ? (target ? Number(target) : null)
+  : (localTarget ? Number(localTarget) : null),
   },
   
   { onConflict: 'key_result_id,reporting_month' }
@@ -851,7 +882,7 @@ const getScoreBackground = () => {
 }
 
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ marginBottom: 10 }} data-kr={label}>
       <div style={row}>
         <span>{label}</span>
 
@@ -870,51 +901,68 @@ const getScoreBackground = () => {
         <input
           style={targetCell}
           value={
-  isCurrency && localTarget
-    ? '$' + localTarget
-  : isPercentage && localTarget
-    ? localTarget + '%'
-  : localTarget
+  (() => {
+    const displayVal = target ?? localTarget
+
+    if (isEditing && isMasterTarget) {
+      return displayVal
+    }
+
+    if (isCurrency && displayVal) {
+      return '$' + Number(displayVal).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+    }
+
+    if (isPercentage && displayVal) {
+      return displayVal + '%'
+    }
+
+    return displayVal
+  })()
 }
           disabled={!isEditing}
 
 onChange={(e) => {
   let val = ''
 
-  if (isCurrency || isPercentage) {
-    const raw = e.target.value.replace(/[^0-9.]/g, '')
-    const parts = raw.split('.').slice(0, 2)
+  const raw = e.target.value.replace(/[^0-9.]/g, '')
+  const parts = raw.split('.').slice(0, 2)
 
-    val = parts[0]
+  val = parts[0]
 
-    if (parts.length > 1) {
-      val += '.' + parts[1].slice(0, 2)
-    }
-  } else {
-    val = e.target.value.replace(/[^0-9]/g, '')
+  if (parts.length > 1) {
+    val += '.' + parts[1].slice(0, 2)
+  }
+
+  if (isMasterTarget) {
+    if (setTarget) setTarget(val)
   }
 
   setLocalTarget(val)
   setIsDirty(true)
+
   const numericVal = Number(value || 0)
-const numericTarget = Number(val || 0)
+  const numericTarget = Number(val || 0)
 
-let effectiveTarget = numericTarget
+  let effectiveTarget = numericTarget
 
-const isTimeBound = timeBoundSet.has(label)
+  const isTimeBound = timeBoundSet.has(label)
 
-if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = numericTarget * (adjustedPercent / 100)
-}
+  if (isTimeBound && percentIntoPeriod > 0) {
+    const adjustedPercent = Math.max(percentIntoPeriod, 25)
+    effectiveTarget = numericTarget * (adjustedPercent / 100)
+  }
 
-if (effectiveTarget > 0) {
-  const percent = Math.round((numericVal / effectiveTarget) * 100)
-  setScore(percent + '%')
-} else {
-  setScore('0%')
-}
+  if (effectiveTarget > 0) {
+    const percent = Math.round((numericVal / effectiveTarget) * 100)
+    setScore(percent + '%')
+  } else {
+    setScore('0%')
+  }
 }}
+
 onBlur={handleSave}
 onKeyDown={handleEnter}
 
