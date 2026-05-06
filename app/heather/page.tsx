@@ -242,6 +242,7 @@ export default function Page() {
   percentIntoPeriod={percentIntoPeriod}
 />
           <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
+          
           <KeyResult 
   label="Total Production (Individual)" 
   selectedMonth={selectedMonth} 

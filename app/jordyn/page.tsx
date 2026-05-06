@@ -241,7 +241,7 @@ export default function Page() {
   setParentValue={setJordynStarts}
   percentIntoPeriod={percentIntoPeriod}
 />
-          <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="SDS" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod} />
           <KeyResult 
   label="Total Production (Individual)" 
   selectedMonth={selectedMonth} 
@@ -893,17 +893,14 @@ const actualValue = Number(value || 0)
   {label}
 
   {isTimeBound && (
-    <span
-  title="Score is adjusted based on % of month completed"
-  style={{
-    fontSize: 11,
-    color: '#0369a1',
-    fontWeight: 600,
-    whiteSpace: 'nowrap'
-  }}
->
-  (time-bound score)
-</span>
+    <span style={{
+      fontSize: 11,
+      fontWeight: 500,
+      color: '#6B7280',
+      marginLeft: 6
+    }}>
+      (time-bound score)
+    </span>
   )}
 </span>
 
