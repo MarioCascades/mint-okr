@@ -15,6 +15,9 @@ import { supabase } from '../../lib/supabase'
 const formatPercent = (val: number) =>
   `${val.toFixed(2)}%`
 
+const timeBoundSet = new Set([
+  'NP Scheduled (GF)'
+])
 // =========================
 // PAGE
 // =========================
@@ -372,7 +375,44 @@ const isPercent = percentLabels.includes(label)
       if (isPercent) return formatPercent(v)
       return v.toString()
     }
-    
+
+    const calculateScore = (
+  actual: number,
+  targetVal: number
+) => {
+
+  const safeActual = Number(actual)
+  const safeTarget = Number(targetVal)
+
+  if (isNaN(safeActual) || safeActual === 0) {
+    return '0%'
+  }
+
+  if (isNaN(safeTarget) || safeTarget === 0) {
+    return '—'
+  }
+
+  const percentIntoPeriodNum =
+    parseFloat(String(percentIntoPeriod).replace('%', '')) / 100 || 0
+
+  const isTimeBound = timeBoundSet.has(label)
+
+  let effectiveTarget = safeTarget
+
+  if (isTimeBound && percentIntoPeriodNum > 0) {
+    effectiveTarget = safeTarget * percentIntoPeriodNum
+  }
+
+  if (isNaN(effectiveTarget) || effectiveTarget === 0) {
+    return '—'
+  }
+
+  const percent = Math.round(
+    (safeActual / effectiveTarget) * 100
+  )
+
+  return percent + '%'
+}
 
   const getScoreColor = () => {
   const num = Number(score.replace('%', ''))
@@ -644,44 +684,48 @@ if (formattedValue !== value) {
 }, [label, selectedMonth, sourceKeyResultId])
 
 // =========================
-// SCORE CALCULATION (SAFE)
+// SCORE CALCULATION
 // =========================
 
 useEffect(() => {
-  const numericValue = Number(String(value).replace('%', '')) || 0
-  const numericTarget = Number(String(target).replace('%', '')) || 0
 
-  if (!numericTarget) {
-    setScore(value ? '0%' : '—')
-    return
-  }
+  const numericValue =
+    Number(String(value).replace('%', '')) || 0
 
-  const timeBoundLabels = ["NP Scheduled (GF)"]
-  const isTimeBound = timeBoundLabels.includes(label)
+  const numericTarget =
+    Number(String(target).replace('%', '')) || 0
 
-  const percentIntoPeriodNum =
-    parseFloat(String(percentIntoPeriod).replace('%', '')) / 100
-
-  let effectiveTarget = numericTarget
-
-  if (isTimeBound && percentIntoPeriodNum > 0) {
-    effectiveTarget = numericTarget * percentIntoPeriodNum
-  }
-
-  const percent = Math.round((numericValue / effectiveTarget) * 100)
-  const newScore = percent + '%'
-
-  if (newScore !== score) {
-    setScore(newScore)
-  }
+  setScore(
+    calculateScore(
+      numericValue,
+      numericTarget
+    )
+  )
 
 }, [value, target, percentIntoPeriod, label])
+
 
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-  <span>{label}</span>
+  <span style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6
+  }}>
+    {label}
+
+    {timeBoundSet.has(label) && (
+      <span style={{
+        fontSize: 11,
+        fontWeight: 500,
+        color: '#6B7280'
+      }}>
+        (time-bound score)
+      </span>
+    )}
+  </span>
 
   {sourceLabel && (
     <span style={{
@@ -700,10 +744,24 @@ useEffect(() => {
   style={targetCell}
   value={target}
   readOnly={!isEditing}
-  onChange={(e) => {
-    setTarget(e.target.value)
-    setIsDirty(true)
-  }}
+ onChange={(e) => {
+
+  setTarget(e.target.value)
+  setIsDirty(true)
+
+  const numericValue =
+    Number(String(value).replace('%', '')) || 0
+
+  const numericTarget =
+    Number(String(e.target.value).replace('%', '')) || 0
+
+  setScore(
+    calculateScore(
+      numericValue,
+      numericTarget
+    )
+  )
+}}
   onBlur={handleSave}
 />
 
@@ -712,8 +770,22 @@ useEffect(() => {
             value={value}
             readOnly={!isEditing}
             onChange={(e) => {
+
   setValue(e.target.value)
   setIsDirty(true)
+
+  const numericValue =
+    Number(String(e.target.value).replace('%', '')) || 0
+
+  const numericTarget =
+    Number(String(target).replace('%', '')) || 0
+
+  setScore(
+    calculateScore(
+      numericValue,
+      numericTarget
+    )
+  )
 }}
             onBlur={handleSave}
 />
