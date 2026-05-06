@@ -469,6 +469,9 @@ const percentageMetrics = [
   "FD Reception Rate Bright Referral",
   "FD Reception Rate DM Engage",
 ]
+const timeBoundSet = new Set([
+  'FD NP Scheduled (GF)'
+])
 
 // =========================
 // OBJECTIVE
@@ -529,6 +532,47 @@ const [isSaving, setIsSaving] = useState(false)
 
   const rowRef = useRef<HTMLDivElement | null>(null)
 
+  const calculateScore = (
+  actual: number,
+  targetVal: number
+) => {
+
+  const safeActual = Number(actual)
+  const safeTarget = Number(targetVal)
+
+  if (isNaN(safeActual) || safeActual === 0) return '0%'
+  if (isNaN(safeTarget) || safeTarget === 0) return '—'
+
+  const direction = directionMap[label] || 'increase'
+
+  const isTimeBound = timeBoundSet.has(label)
+
+  const percentIntoPeriodNum =
+    parseFloat(percentIntoPeriod.replace('%', '')) / 100 || 0
+
+  let effectiveTarget = safeTarget
+
+  if (isTimeBound && percentIntoPeriodNum > 0) {
+    effectiveTarget = safeTarget * percentIntoPeriodNum
+  }
+
+  if (isNaN(effectiveTarget) || effectiveTarget === 0) {
+    return '—'
+  }
+
+  let percent = 0
+
+  if (direction === 'increase') {
+    percent = Math.round((safeActual / effectiveTarget) * 100)
+  } else {
+    percent =
+      safeActual === 0
+        ? 100
+        : Math.round((effectiveTarget / safeActual) * 100)
+  }
+
+  return percent + '%'
+}
   
 
 // FINAL TARGET LOGIC (stable)
@@ -738,57 +782,25 @@ loadData()
 }, [label, selectedMonth])
 
 useEffect(() => {
+
   const direction = directionMap[label] || 'increase'
-
-  const numericValue = Number(value)
-  const numericTarget = Number(target)
-
-  // =========================
-// TIME-BOUND DETECTION
-// =========================
-
-const isNPScheduled =
-  label === "FD NP Scheduled (GF)"
-
-  const percentIntoPeriodNum =
-  parseFloat(percentIntoPeriod.replace('%', '')) / 100 || 0
 
   if (direction === 'none') {
     setScore('—')
     return
   }
 
-  if (!numericTarget || numericTarget === 0) {
-    setScore('—')
+  if (percentageMetrics.includes(label)) {
+    setScore(value ? value + '%' : '—')
     return
   }
 
-let percent = 0
+  const numericValue = Number(value || 0)
+  const numericTarget = Number(target || 0)
 
-let effectiveTarget = numericTarget
-
-if (isNPScheduled && percentIntoPeriodNum > 0) {
-  effectiveTarget = numericTarget * percentIntoPeriodNum
-}
-
- if (percentageMetrics.includes(label)) {
-  setScore(value ? value + '%' : '—')
-  return
-}
-
-if (direction === 'increase') {
-  percent = Math.round((numericValue / effectiveTarget) * 100)
-
-} else {
-percent = numericValue === 0
-  ? 100
-  : Math.round((effectiveTarget / numericValue) * 100)
-}
-
-setScore(percent + '%')
+  setScore(calculateScore(numericValue, numericTarget))
 
 }, [value, target, label, percentIntoPeriod])
-
 
   useEffect(() => {
  const handleGlobalSave = async (e: any) => {
@@ -911,8 +923,20 @@ const handleInitiativeSave = async (
   rowRef.current = el
 }}
 >
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-  <span>{displayLabelMap[label] || label}</span>
+<div style={{ display: 'flex', flexDirection: 'column' }}>
+  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+    {displayLabelMap[label] || label}
+
+    {timeBoundSet.has(label) && (
+      <span style={{
+        fontSize: 11,
+        fontWeight: 500,
+        color: '#6B7280'
+      }}>
+        (time-bound score)
+      </span>
+    )}
+  </span>
 
   {sourceUser !== 'Ashley' && (
     <span style={{
@@ -935,12 +959,25 @@ const handleInitiativeSave = async (
       : target
   }
   disabled={!isEditing}
-  onChange={(e) => {
-    const val = e.target.value
-    if (/^\d*\.?\d*$/.test(val)) {
-      setTarget(val)
-    }
-  }}
+
+onChange={(e) => {
+  const val = e.target.value
+
+  if (/^\d*\.?\d*$/.test(val)) {
+
+    setTarget(val)
+
+    const numericValue = Number(value || 0)
+    const numericTarget = Number(val || 0)
+
+    setScore(
+      calculateScore(
+        numericValue,
+        numericTarget
+      )
+    )
+  }
+}}
 />
 
 <input
@@ -951,12 +988,25 @@ const handleInitiativeSave = async (
       : value
   }
   disabled={!isEditing}
-  onChange={(e) => {
-    let val = e.target.value.replace('%', '')
-    if (/^\d*\.?\d*$/.test(val)) {
-      setValue(val)
-    }
-  }}
+
+ onChange={(e) => {
+  let val = e.target.value.replace('%', '')
+
+  if (/^\d*\.?\d*$/.test(val)) {
+
+    setValue(val)
+
+    const numericValue = Number(val || 0)
+    const numericTarget = Number(target || 0)
+
+    setScore(
+      calculateScore(
+        numericValue,
+        numericTarget
+      )
+    )
+  }
+}}
 />
 
 <input
