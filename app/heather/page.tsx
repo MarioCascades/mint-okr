@@ -689,8 +689,7 @@ let effectiveTarget = t
 const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = t * (adjustedPercent / 100)
+ effectiveTarget = t * (percentIntoPeriod / 100)
 }
 
 if (effectiveTarget <= 0) {
@@ -771,8 +770,7 @@ let effectiveTarget = t
 const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = t * (adjustedPercent / 100)
+effectiveTarget = t * (percentIntoPeriod / 100)
 }
 
 if (effectiveTarget <= 0) {
@@ -796,8 +794,7 @@ if (effectiveTarget <= 0) {
   const isTimeBound = timeBoundSet.has(label)
 
   if (isTimeBound && percentIntoPeriod > 0) {
-    const adjustedPercent = Math.max(percentIntoPeriod, 25)
-    effectiveTarget = numericTarget * (adjustedPercent / 100)
+  effectiveTarget = numericTarget * (percentIntoPeriod / 100)
   }
 
   if (effectiveTarget > 0) {
@@ -884,7 +881,10 @@ const getScoreBackground = () => {
   return (
     <div style={{ marginBottom: 10 }} data-kr={label}>
       <div style={row}>
-        <span>{label}</span>
+       <span>
+  {label}
+  {timeBoundSet.has(label) ? ' (time-bound score)' : ''}
+</span>
 
         <input
           style={prevCell}
@@ -951,8 +951,7 @@ onChange={(e) => {
   const isTimeBound = timeBoundSet.has(label)
 
   if (isTimeBound && percentIntoPeriod > 0) {
-    const adjustedPercent = Math.max(percentIntoPeriod, 25)
-    effectiveTarget = numericTarget * (adjustedPercent / 100)
+    effectiveTarget = numericTarget * (percentIntoPeriod / 100)
   }
 
   if (effectiveTarget > 0) {
@@ -1011,10 +1010,9 @@ let effectiveTarget = numericTarget
 const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = numericTarget * (adjustedPercent / 100)
-}
+effectiveTarget = numericTarget * (percentIntoPeriod / 100)
 
+}
 if (effectiveTarget > 0) {
   const percent = Math.round((numericVal / effectiveTarget) * 100)
   setScore(percent + '%')
