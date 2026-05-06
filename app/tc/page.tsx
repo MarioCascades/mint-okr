@@ -747,6 +747,8 @@ const Card = ({ title, value, prev = 0, target = 0, percentIntoPeriod = 100, isC
   
   const isCurrency = title.toLowerCase().includes('production')
 const isPercent = title.toLowerCase().includes('conversion')
+const isTimeBound =
+  !isPercent
 
 const formatValue = (val: any) => {
   const parsed = Number(val)
@@ -774,7 +776,12 @@ const numericValue = isNaN(cleaned) ? 0 : cleaned
 let adjustedTarget = Number(target)
 
 // ONLY adjust if it's the current month
-if (isCurrentMonth && percentIntoPeriod > 0 && percentIntoPeriod < 100) {
+if (
+  isTimeBound &&
+  isCurrentMonth &&
+  percentIntoPeriod > 0 &&
+  percentIntoPeriod < 100
+) {
   adjustedTarget = target * (percentIntoPeriod / 100)
 }
 
