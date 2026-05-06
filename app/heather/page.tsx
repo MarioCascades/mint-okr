@@ -21,7 +21,7 @@ const labelMap: Record<string, string> = {
   "Collections from Starts": "TC Collections from Starts",
   "Scheduled New Patients": "TC Scheduled New Patients",
   "Kept New Patients": "TC Kept New Patients",
-  "Conversion Rate": "TC Conversion Rate",
+  "Conversion Rate (Based on Trackers)": "TC Conversion Rate",
   "Whitening Kits": "TC Whitening Kits",
   "Total Starts": "Total TC Starts",
   "Total Production": "TC Total Production after Discounts",
@@ -52,7 +52,7 @@ const timeBoundSet = new Set([
   'Total Whitening Kits',
   'Whitening Kits',
   'SDS',
-  'Conversion Rate'
+  'Conversion Rate (Based on Trackers)'
 ])
 
 // =========================
@@ -258,7 +258,7 @@ derivedTarget={undefined}
         <Objective title="Objective 2: New Patient Conversion">
           <KeyResult label="Scheduled New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
           <KeyResult label="Kept New Patients" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
-          <KeyResult label="Conversion Rate" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
+          <KeyResult label="Conversion Rate (Based on Trackers)" selectedMonth={selectedMonth} isEditing={isEditing} percentIntoPeriod={percentIntoPeriod}/>
         </Objective>
 
         {/* OBJECTIVE 3 */}
