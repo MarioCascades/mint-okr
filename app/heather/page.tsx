@@ -50,7 +50,9 @@ const timeBoundSet = new Set([
   'Total Starts',
   'Total Starts (Individual)',
   'Total Whitening Kits',
-  'Whitening Kits'
+  'Whitening Kits',
+  'SDS',
+  'Conversion Rate'
 ])
 
 // =========================
@@ -883,7 +885,16 @@ const getScoreBackground = () => {
       <div style={row}>
        <span>
   {label}
-  {timeBoundSet.has(label) ? ' (time-bound score)' : ''}
+  {timeBoundSet.has(label) && (
+    <span style={{
+      fontSize: 11,
+      fontWeight: 500,
+      color: '#6B7280',
+      marginLeft: 6
+    }}>
+      (time-bound score)
+    </span>
+  )}
 </span>
 
         <input
