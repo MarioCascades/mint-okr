@@ -678,6 +678,12 @@ if (
   }
 
   const total = jordyn + heather
+
+const formattedTotal = Number.isInteger(total)
+  ? total.toString()
+  : total.toFixed(2)
+
+setValue(formattedTotal)
   
 // =========================
 // CURRENT VALUE
@@ -759,9 +765,13 @@ if (label === "Total Whitening Kits") {
   prevHeather = await getPrevValue(HEATHER_ID, labelMap["Whitening Kits"])
 }
 
-const prevTotal = prevJordyn + prevHeather
+const prevTotal = jordyn + heather
 
-setLastMonth(prevTotal.toString())
+const formattedPrevTotal = Number.isInteger(prevTotal)
+  ? prevTotal.toString()
+  : prevTotal.toFixed(2)
+
+setLastMonth(formattedPrevTotal)
 
 return
 }

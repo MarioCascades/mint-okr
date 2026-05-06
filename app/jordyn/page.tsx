@@ -676,9 +676,13 @@ if (
     partner = await getValue(partnerName, labelMap["Whitening Kits"])
   }
 
-  const total = jordyn + partner
+const total = jordyn + partner
 
-  setValue(total.toString())
+const formattedTotal = Number.isInteger(total)
+  ? total.toString()
+  : total.toFixed(2)
+
+setValue(formattedTotal)
 
 const baseTarget = isMasterTarget
   ? Number(target || 0)
@@ -734,8 +738,13 @@ setScore(calculateScore(total, baseTarget))
     prevPartner = await getPrevValue(partnerName, labelMap["Whitening Kits"])
   }
 
-  const prevTotal = prevJordyn + prevPartner
-  setLastMonth(prevTotal.toString())
+const prevTotal = prevJordyn + prevPartner
+
+const formattedPrevTotal = Number.isInteger(prevTotal)
+  ? prevTotal.toString()
+  : prevTotal.toFixed(2)
+
+setLastMonth(formattedPrevTotal)
 
   return
 

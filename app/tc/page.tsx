@@ -367,7 +367,8 @@ const secondProduction = await getValue(
   labelMap["Total Production (Individual)"]
 )
 
-const totalProductionValue = jordynProduction + secondProduction
+const totalProductionValue =
+  Math.round((jordynProduction + secondProduction) * 100) / 100
 
 const prevJordynProduction = await getPrevValue(
   'Jordyn',
@@ -379,7 +380,8 @@ const prevSecondProduction = await getPrevValue(
   labelMap["Total Production (Individual)"]
 )
 
-const prevProductionValue = prevJordynProduction + prevSecondProduction
+const prevProductionValue =
+  Math.round((prevJordynProduction + prevSecondProduction) * 100) / 100
 
 let productionTargetValue = await getJordynSharedTarget(
   labelMap["Total Production"]
@@ -463,7 +465,8 @@ const secondConversion = await getValue(
   labelMap["Conversion Rate"]
 )
 
-const conversionValue = (jordynConversion + secondConversion) / 2
+const conversionValue =
+  Math.round(((jordynConversion + secondConversion) / 2) * 100) / 100
 
 const prevJordynConversion = await getPrevValue(
   'Jordyn',
@@ -708,8 +711,8 @@ const conversion =
 
         <Card 
   title="New Patient Conversion" 
-  value={`${conversion.toFixed(0)}%`}
-  prev={`${prevConversion.toFixed(0)}%`}
+  value={conversion}
+  prev={prevConversion}
   target={conversionTarget}
   percentIntoPeriod={localPercent}
   isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
@@ -756,9 +759,9 @@ const formatValue = (val: any) => {
     })
   }
 
-  if (isPercent) {
-    return `${Math.round(num)}%`
-  }
+if (isPercent) {
+  return `${Number(num).toFixed(0)}%`
+}
 
   return num
 }
@@ -776,7 +779,7 @@ if (isCurrentMonth && percentIntoPeriod > 0 && percentIntoPeriod < 100) {
 }
 
 const percent =
-  adjustedTarget > 0
+  adjustedTarget > 0 && numericValue > 0
     ? (numericValue / adjustedTarget) * 100
     : 0
 
