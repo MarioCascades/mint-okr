@@ -44,7 +44,9 @@ const timeBoundSet = new Set([
   'Total Starts',
   'Total Starts (Individual)',
   'Total Whitening Kits',
-  'Whitening Kits'
+  'Whitening Kits',
+  'SDS',
+  'Conversion Rate'
 ])
 
 // =========================
@@ -558,8 +560,81 @@ if (!isDirty) {
   }
 }
 
+// =========================
+// GLOBAL TOTALS (JORDYN + OLIVIA)
+// =========================
+
+if (
+  label === "Total Starts" ||
+  label === "Total Production" ||
+  label === "Total Whitening Kits"
+) {
+
+  const getValue = async (userName: string, krTitle: string) => {
+    const { data: row } = await supabase
+      .from('dashboard_okr_data')
+      .select('key_result_id')
+      .eq('user_name', userName)
+      .eq('key_result_title', krTitle)
+      .maybeSingle()
+
+    if (!row) return 0
+
+    const y = selectedMonth.getFullYear()
+    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+    const reportingDate = `${y}-${m}-01`
+
+    const { data: update } = await supabase
+      .from('key_result_updates')
+      .select('value')
+      .eq('key_result_id', row.key_result_id)
+      .eq('reporting_month', reportingDate)
+      .maybeSingle()
+
+    return Number(update?.value ?? 0)
+  }
+
+  let jordyn = 0
+  let olivia = 0
+
+  if (label === "Total Starts") {
+    jordyn = await getValue("Jordyn", labelMap["Total Starts (Individual)"])
+    olivia = await getValue("Olivia", labelMap["Total Starts (Individual)"])
+  }
+
+  if (label === "Total Production") {
+    jordyn = await getValue("Jordyn", labelMap["Total Production (Individual)"])
+    olivia = await getValue("Olivia", labelMap["Total Production (Individual)"])
+  }
+
+  if (label === "Total Whitening Kits") {
+    jordyn = await getValue("Jordyn", labelMap["Whitening Kits"])
+    olivia = await getValue("Olivia", labelMap["Whitening Kits"])
+  }
+
+  const total = jordyn + olivia
+
+  setValue(total.toString())
+
+  const t = Number(resolvedTarget || 0)
+
+  let effectiveTarget = t
+
+  if (timeBoundSet.has(label) && percentIntoPeriod > 0) {
+    effectiveTarget = t * (percentIntoPeriod / 100)
+  }
+
+  if (effectiveTarget <= 0) {
+    setScore('0%')
+  } else {
+    setScore(Math.round((total / effectiveTarget) * 100) + '%')
+  }
+
+  return
+}
+
 // =======================
-// SCORE
+// NORMAL SCORE
 // =======================
 
 const c = Number(currentValue || 0)
@@ -567,11 +642,8 @@ const t = Number(resolvedTarget || 0)
 
 let effectiveTarget = t
 
-const isTimeBound = timeBoundSet.has(label)
-
-if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = t * (adjustedPercent / 100)
+if (timeBoundSet.has(label) && percentIntoPeriod > 0) {
+  effectiveTarget = t * (percentIntoPeriod / 100)
 }
 
 if (effectiveTarget <= 0) {
@@ -584,6 +656,7 @@ if (effectiveTarget <= 0) {
 fetchData()
 
 }, [label, selectedMonth, percentIntoPeriod])
+
 useEffect(() => {
   const numericVal = Number(value || 0)
   const numericTarget = Number(localTarget || 0)
@@ -593,8 +666,7 @@ useEffect(() => {
   const isTimeBound = timeBoundSet.has(label)
 
   if (isTimeBound && percentIntoPeriod > 0) {
-    const adjustedPercent = Math.max(percentIntoPeriod, 25)
-    effectiveTarget = numericTarget * (adjustedPercent / 100)
+   effectiveTarget = numericTarget * (percentIntoPeriod / 100)
   }
 
   if (effectiveTarget > 0) {
@@ -608,77 +680,140 @@ useEffect(() => {
 return (
   <div style={{ marginBottom: 10 }}>
     <div style={row}>
-      <span>{label}</span>
+      <span>
+  {label}
+  {timeBoundSet.has(label) && (
+    <span style={{
+      fontSize: 11,
+      fontWeight: 500,
+      color: '#6B7280',
+      marginLeft: 6
+    }}>
+      (time-bound score)
+    </span>
+  )}
+</span>
 
-      <input style={prevCell} value={lastMonth} readOnly />
+      <input
+  style={prevCell}
+  value={
+    isCurrency && lastMonth
+      ? '$' + Number(lastMonth).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : isPercentage && lastMonth
+      ? Number(lastMonth) + '%'
+      : lastMonth
+  }
+  readOnly
+/>
 
      <input
   style={targetCell}
   value={
-  isCurrency && localTarget
-    ? '$' + Number(localTarget).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })
-    : isPercentage && localTarget
-    ? localTarget + '%'
-    : localTarget
-}
+    (() => {
+      const displayVal = target ?? localTarget
+
+      if (isEditing && (
+        label === "Total Starts" ||
+        label === "Total Production" ||
+        label === "Total Whitening Kits"
+      )) {
+        return displayVal
+      }
+
+      if (isCurrency && displayVal) {
+        return '$' + Number(displayVal).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
+      }
+
+      if (isPercentage && displayVal) {
+        return displayVal + '%'
+      }
+
+      return displayVal
+    })()
+  }
   disabled={!isEditing}
-  onChange={async (e) => {
-    const val = e.target.value.replace(/[^0-9.]/g, '')
+  onChange={(e) => {
+    let val = ''
+
+    const raw = e.target.value.replace(/[^0-9.]/g, '')
+    const parts = raw.split('.').slice(0, 2)
+
+    val = parts[0]
+
+    if (parts.length > 1) {
+      val += '.' + parts[1].slice(0, 2)
+    }
+
+    if (
+      label === "Total Starts" ||
+      label === "Total Production" ||
+      label === "Total Whitening Kits"
+    ) {
+      if (setTarget) setTarget(val)
+    }
 
     setLocalTarget(val)
+    setIsDirty(true)
 
-const numericVal = Number(value || 0)
-const numericTarget = Number(val || 0)
+    const numericVal = Number(value || 0)
+    const numericTarget = Number(val || 0)
 
-let effectiveTarget = numericTarget
+    let effectiveTarget = numericTarget
 
-const isTimeBound = timeBoundSet.has(label)
+    if (timeBoundSet.has(label) && percentIntoPeriod > 0) {
+      effectiveTarget = numericTarget * (percentIntoPeriod / 100)
+    }
 
-if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = numericTarget * (adjustedPercent / 100)
-}
-
-if (effectiveTarget > 0) {
-  const percent = Math.round((numericVal / effectiveTarget) * 100)
-  setScore(percent + '%')
-} else {
-  setScore('0%')
-}
-
+    if (effectiveTarget > 0) {
+      const percent = Math.round((numericVal / effectiveTarget) * 100)
+      setScore(percent + '%')
+    } else {
+      setScore('0%')
+    }
+  }}
+  onBlur={async () => {
     if (!keyResultId) return
 
     const y = selectedMonth.getFullYear()
     const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
     const reportingDate = `${y}-${m}-01`
-    
-await supabase.from('key_result_updates').upsert(
-  {
-    key_result_id: keyResultId,
-    reporting_month: reportingDate,
-    target_value: val ? Number(val) : null,
-  },
-  { onConflict: 'key_result_id,reporting_month' }
-)
- 
+
+    await supabase.from('key_result_updates').upsert(
+      {
+        key_result_id: keyResultId,
+        reporting_month: reportingDate,
+        target_value: (
+          label === "Total Starts" ||
+          label === "Total Production" ||
+          label === "Total Whitening Kits"
+        )
+          ? (target ? Number(target) : null)
+          : (localTarget ? Number(localTarget) : null)
+      },
+      { onConflict: 'key_result_id,reporting_month' }
+    )
   }}
 />
+
       <input
         style={currentCell}
         value={
-  isEditing
-    ? value
-    : isCurrency && value
-    ? '$' + Number(value).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })
-    : isPercentage && value
-    ? value + '%'
-    : value
+  forcedValue !== undefined
+    ? (label === "Total Production"
+        ? '$' + Number(forcedValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : forcedValue)
+    : (
+      isEditing
+        ? value
+        : isCurrency && value
+        ? '$' + Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : isPercentage && value
+        ? value + '%'
+        : value
+    )
 }
         disabled={!isEditing}
        onChange={(e) => {
@@ -701,8 +836,7 @@ let effectiveTarget = numericTarget
 const isTimeBound = timeBoundSet.has(label)
 
 if (isTimeBound && percentIntoPeriod > 0) {
-  const adjustedPercent = Math.max(percentIntoPeriod, 25)
-  effectiveTarget = numericTarget * (adjustedPercent / 100)
+ effectiveTarget = numericTarget * (percentIntoPeriod / 100)
 }
 
 if (effectiveTarget > 0) {
