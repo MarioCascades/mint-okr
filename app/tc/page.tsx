@@ -710,7 +710,7 @@ const conversion =
 />
 
         <Card 
-  title="New Patient Conversion" 
+  title="New Patient Kept / Scheduled"
   value={conversion}
   prev={prevConversion}
   target={conversionTarget}
@@ -746,7 +746,9 @@ const conversion =
 const Card = ({ title, value, prev = 0, target = 0, percentIntoPeriod = 100, isCurrentMonth = false }: any) => {
   
   const isCurrency = title.toLowerCase().includes('production')
-const isPercent = title.toLowerCase().includes('conversion')
+  const isPercent =
+  title.toLowerCase().includes('conversion') ||
+  title.toLowerCase().includes('kept / scheduled')
 const isTimeBound =
   !isPercent
 
