@@ -36,7 +36,7 @@ export default function Home() {
     : 'Olivia'
 
 
-   const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+  const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
 
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function Home() {
       percent = 100
     }
 
-    setPercentIntoPeriod(Math.round(percent) + '%')
+    setPercentIntoPeriod(Math.round(percent))
   }, [selectedMonth])
 
   const changeMonth = (offset: number) => {
@@ -651,10 +651,10 @@ return (
     <div>
       <div style={label}>% Into Period</div>
       <input
-        value={percentIntoPeriod}
-        readOnly
-        style={input}
-      />
+  value={percentIntoPeriod + '%'}
+  readOnly
+  style={input}
+/>
     </div>
   </div>
 
