@@ -81,7 +81,7 @@ export default function Page() {
   // MASTER TARGETS (UI CONTROLLED)
   const [masterStartsTarget, setMasterStartsTarget] = useState('0')
   const [masterProductionTarget, setMasterProductionTarget] = useState('0')
-  
+  const [masterWhiteningTarget, setMasterWhiteningTarget] = useState('0')
 
 
   useEffect(() => {
@@ -299,10 +299,12 @@ derivedTarget={undefined}
 
                {/* OBJECTIVE 5 */}
 <Objective title="Objective 5: TC Whitening Kits">
-  <KeyResult 
-    label="Total Whitening Kits" 
-    selectedMonth={selectedMonth} 
+  <KeyResult
+    label="Total Whitening Kits"
+    selectedMonth={selectedMonth}
     isEditing={isEditing}
+    target={masterWhiteningTarget}
+    setTarget={setMasterWhiteningTarget}
     percentIntoPeriod={percentIntoPeriod}
   />
 </Objective>
