@@ -922,9 +922,9 @@ const actualValue = Number(value || 0)
   (() => {
     const displayVal = target ?? localTarget
 
-    if (isEditing && isMasterTarget) {
-      return displayVal
-    }
+  if (isEditing) {
+  return displayVal
+}
 
     if (isCurrency && displayVal) {
       return '$' + Number(displayVal).toLocaleString(undefined, {

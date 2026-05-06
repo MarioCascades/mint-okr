@@ -712,13 +712,9 @@ return (
     (() => {
       const displayVal = target ?? localTarget
 
-      if (isEditing && (
-        label === "Total Starts" ||
-        label === "Total Production" ||
-        label === "Total Whitening Kits"
-      )) {
-        return displayVal
-      }
+      if (isEditing) {
+  return displayVal
+}
 
       if (isCurrency && displayVal) {
         return '$' + Number(displayVal).toLocaleString(undefined, {
