@@ -351,6 +351,11 @@ const KeyResult = ({
   forcedValue 
 }: any) => {
 
+  const displayValue =
+  forcedValue !== undefined
+    ? forcedValue
+    : value
+
   const [value, setValue] = useState('')
   const [lastMonth, setLastMonth] = useState('')
  
@@ -808,9 +813,7 @@ fetchData();
 
 useEffect(() => {
 
-  const actualVal = isMasterTarget
-    ? Number(forcedValue ?? value ?? 0)
-    : Number(value ?? 0)
+  const actualVal = Number(displayValue ?? 0)
 
   const numericTarget = isMasterTarget
     ? Number(target ?? 0)
@@ -819,8 +822,7 @@ useEffect(() => {
   setScore(calculateScore(actualVal, numericTarget))
 
 }, [
-  value,
-  forcedValue,
+  displayValue,
   localTarget,
   target,
   percentIntoPeriod
@@ -1028,26 +1030,17 @@ onKeyDown={handleEnter}
 
         <input
           style={currentCell}
-          value={
-  forcedValue !== undefined
-    ? (label === "Total Production"
-        ? '$' + Number(forcedValue).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          })
-        : forcedValue)
-    : (
-      isEditing
-        ? value
-        : isCurrency && value
-        ? '$' + Number(value).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          })
-        : isPercentage && value
-        ? value + '%'
-        : value
-    )
+        value={
+  isEditing
+    ? displayValue
+    : isCurrency && displayValue
+    ? '$' + Number(displayValue).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+    : isPercentage && displayValue
+    ? displayValue + '%'
+    : displayValue
 }
           disabled={!isEditing || isComputed}
           onChange={(e) => {
