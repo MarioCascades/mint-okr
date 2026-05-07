@@ -246,7 +246,7 @@ const percent =
         color: '#6B7280'
       }}
     >
-      (timebound score)
+      Timebound score
     </span>
   )}
 </div>
