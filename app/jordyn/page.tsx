@@ -356,6 +356,27 @@ const KeyResult = ({
  
   const [localTarget, setLocalTarget] = useState('')
   const [score, setScore] = useState('')
+  useEffect(() => {
+  const numericVal = Number(value || 0)
+  const numericTarget = Number(
+  target ?? localTarget ?? 0
+)
+
+  let effectiveTarget = numericTarget
+
+  const isTimeBound = timeBoundSet.has(label)
+
+  if (isTimeBound && percentIntoPeriod > 0) {
+    effectiveTarget = numericTarget * (percentIntoPeriod / 100)
+  }
+
+  if (effectiveTarget > 0) {
+    const percent = Math.round((numericVal / effectiveTarget) * 100)
+    setScore(percent + '%')
+  } else {
+    setScore('0%')
+  }
+}, [value, localTarget, percentIntoPeriod])
   const [keyResultId, setKeyResultId] = useState<string | null>(null)
   const [metricType, setMetricType] = useState('')
   const [showInitiatives, setShowInitiatives] = useState(false)
