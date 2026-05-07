@@ -12,6 +12,8 @@ type Props = {
   target?: number
   isCurrency?: boolean
   isPercent?: boolean
+  percentIntoPeriod?: number
+  isCurrentMonth?: boolean
 
   initiatives?: string[]
   setInitiatives?: (vals: string[]) => void
@@ -31,7 +33,9 @@ export default function KPI({
   isPercent,
   initiatives = ['', '', ''],
   setInitiatives,
-  saveInitiative
+  saveInitiative,
+  percentIntoPeriod = 100,
+  isCurrentMonth = false,
 }: Props) {
 
   const [data, setData] = useState<any[]>([])
@@ -149,10 +153,27 @@ export default function KPI({
     setMacro(consults ? starts / consults : 0)
   }
 
-  const percent =
-  finalTarget > 0
-    ? finalCurrent / finalTarget
+  const isTimeBound = !isPercent
+
+let adjustedTarget = Number(finalTarget)
+
+if (
+  isTimeBound &&
+  isCurrentMonth &&
+  percentIntoPeriod > 0 &&
+  percentIntoPeriod < 100
+) {
+  adjustedTarget =
+    Number(finalTarget) *
+    (percentIntoPeriod / 100)
+}
+
+const percent =
+  adjustedTarget > 0
+    ? Number(finalCurrent) / adjustedTarget
     : 0
+
+
   const getResultBackground = () => {
   const score = percent * 100
 

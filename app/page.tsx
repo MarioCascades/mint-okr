@@ -702,6 +702,11 @@ return (
     value={starts}
     prev={prevStarts}
     target={startsTarget}
+    percentIntoPeriod={percentIntoPeriod}
+  isCurrentMonth={
+  selectedMonth.getMonth() === new Date().getMonth() &&
+  selectedMonth.getFullYear() === new Date().getFullYear()
+}
     initiatives={
       kpiInitiatives['Total TC Starts']
     }
@@ -719,6 +724,11 @@ return (
     value={production}
     prev={prevProduction}
     target={productionTarget}
+    percentIntoPeriod={percentIntoPeriod}
+isCurrentMonth={
+  selectedMonth.getMonth() === new Date().getMonth() &&
+  selectedMonth.getFullYear() === new Date().getFullYear()
+}
     isCurrency
     initiatives={
       kpiInitiatives['Total Production']
@@ -737,6 +747,11 @@ return (
     value={kept}
     prev={prevKept}
     target={keptTarget}
+    percentIntoPeriod={percentIntoPeriod}
+isCurrentMonth={
+  selectedMonth.getMonth() === new Date().getMonth() &&
+  selectedMonth.getFullYear() === new Date().getFullYear()
+}
     initiatives={
       kpiInitiatives['Consults Kept']
     }
@@ -754,6 +769,11 @@ return (
     value={macroConversion}
     prev={prevConversion}
     target={conversionTarget}
+    percentIntoPeriod={percentIntoPeriod}
+isCurrentMonth={
+  selectedMonth.getMonth() === new Date().getMonth() &&
+  selectedMonth.getFullYear() === new Date().getFullYear()
+}
     isPercent
     initiatives={
       kpiInitiatives['Macro Conversion Rate']
