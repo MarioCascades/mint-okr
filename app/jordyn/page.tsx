@@ -351,13 +351,14 @@ const KeyResult = ({
   forcedValue 
 }: any) => {
 
-  const displayValue =
+ const [value, setValue] = useState('')
+const [lastMonth, setLastMonth] = useState('')
+
+const displayValue =
   forcedValue !== undefined
     ? forcedValue
     : value
-
-  const [value, setValue] = useState('')
-  const [lastMonth, setLastMonth] = useState('')
+  
  
   const [localTarget, setLocalTarget] = useState('')
   const [score, setScore] = useState('')
