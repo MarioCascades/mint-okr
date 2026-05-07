@@ -225,9 +225,9 @@ const percent =
       <div
   style={{
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
     marginBottom: 16,
     paddingBottom: 10,
     borderBottom: '2px solid #F6A27A'
@@ -240,10 +240,10 @@ const percent =
   {!isPercent && (
     <span
       style={{
+        marginTop: 4,
         fontSize: 11,
         fontWeight: 600,
-        color: '#6B7280',
-        whiteSpace: 'nowrap'
+        color: '#6B7280'
       }}
     >
       (timebound score)
