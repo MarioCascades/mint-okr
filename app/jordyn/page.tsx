@@ -823,22 +823,7 @@ setScore(calculateScore(actualValue, baseTarget))
 fetchData();
 }, [label, selectedMonth, percentIntoPeriod]);
 
-useEffect(() => {
 
-  const actualVal = Number(displayValue ?? 0)
-
-  const numericTarget = isMasterTarget
-    ? Number(target ?? 0)
-    : Number(localTarget ?? 0)
-
-  setScore(calculateScore(actualVal, numericTarget))
-
-}, [
-  displayValue,
-  localTarget,
-  target,
-  percentIntoPeriod
-])
 
  const handleSave = async () => {
   if (isComputed && !isMasterTarget) return
