@@ -403,8 +403,14 @@ const KeyResult = ({
   const isTimeBound = timeBoundSet.has(label)
 
 const calculateScore = (actual: number, targetVal: number) => {
-  const safeActual = Number(actual)
-  const safeTarget = Number(targetVal)
+
+  const safeActual = Number(
+    String(actual).replace(/[^0-9.-]+/g, '')
+  )
+
+  const safeTarget = Number(
+    String(targetVal).replace(/[^0-9.-]+/g, '')
+  )
 
   if (isNaN(safeActual) || safeActual === 0) return '0%'
   if (isNaN(safeTarget) || safeTarget === 0) return '0%'
