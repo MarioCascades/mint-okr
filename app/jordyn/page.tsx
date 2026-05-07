@@ -356,6 +356,7 @@ const KeyResult = ({
  
   const [localTarget, setLocalTarget] = useState('')
   const [score, setScore] = useState('')
+
   useEffect(() => {
   const numericVal = Number(value || 0)
   const numericTarget = Number(
@@ -800,15 +801,24 @@ fetchData();
 }, [label, selectedMonth, percentIntoPeriod]);
 
 useEffect(() => {
-  const numericVal = Number(value || 0)
+
+  const actualVal = isMasterTarget
+    ? Number(forcedValue ?? value ?? 0)
+    : Number(value ?? 0)
 
   const numericTarget = isMasterTarget
-    ? Number(target || 0)
-    : Number(localTarget || 0)
+    ? Number(target ?? 0)
+    : Number(localTarget ?? 0)
 
-  setScore(calculateScore(numericVal, numericTarget))
-}, [value, localTarget, target, percentIntoPeriod])
+  setScore(calculateScore(actualVal, numericTarget))
 
+}, [
+  value,
+  forcedValue,
+  localTarget,
+  target,
+  percentIntoPeriod
+])
 
  const handleSave = async () => {
   if (isComputed && !isMasterTarget) return
