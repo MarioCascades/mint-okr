@@ -222,7 +222,34 @@ const percent =
   return (
     <div style={kpiCard}>
 
-      <div style={kpiLabel}>{label}</div>
+      <div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 16,
+    paddingBottom: 10,
+    borderBottom: '2px solid #F6A27A'
+  }}
+>
+  <div style={kpiLabel}>
+    {label}
+  </div>
+
+  {!isPercent && (
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 600,
+        color: '#6B7280',
+        whiteSpace: 'nowrap'
+      }}
+    >
+      (timebound score)
+    </span>
+  )}
+</div>
 
       <div style={kpiHeader}>
         <span>Prev</span>
@@ -351,10 +378,7 @@ const kpiLabel: React.CSSProperties = {
   color: '#1E266D',
   fontSize: 24,
   fontWeight: 800,
-  marginBottom: 16,
-  paddingBottom: 10,
-  borderBottom: '2px solid #F6A27A',
-  textAlign: 'center'
+    textAlign: 'center'
 }
 const kpiHeader: React.CSSProperties = {
   display: 'grid',
