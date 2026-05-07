@@ -780,23 +780,20 @@ if (setParentValue && currentValue !== undefined) {
   setParentValue(Number(currentValue))
 }
 
-// =========================
+
 // SCORE CALC (INSIDE fetchData)
-// =========================
 
-let c = 0
-
-if (isDirty) {
-  c = Number(value || 0)
-} else if (currentValue !== null) {
-  c = Number(currentValue)
-}
+const actualValue =
+  currentValue !== null &&
+  currentValue !== undefined
+    ? Number(currentValue)
+    : Number(value || 0)
 
 const baseTarget = isMasterTarget
   ? Number(target || 0)
   : Number(localTarget || resolvedTarget || 0)
 
-setScore(calculateScore(c, baseTarget))
+setScore(calculateScore(actualValue, baseTarget))
 }
 
 fetchData();
