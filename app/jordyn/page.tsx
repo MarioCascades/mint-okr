@@ -718,14 +718,25 @@ const formattedTotal = Number.isInteger(total)
 
 setValue(formattedTotal)
 
-const baseTarget = isMasterTarget
-  ? Number(target || 0)
-  : Number(localTarget || resolvedTarget || 0)
+// =========================
+// SCORE CALCULATION
+// =========================
 
-setScore(calculateScore(total, baseTarget))
+const t = Number(resolvedTarget ?? krData?.target_value ?? 0)
 
+let effectiveTarget = t
 
+const isTimeBound = timeBoundSet.has(label)
 
+if (isTimeBound && percentIntoPeriod > 0) {
+  effectiveTarget = t * (percentIntoPeriod / 100)
+}
+
+if (effectiveTarget <= 0) {
+  setScore('0%')
+} else {
+  setScore(Math.round((total / effectiveTarget) * 100) + '%')
+}
   // PREVIOUS MONTH
   const prevDateObj = new Date(selectedMonth)
   prevDateObj.setMonth(prevDateObj.getMonth() - 1)
