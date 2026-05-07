@@ -806,7 +806,31 @@ const percent =
 
   return (
     <div style={card}>
-      <div style={cardTitle}>{title}</div>
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: 18
+  }}
+>
+  <div style={cardTitle}>
+    {title}
+  </div>
+
+  {isTimeBound && (
+    <div
+      style={{
+        fontSize: 11,
+        fontWeight: 600,
+        color: '#6B7280',
+        marginTop: 2
+      }}
+    >
+      Timebound Score
+    </div>
+  )}
+</div>
 
       <div style={cardHeader}>
         <span>Prev</span>
@@ -945,7 +969,6 @@ const card: React.CSSProperties = {
 
 const cardTitle: React.CSSProperties = {
   textAlign: 'center',
-  marginBottom: 18,
   fontWeight: 800,
   fontSize: 30,
   color: COLORS.navy
