@@ -1,5 +1,5 @@
 'use client'
-import Image from 'next/image'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
@@ -92,10 +92,12 @@ const container: React.CSSProperties = {
   justifyContent: 'center',
   alignItems: 'center',
   padding: 20,
-  backgroundImage: "url('/images/mint-login-banner.png')",
+  backgroundImage:
+    "linear-gradient(rgba(5,15,40,0.35), rgba(5,15,40,0.35)), url('/images/mainbanner.png')",
   backgroundSize: 'cover',
   backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat'
+  backgroundRepeat: 'no-repeat',
+  backgroundColor: '#08182F'
 }
 
 const card: React.CSSProperties = {
