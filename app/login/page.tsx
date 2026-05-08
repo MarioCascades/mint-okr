@@ -1,5 +1,5 @@
 'use client'
-
+import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
@@ -88,27 +88,32 @@ window.location.href = '/'
 
 const container: React.CSSProperties = {
   minHeight: '100vh',
-  backgroundColor: '#f5f5f5',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: 20
+  padding: 20,
+  backgroundImage: "url('/images/mint-login-banner.png')",
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat'
 }
 
 const card: React.CSSProperties = {
   width: 420,
-  backgroundColor: '#FFFFFF',
+  background: 'rgba(255, 255, 255, 0.92)',
+  backdropFilter: 'blur(14px)',
+  WebkitBackdropFilter: 'blur(14px)',
   padding: 40,
-  borderRadius: 18,
-  border: '1px solid #F6A27A',
-  boxShadow: '0 12px 30px rgba(0,0,0,0.08)'
+  borderRadius: 20,
+  border: '1px solid rgba(255,255,255,0.35)',
+  boxShadow: '0 20px 60px rgba(0,0,0,0.35)'
 }
 
 const title: React.CSSProperties = {
   fontSize: 32,
   fontWeight: 800,
   marginBottom: 10,
-  color: '#1E266D',
+  color: '#0B1F4D',
   textAlign: 'center'
 }
 
