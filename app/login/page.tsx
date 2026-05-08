@@ -88,27 +88,27 @@ window.location.href = '/'
 
 const container: React.CSSProperties = {
   minHeight: '100vh',
+  backgroundColor: '#f3f4f6',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: 20,
+  padding: 40,
   backgroundImage:
-    "linear-gradient(rgba(5,15,40,0.35), rgba(5,15,40,0.35)), url('/images/mainbanner.png')",
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-  backgroundColor: '#08182F'
+    "linear-gradient(rgba(5,15,40,0.18), rgba(5,15,40,0.18)), url('/images/mainbanner.png')",
+  backgroundSize: '88%',
+  backgroundPosition: 'center center',
+  backgroundRepeat: 'no-repeat'
 }
 
 const card: React.CSSProperties = {
   width: 420,
-  background: 'rgba(255, 255, 255, 0.92)',
-  backdropFilter: 'blur(14px)',
-  WebkitBackdropFilter: 'blur(14px)',
+  background: 'rgba(255,255,255,0.96)',
   padding: 40,
-  borderRadius: 20,
-  border: '1px solid rgba(255,255,255,0.35)',
-  boxShadow: '0 20px 60px rgba(0,0,0,0.35)'
+  borderRadius: 18,
+  border: '1px solid rgba(255,255,255,0.6)',
+  boxShadow: '0 20px 60px rgba(0,0,0,0.22)',
+  position: 'relative',
+  zIndex: 10
 }
 
 const title: React.CSSProperties = {
