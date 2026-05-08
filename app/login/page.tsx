@@ -88,7 +88,7 @@ window.location.href = '/'
 
 const container: React.CSSProperties = {
   minHeight: '100vh',
-  backgroundColor: '#f3f4f6',
+  backgroundColor: '#ffff',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
