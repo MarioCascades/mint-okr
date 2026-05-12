@@ -875,9 +875,11 @@ const headerBox: React.CSSProperties = {
   margin: 20,
   borderRadius: 14,
   border: `2px solid ${COLORS.softOrange}`,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
+  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+  position: 'sticky',
+  top: 70,
+  zIndex: 90
 }
-
 const mainTitle: React.CSSProperties = {
   fontSize: 42,
   fontWeight: 800,
