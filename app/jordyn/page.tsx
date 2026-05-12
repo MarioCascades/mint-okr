@@ -206,31 +206,28 @@ export default function Page() {
       ← Back to Main
     </button>
 
-    <button
-      style={editButton}
+{(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
+  <button
+    style={editButton}
+    onClick={async () => {
+      if (isEditing) {
+        document.querySelectorAll('[data-kr]').forEach((el) => {
+          const label = el.getAttribute('data-kr')
 
-onClick={async () => {
-  if (isMember() && !canEditThisMonth) {
-    return
-  }
-
-  if (isEditing) {
-    document.querySelectorAll('[data-kr]').forEach((el) => {
-      const label = el.getAttribute('data-kr')
-
-      if (label) {
-        document.dispatchEvent(
-          new Event(`save-${label}`)
-        )
+          if (label) {
+            document.dispatchEvent(
+              new Event(`save-${label}`)
+            )
+          }
+        })
       }
-    })
-  }
 
-  setIsEditing(!isEditing)
-}}
-    >
-      {isEditing ? 'Save' : 'Edit'}
-    </button>
+      setIsEditing(!isEditing)
+    }}
+  >
+    {isEditing ? 'Save' : 'Edit'}
+  </button>
+)}
 
   </div>
 

@@ -12,15 +12,38 @@ export const isMember = () => {
   return getUserRole() === 'member'
 }
 
-export const canEditSelectedMonth = (selectedMonth: Date) => {
+export const canEditSelectedMonth = (
+  selectedMonth: Date
+) => {
   if (isAdmin()) return true
 
   if (isMember()) {
     const now = new Date()
 
+    const currentMonth =
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        1
+      )
+
+    const previousMonth =
+      new Date(
+        now.getFullYear(),
+        now.getMonth() - 1,
+        1
+      )
+
+    const selected =
+      new Date(
+        selectedMonth.getFullYear(),
+        selectedMonth.getMonth(),
+        1
+      )
+
     return (
-      selectedMonth.getMonth() === now.getMonth() &&
-      selectedMonth.getFullYear() === now.getFullYear()
+      selected.getTime() === currentMonth.getTime() ||
+      selected.getTime() === previousMonth.getTime()
     )
   }
 
