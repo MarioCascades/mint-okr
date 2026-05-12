@@ -6,7 +6,9 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import KPI from '../components/KPI'
 import TopNav from '@/components/TopNav'
+import PracticeTrendsCharts from '../components/PracticeTrendsCharts'
 import { supabase } from '../lib/supabase'
+
 
 // ================= LABEL MAP =================
 
@@ -806,6 +808,8 @@ isCurrentMonth={
 }
 />
 </div>
+
+<PracticeTrendsCharts />
 
 {/* ================= REMARKS ================= */}
 <div style={notesBlock}>
