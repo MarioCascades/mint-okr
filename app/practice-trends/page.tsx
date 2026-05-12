@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
 import { isAdmin } from '@/lib/auth'
+import { COLORS } from '@/lib/colors'
 
 export default function PracticeTrendsPage() {
   const [isEditing, setIsEditing] = useState(false)
@@ -352,7 +353,7 @@ useEffect(() => {
 
 const container: React.CSSProperties = {
   minHeight: '100vh',
-  backgroundColor: '#f5f5f5c4'
+  backgroundColor: COLORS.grayAppBackground
 }
 
 const header: React.CSSProperties = {
@@ -362,11 +363,11 @@ const header: React.CSSProperties = {
 const title: React.CSSProperties = {
   fontSize: 36,
   fontWeight: 800,
-  color: '#1E266D'
+  color: COLORS.navy
 }
 
 const subtitle: React.CSSProperties = {
-  color: '#6B7280',
+  color: COLORS.textMuted,
   marginTop: 8
 }
 
@@ -378,47 +379,50 @@ const tableWrapper: React.CSSProperties = {
 const table: React.CSSProperties = {
   width: '100%',
   borderCollapse: 'collapse',
-  backgroundColor: '#FFFFFF',
+  backgroundColor: COLORS.white,
   borderRadius: 12
 }
 
 const th: React.CSSProperties = {
   padding: 14,
-  border: '1px solid #E5E7EB',
-  backgroundColor: '#F26C2F',
-  color: '#FFFFFF',
+  border: `1px solid ${COLORS.orangeSoft}`,
+  backgroundColor: COLORS.orangePrimary,
+  color: COLORS.white,
   fontWeight: 700,
   textAlign: 'center'
 }
 
 const td: React.CSSProperties = {
   padding: 10,
-  border: '1px solid #E5E7EB',
+  border: `1px solid ${COLORS.orangeSoft}`,
   textAlign: 'center'
 }
 
 const monthCell: React.CSSProperties = {
   padding: 12,
-  border: '1px solid #E5E7EB',
+  border: `1px solid ${COLORS.orangeSoft}`,
   fontWeight: 700,
-  color: '#1E266D'
+  color: COLORS.navy,
+  backgroundColor: COLORS.orangeTint
 }
 
 const input: React.CSSProperties = {
   width: '100%',
   padding: 10,
-  border: '1px solid #F6A27A',
+  border: `1px solid ${COLORS.orangeSoft}`,
   borderRadius: 8,
   textAlign: 'center',
-  color: '#111827'
+  color: COLORS.textPrimary,
+  backgroundColor: COLORS.white
 }
 
 const headerBar: React.CSSProperties = {
-  backgroundColor: '#F26C2F',
+  backgroundColor: COLORS.orangePrimary,
   padding: 24,
   margin: 20,
   borderRadius: 14,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+  border: `2px solid ${COLORS.orangeSoft}`,
+  boxShadow: COLORS.shadowSoft,
   position: 'sticky',
   top: 0,
   zIndex: 100,
@@ -428,12 +432,12 @@ const headerBar: React.CSSProperties = {
 const headerTitle: React.CSSProperties = {
   fontSize: 40,
   fontWeight: 800,
-  color: '#FFFFFF',
+  color: COLORS.white,
   marginBottom: 6
 }
 
 const headerSubtitle: React.CSSProperties = {
-  color: '#FFFFFF',
+  color: COLORS.white,
   fontSize: 15,
   opacity: 0.95
 }
@@ -446,7 +450,7 @@ const sectionCard: React.CSSProperties = {
 const sectionTitle: React.CSSProperties = {
   fontSize: 28,
   fontWeight: 800,
-  color: '#1E266D'
+  color: COLORS.navy
 }
 
 const actionRow: React.CSSProperties = {
@@ -456,8 +460,8 @@ const actionRow: React.CSSProperties = {
 }
 
 const editButton: React.CSSProperties = {
-  backgroundColor: '#1E266D',
-  color: '#FFFFFF',
+  backgroundColor: COLORS.navy,
+  color: COLORS.white,
   border: 'none',
   padding: '12px 22px',
   borderRadius: 10,
@@ -466,14 +470,16 @@ const editButton: React.CSSProperties = {
   cursor: 'pointer',
   minWidth: 110
 }
+
 const sectionTableCard: React.CSSProperties = {
   margin: '0 0 32px 0',
-  backgroundColor: '#F3F4F6',
-  border: '2px solid #D1D5DB',
+  backgroundColor: COLORS.grayPanel,
+  border: `2px solid ${COLORS.orangeSoft}`,
   borderRadius: 16,
   padding: 20,
-  boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+  boxShadow: COLORS.shadowSoft
 }
+
 const topRowGrid: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
@@ -481,12 +487,13 @@ const topRowGrid: React.CSSProperties = {
   margin: '0 20px 32px 20px',
   alignItems: 'start'
 }
+
 const sectionBlock: React.CSSProperties = {
-  backgroundColor: '#F3F4F6',
-  border: '2px solid #D1D5DB',
+  backgroundColor: COLORS.grayPanel,
+  border: `2px solid ${COLORS.orangeSoft}`,
   borderRadius: 16,
   padding: 20,
-  boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+  boxShadow: COLORS.shadowSoft
 }
 
 const startsWrapper: React.CSSProperties = {

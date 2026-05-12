@@ -3,6 +3,7 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
+import { COLORS } from '@/lib/colors'
 
 const users = [
   { name: 'Main', path: '/' },
@@ -48,15 +49,19 @@ export default function TopNav() {
           onClick={() => router.push(user.path)}
           style={{
   ...button,
-  backgroundColor: isActive ? '#F97316' : '#FFFFFF',
-  color: isActive ? '#1E266D' : '#F26C2F',
-  border: '1px solid #F26C2F',
+  backgroundColor: isActive
+    ? COLORS.orangePrimary
+    : COLORS.white,
+  color: isActive
+    ? COLORS.white
+    : COLORS.navy,
+  border: `1px solid ${COLORS.orangeSoft}`,
   fontWeight: isActive ? 700 : 500
 }}
 
 onMouseEnter={(e) => {
   if (!isActive) {
-    e.currentTarget.style.backgroundColor = '#F9FAFB'
+    e.currentTarget.style.backgroundColor = COLORS.orangeTint
   }
 }}
 onMouseLeave={(e) => {
@@ -85,8 +90,7 @@ onMouseLeave={(e) => {
     </div>
   )
 }
-
-const navContainer : React.CSSProperties = {
+const navContainer: React.CSSProperties = {
   position: 'sticky',
   top: 0,
   zIndex: 100,
@@ -94,33 +98,33 @@ const navContainer : React.CSSProperties = {
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '12px 20px',
-  backgroundColor: '#F3F4F6', // 👈 light grey
-  borderBottom: '1px solid #E5E7EB',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+  backgroundColor: COLORS.grayPanel,
+  borderBottom: `2px solid ${COLORS.orangeSoft}`,
+  boxShadow: COLORS.shadowSoft
 }
 
-const left : React.CSSProperties = {
+const left: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 10
 }
 
-const logo : React.CSSProperties = {
+const logo: React.CSSProperties = {
   width: 32,
   height: 32,
   borderRadius: '50%',
-  backgroundColor: '#F97316',
+  backgroundColor: COLORS.orangePrimary,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontWeight: 'bold',
-  color: '#000'
+  color: COLORS.white
 }
 
 const title: React.CSSProperties = {
   fontSize: 22,
   fontWeight: 700,
-  color: '#111827'
+  color: COLORS.navy
 }
 
 const right: React.CSSProperties = {
@@ -134,16 +138,17 @@ const right: React.CSSProperties = {
 const button: React.CSSProperties = {
   padding: '8px 16px',
   borderRadius: 8,
-  border: '1px solid #F26C2F',
-  backgroundColor: '#FFFFFF',
-  color: '#1E266D',
+  border: `1px solid ${COLORS.orangeSoft}`,
+  backgroundColor: COLORS.white,
+  color: COLORS.navy,
   fontWeight: 600,
   cursor: 'pointer',
   fontSize: 15,
-  minWidth: 'fit-content'
+  minWidth: 'fit-content',
+  transition: 'all 0.2s ease'
 }
 
-const logoImg : React.CSSProperties = {
+const logoImg: React.CSSProperties = {
   height: 40
 }
 
@@ -165,9 +170,10 @@ const logoutSection: React.CSSProperties = {
 const logoutButton: React.CSSProperties = {
   padding: '8px 14px',
   borderRadius: 8,
-  border: '1px solid #F26C2F',
-  backgroundColor: '#FFFFFF',
-  color: '#F26C2F',
+  border: `1px solid ${COLORS.orangeSoft}`,
+  backgroundColor: COLORS.white,
+  color: COLORS.orangePrimary,
   fontWeight: 700,
-  cursor: 'pointer'
+  cursor: 'pointer',
+  transition: 'all 0.2s ease'
 }

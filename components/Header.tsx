@@ -1,5 +1,7 @@
 'use client'
 
+import { COLORS } from '@/lib/colors'
+
 export default function Header() {
   return (
     <div style={container}>
@@ -10,23 +12,24 @@ export default function Header() {
   )
 }
 
-const container : React.CSSProperties = {
+const container: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '12px 20px',
-  borderBottom: '1px solid #1F2937',
-  backgroundColor: '#000000'
+  borderBottom: `2px solid ${COLORS.orangeSoft}`,
+  backgroundColor: COLORS.navy,
+  boxShadow: COLORS.shadowSoft
 }
 
-const logo : React.CSSProperties = {
+const logo: React.CSSProperties = {
   height: 40
 }
 
-const title : React.CSSProperties = {
+const title: React.CSSProperties = {
   fontSize: 18,
   fontWeight: 600,
   flex: 1,
   textAlign: 'center',
-  color: '#FFFFFF'
+  color: COLORS.white
 }

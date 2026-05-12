@@ -135,13 +135,19 @@ function ChartCard({
 
           <XAxis dataKey="month" />
           <YAxis />
-          <Tooltip />
+          <Tooltip
+  contentStyle={{
+    borderRadius: 12,
+    border: `1px solid ${COLORS.orangeSoft}`,
+    boxShadow: COLORS.shadowSoft
+  }}
+/>
           <Legend />
 
           <Line
             type="monotone"
             dataKey="y2024"
-            stroke="#1E266D"
+            stroke={COLORS.navy}
             strokeWidth={3}
             name="2024"
           />
@@ -192,7 +198,7 @@ const topRowGrid: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   gap: 24,
-  marginTop: 24,
+  margin: '24px 0 0 0',
   alignItems: 'start'
 }
 
@@ -208,7 +214,7 @@ const chartCard: React.CSSProperties = {
   width: '100%',
   padding: 28,
   borderRadius: 18,
-  border: `2px solid ${COLORS.orangeTint}`,
+  border: `2px solid ${COLORS.orangeSoft}`,
   boxShadow: COLORS.shadowMedium,
   minHeight: 500
 }

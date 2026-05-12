@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { COLORS } from '@/lib/colors'
 
 type Props = {
   label: string
@@ -178,14 +179,14 @@ const percent =
   const score = percent * 100
 
   if (score >= 100) {
-    return '#acf3c3d7' // light green
+    return COLORS.scoreGreen
   }
 
   if (score >= 90) {
-    return '#fff4ccf3' // soft yellow
+    return COLORS.scoreYellow
   }
 
-  return '#f3b8b8d8' // light red
+  return COLORS.scoreRed
 }
   // =========================
   // UPDATE LOGIC (ONLY SINGLE)
@@ -230,7 +231,7 @@ const percent =
     justifyContent: 'center',
     marginBottom: 16,
     paddingBottom: 10,
-    borderBottom: '2px solid #F6A27A'
+    borderBottom: `2px solid ${COLORS.orangeSoft}`
   }}
 >
   <div style={kpiLabel}>
@@ -243,7 +244,7 @@ const percent =
         marginTop: 4,
         fontSize: 11,
         fontWeight: 600,
-        color: '#6B7280'
+        color: COLORS.textMuted
       }}
     >
       Timebound score
@@ -304,7 +305,7 @@ const percent =
     backgroundColor: getResultBackground(),
     fontWeight: 800,
     fontSize: 16,
-    color: '#1E266D'
+    color: COLORS.navy
   }}
   value={percent ? `${Math.round(percent * 100)}%` : ''}
   disabled
@@ -353,40 +354,29 @@ const percent =
 // ================= STYLES =================
 //
 
-const KPI_COLORS = {
-  navy: '#1E266D',
-  blue: '#A9C9D8',
-  orange: '#F26C2F',
-  peach: '#F6A27A',
-  white: '#FFFFFF',
-  border: '#D9DEE8',
-  lightGray: '#F7F8FA',
-  text: '#1F2937',
-  muted: '#6B7280'
-}
-
 const kpiCard: React.CSSProperties = {
-  backgroundColor: '#E5E5E5',
-  border: '2px solid #F6A27A',
+  backgroundColor: COLORS.grayPanel,
+  border: `2px solid ${COLORS.orangeSoft}`,
   borderRadius: 18,
   padding: 24,
-  boxShadow: '0 10px 24px rgba(0,0,0,0.06)',
+  boxShadow: COLORS.shadowMedium,
   overflow: 'hidden'
 }
 
 const kpiLabel: React.CSSProperties = {
-  color: '#1E266D',
+  color: COLORS.navy,
   fontSize: 24,
   fontWeight: 800,
-    textAlign: 'center'
+  textAlign: 'center'
 }
+
 const kpiHeader: React.CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(4, 1fr)',
   gap: 8,
   fontSize: 13,
   fontWeight: 700,
-  color: KPI_COLORS.muted,
+  color: COLORS.textMuted,
   marginBottom: 10,
   textAlign: 'center'
 }
@@ -400,28 +390,29 @@ const kpiRow: React.CSSProperties = {
 const cell: React.CSSProperties = {
   width: '100%',
   padding: '10px 12px',
-  backgroundColor: '#FFFFFF',
-  border: '1px solid #F6A27A',
+  backgroundColor: COLORS.white,
+  border: `1px solid ${COLORS.orangeSoft}`,
   borderRadius: 8,
-  color: '#1E266D',
+  color: COLORS.navy,
   fontSize: 14,
   fontWeight: 500,
   textAlign: 'center',
   outline: 'none'
 }
+
 const prevCell: React.CSSProperties = {
   ...cell,
-  backgroundColor: '#cacacada'
+  backgroundColor: COLORS.grayMuted
 }
 
 const targetCell: React.CSSProperties = {
   ...cell,
-  backgroundColor: '#9c9dfd'
+  backgroundColor: COLORS.inputBlue
 }
 
 const currentCell: React.CSSProperties = {
   ...cell,
-  backgroundColor: '#FFFFFF'
+  backgroundColor: COLORS.white
 }
 
 const cellWide: React.CSSProperties = {
@@ -432,12 +423,12 @@ const cellWide: React.CSSProperties = {
 const button: React.CSSProperties = {
   marginTop: 14,
   width: '100%',
-  backgroundColor: KPI_COLORS.orange,
+  backgroundColor: COLORS.orangePrimary,
   border: 'none',
   padding: '10px 12px',
   borderRadius: 8,
   cursor: 'pointer',
-  color: KPI_COLORS.white,
+  color: COLORS.white,
   fontSize: 13,
   fontWeight: 600
 }
@@ -448,7 +439,7 @@ const initRow: React.CSSProperties = {
   gap: 10,
   marginTop: 10,
   padding: 12,
-  backgroundColor: '#FFF7F3',
+  backgroundColor: COLORS.orangeTint,
   borderRadius: 12,
-  border: '1px solid #F6A27A'
+  border: `1px solid ${COLORS.orangeSoft}`
 }
