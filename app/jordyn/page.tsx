@@ -6,6 +6,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import {
+  isAdmin,
+  isMember,
+  canEditSelectedMonth
+} from '@/lib/auth'
 
 
 // =========================
@@ -69,6 +74,8 @@ export default function Page() {
   const [lastUpdated, setLastUpdated] = useState('')
   const [percentIntoPeriod, setPercentIntoPeriod] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
+  const canEditThisMonth =
+  canEditSelectedMonth(selectedMonth)
   
 
   //  MASTER TARGETS (UI CONTROLLED)
@@ -202,13 +209,19 @@ export default function Page() {
     <button
       style={editButton}
 
- onClick={async () => {
+onClick={async () => {
+  if (isMember() && !canEditThisMonth) {
+    return
+  }
+
   if (isEditing) {
-    // FORCE SAVE ALL KEY RESULTS
     document.querySelectorAll('[data-kr]').forEach((el) => {
       const label = el.getAttribute('data-kr')
+
       if (label) {
-        document.dispatchEvent(new Event(`save-${label}`))
+        document.dispatchEvent(
+          new Event(`save-${label}`)
+        )
       }
     })
   }
