@@ -9,7 +9,7 @@ import TopNav from '@/components/TopNav'
 import PracticeTrendsCharts from '../components/PracticeTrendsCharts'
 import { supabase } from '../lib/supabase'
 import { isAdmin } from '@/lib/auth'
-
+import { COLORS } from '@/lib/colors'
 
 // ================= LABEL MAP =================
 
@@ -841,24 +841,9 @@ onBlur={(e) =>
 
 // ================= STYLES =================
 
-const COLORS = {
-  navy: '#1E266D',
-  blue: '#A9C9D8',
-  orange: '#F26C2F',
-  softOrange: '#F6A27A',
-  lightOrange: '#FFD2B8',
-  paleOrange: '#FFE6D8',
-  white: '#FFFFFF',
-  lightGray: '#f5f5f5d5',
-  gray: '#e5e5e5c4',
-  border: '#F6A27A',
-  text: '#1F2937',
-  muted: '#6B7280'
-}
-
 const container: React.CSSProperties = {
-  backgroundColor: COLORS.lightGray,
-  color: COLORS.text,
+  backgroundColor: COLORS.grayAppBackground,
+  color: COLORS.textPrimary,
   minHeight: '100vh'
 }
 
@@ -873,16 +858,17 @@ const brandText: React.CSSProperties = {
 }
 
 const headerBox: React.CSSProperties = {
-  backgroundColor: COLORS.orange,
+  backgroundColor: COLORS.orangePrimary,
   padding: 24,
   margin: 20,
   borderRadius: 14,
-  border: `2px solid ${COLORS.softOrange}`,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+  border: `2px solid ${COLORS.orangeSoft}`,
+  boxShadow: COLORS.shadowSoft,
   position: 'sticky',
   top: 70,
   zIndex: 90
 }
+
 const mainTitle: React.CSSProperties = {
   fontSize: 42,
   fontWeight: 800,
@@ -908,8 +894,8 @@ const label: React.CSSProperties = {
 const input: React.CSSProperties = {
   padding: 10,
   backgroundColor: COLORS.white,
-  color: COLORS.text,
-  border: `1px solid ${COLORS.border}`,
+  color: COLORS.textPrimary,
+  border: `1px solid ${COLORS.orangeSoft}`,
   borderRadius: 8,
   minWidth: 160
 }
@@ -921,12 +907,12 @@ const monthSelector: React.CSSProperties = {
   backgroundColor: 'rgba(255,255,255,0.18)',
   padding: '10px 18px',
   borderRadius: 12,
-  border: `1px solid ${COLORS.softOrange}`,
+  border: `1px solid ${COLORS.orangeSoft}`,
   width: 'fit-content'
 }
 
 const monthButton: React.CSSProperties = {
-  backgroundColor: '#1E266D',
+  backgroundColor: COLORS.navy,
   border: 'none',
   borderRadius: 10,
   width: 40,
@@ -934,7 +920,7 @@ const monthButton: React.CSSProperties = {
   cursor: 'pointer',
   fontWeight: 800,
   fontSize: 18,
-  color: '#FFFFFF',
+  color: COLORS.white,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center'
@@ -948,12 +934,12 @@ const kpiGrid: React.CSSProperties = {
 }
 
 const notesBlock: React.CSSProperties = {
-  backgroundColor: '#E5E5E5',
+  backgroundColor: COLORS.grayPanel,
   padding: 28,
   marginTop: 24,
   borderRadius: 20,
-  border: '2px solid #F6A27A',
-  boxShadow: '0 14px 30px rgba(0,0,0,0.08)'
+  border: `2px solid ${COLORS.orangeSoft}`,
+  boxShadow: COLORS.shadowLarge
 }
 
 const notesTitle: React.CSSProperties = {
@@ -969,9 +955,9 @@ const textarea: React.CSSProperties = {
   padding: 20,
   fontSize: 16,
   fontWeight: 500,
-  color: '#1E266D',
-  backgroundColor: '#E5E5E5',
-  border: '1px solid #F6A27A',
+  color: COLORS.navy,
+  backgroundColor: COLORS.grayPanel,
+  border: `1px solid ${COLORS.orangeSoft}`,
   borderRadius: 16,
   outline: 'none',
   resize: 'vertical',
