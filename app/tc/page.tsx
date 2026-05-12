@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import TopNav from '@/components/TopNav'
+import { COLORS } from '@/lib/colors'
 
 //LABELMAP
 
@@ -863,7 +864,7 @@ const percent =
             ...cardCell,
             backgroundColor: getResultBackground(),
             fontWeight: 800,
-            color: '#1E266D'
+            color: COLORS.navy
           }}
           value={
             Number(target) > 0
@@ -880,33 +881,23 @@ const percent =
 
 // ================= STYLES =================
 
-const COLORS = {
-  navy: '#1E266D',
-  orange: '#F26C2F',
-  white: '#FFFFFF',
-  lightGray: '#f5f5f5d5',
-  border: '#F6A27A',
-  text: '#1F2937',
-  muted: '#6B7280'
-}
-
 const container: React.CSSProperties = {
-  backgroundColor: COLORS.lightGray,
-  color: COLORS.text,
+  backgroundColor: COLORS.grayAppBackground,
+  color: COLORS.textPrimary,
   minHeight: '100vh'
 }
 
 const headerBar: React.CSSProperties = {
-  backgroundColor: COLORS.orange,
+  backgroundColor: COLORS.orangePrimary,
   padding: 24,
   margin: 20,
   borderRadius: 14,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+  border: `2px solid ${COLORS.orangeSoft}`,
+  boxShadow: COLORS.shadowSoft,
   position: 'sticky',
   top: 60,
   zIndex: 50
 }
-
 
 const headerTitle: React.CSSProperties = {
   fontSize: 42,
@@ -915,7 +906,7 @@ const headerTitle: React.CSSProperties = {
 }
 
 const backButton: React.CSSProperties = {
-  backgroundColor: '#1F2937',
+  backgroundColor: COLORS.navy,
   border: 'none',
   borderRadius: 10,
   padding: '10px 18px',
@@ -932,12 +923,11 @@ const headerMeta: React.CSSProperties = {
   flexWrap: 'wrap'
 }
 
-
 const metaInput: React.CSSProperties = {
   padding: 10,
   backgroundColor: COLORS.white,
-  color: COLORS.text,
-  border: `1px solid ${COLORS.border}`,
+  color: COLORS.textPrimary,
+  border: `1px solid ${COLORS.orangeSoft}`,
   borderRadius: 8,
   minWidth: 160
 }
@@ -946,9 +936,10 @@ const monthSelector: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 14,
-  backgroundColor: 'rgba(255,255,255,0.18)',
+  backgroundColor: COLORS.orangeSoft,
   padding: '10px 18px',
   borderRadius: 12,
+  border: `1px solid ${COLORS.orangeAccent}`,
   width: 'fit-content'
 }
 
@@ -960,10 +951,10 @@ const grid: React.CSSProperties = {
 }
 
 const card: React.CSSProperties = {
-  backgroundColor: '#E5E5E5',
+  backgroundColor: COLORS.grayPanel,
   padding: 20,
   borderRadius: 18,
-  border: '1px solid #F6A27A',
+  border: `1px solid ${COLORS.orangeSoft}`,
   boxShadow: '0 12px 30px rgba(0,0,0,0.10)'
 }
 
@@ -980,7 +971,7 @@ const cardHeader: React.CSSProperties = {
   gap: 8,
   fontSize: 13,
   fontWeight: 700,
-  color: COLORS.muted,
+  color: COLORS.textMuted,
   marginBottom: 10,
   textAlign: 'center'
 }
@@ -994,14 +985,15 @@ const cardRow: React.CSSProperties = {
 const cardCell: React.CSSProperties = {
   width: '100%',
   padding: 12,
-  backgroundColor: '#F8FAFC',
-  color: COLORS.text,
-  border: '1px solid #F6A27A',
+  backgroundColor: COLORS.white,
+  color: COLORS.textPrimary,
+  border: `1px solid ${COLORS.orangeSoft}`,
   borderRadius: 10,
   fontSize: 15,
   fontWeight: 600,
   textAlign: 'center'
 }
+
 const prevCardCell: React.CSSProperties = {
   ...cardCell,
   backgroundColor: '#cacacada'
@@ -1014,16 +1006,17 @@ const targetCardCell: React.CSSProperties = {
 
 const currentCardCell: React.CSSProperties = {
   ...cardCell,
-  backgroundColor: '#FFFFFF'
+  backgroundColor: COLORS.white
 }
 
 const notesSection: React.CSSProperties = {
-  backgroundColor: '#E5E5E5',
+  backgroundColor: COLORS.grayPanel,
   padding: 28,
   margin: 20,
   marginTop: 24,
   borderRadius: 20,
-  border: '1px solid #F6A27A'
+  border: `1px solid ${COLORS.orangeSoft}`,
+  boxShadow: COLORS.shadowSoft
 }
 
 const notesInput: React.CSSProperties = {
@@ -1032,11 +1025,12 @@ const notesInput: React.CSSProperties = {
   padding: 20,
   fontSize: 16,
   color: COLORS.navy,
-  backgroundColor: '#F8FAFC',
-  border: '1px solid #F6A27A',
+  backgroundColor: COLORS.white,
+  border: `1px solid ${COLORS.orangeSoft}`,
   borderRadius: 16,
   resize: 'vertical'
 }
+
 const headerLabel: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 600,
@@ -1045,7 +1039,7 @@ const headerLabel: React.CSSProperties = {
 }
 
 const monthButton: React.CSSProperties = {
-  backgroundColor: '#1E266D',
+  backgroundColor: COLORS.navy,
   border: 'none',
   borderRadius: 10,
   width: 40,
@@ -1053,7 +1047,7 @@ const monthButton: React.CSSProperties = {
   cursor: 'pointer',
   fontWeight: 800,
   fontSize: 18,
-  color: '#FFFFFF',
+  color: COLORS.white,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center'
@@ -1062,7 +1056,7 @@ const monthButton: React.CSSProperties = {
 const monthText: React.CSSProperties = {
   fontWeight: 800,
   fontSize: 18,
-  color: '#FFFFFF',
+  color: COLORS.white,
   minWidth: 110,
   textAlign: 'center'
 }
