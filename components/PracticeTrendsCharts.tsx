@@ -197,7 +197,7 @@ const topRowGrid: React.CSSProperties = {
 
 const startsWrapper: React.CSSProperties = {
   width: '72%',
-  margin: '0 auto 48px auto',
+  margin: '36px auto 48px auto',
   display: 'flex',
   justifyContent: 'center'
 }
