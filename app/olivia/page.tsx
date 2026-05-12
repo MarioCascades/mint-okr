@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import { isAdmin, canEditSelectedMonth } from '../../lib/auth'
 
 
 // =========================
@@ -200,12 +201,14 @@ export default function Page() {
       ← Back to Main
     </button>
 
-    <button
-      style={editButton}
-      onClick={() => setIsEditing(!isEditing)}
-    >
-      {isEditing ? 'Save' : 'Edit'}
-    </button>
+    {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
+  <button
+    style={editButton}
+    onClick={() => setIsEditing(!isEditing)}
+  >
+    {isEditing ? 'Save' : 'Edit'}
+  </button>
+)}
 
   </div>
 

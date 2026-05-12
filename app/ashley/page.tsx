@@ -8,6 +8,10 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import {
+  isAdmin,
+  canEditSelectedMonth
+} from '@/lib/auth'
 
 
 export default function Page() {
@@ -150,25 +154,29 @@ export default function Page() {
 
             <button style={backButton} onClick={() => router.push('/')}>
               ← Back to Main
-            </button>     
-            <button
-  style={editButton}
- onClick={async () => {
+            </button>   
 
- if (isEditing) {
-  await new Promise((r) => setTimeout(r, 300))
+           {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
+  <button
+    style={editButton}
+    onClick={async () => {
 
-  const event = new CustomEvent('save-all', {
-  detail: { selectedMonth }
-})
-window.dispatchEvent(event)
-}
+      if (isEditing) {
+        await new Promise((r) => setTimeout(r, 300))
 
-  setIsEditing(!isEditing)
-}}
->
-  {isEditing ? 'Save' : 'Edit'}
-</button>
+        const event = new CustomEvent('save-all', {
+          detail: { selectedMonth }
+        })
+
+        window.dispatchEvent(event)
+      }
+
+      setIsEditing(!isEditing)
+    }}
+  >
+    {isEditing ? 'Save' : 'Edit'}
+  </button>
+)}
 
           </div>
 

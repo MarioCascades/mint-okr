@@ -7,6 +7,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import {
+  isAdmin,
+  canEditSelectedMonth
+} from '@/lib/auth'
 
 // =========================
 // KEYWORD MAP (SAFE MATCHING)
@@ -174,21 +178,23 @@ export default function Page() {
       ← Back to Main
     </button>
 
-    <button
-  style={editButton}
-  onClick={async () => {
-    if (isEditing) {
-      const event = new CustomEvent('save-all', {
-        detail: { selectedMonth }
-      })
-      window.dispatchEvent(event)
-    }
+   {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
+  <button
+    style={editButton}
+    onClick={async () => {
+      if (isEditing) {
+        const event = new CustomEvent('save-all', {
+          detail: { selectedMonth }
+        })
+        window.dispatchEvent(event)
+      }
 
-    setIsEditing(!isEditing)
-  }}
->
-  {isEditing ? 'Save' : 'Edit'}
-</button>
+      setIsEditing(!isEditing)
+    }}
+  >
+    {isEditing ? 'Save' : 'Edit'}
+  </button>
+)}
 
   </div>
 

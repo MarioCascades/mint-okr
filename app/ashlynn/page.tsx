@@ -7,6 +7,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import {
+  isAdmin,
+  canEditSelectedMonth
+} from '@/lib/auth'
 
 const labelMap: Record<string, string> = {
   "Missed Slack Orders": "Missed Slack Orders",
@@ -163,21 +167,24 @@ export default function Page() {
             </button>
 
             
-            <button
-  style={editButton}
-  onClick={async () => {
-    if (isEditing) {
-      const event = new CustomEvent('save-all', {
-        detail: { selectedMonth }
-      })
-      window.dispatchEvent(event)
-    }
+           {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
+  <button
+    style={editButton}
+    onClick={async () => {
+      if (isEditing) {
+        const event = new CustomEvent('save-all', {
+          detail: { selectedMonth }
+        })
 
-    setIsEditing(!isEditing)
-  }}
->
-  {isEditing ? 'Save' : 'Edit'}
-</button>
+        window.dispatchEvent(event)
+      }
+
+      setIsEditing(!isEditing)
+    }}
+  >
+    {isEditing ? 'Save' : 'Edit'}
+  </button>
+)}
           </div>
         </div>
       </div>

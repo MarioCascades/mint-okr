@@ -8,6 +8,7 @@ import KPI from '../components/KPI'
 import TopNav from '@/components/TopNav'
 import PracticeTrendsCharts from '../components/PracticeTrendsCharts'
 import { supabase } from '../lib/supabase'
+import { isAdmin } from '@/lib/auth'
 
 
 // ================= LABEL MAP =================
@@ -793,19 +794,21 @@ isCurrentMonth={
       {/* ================= ANNOUNCEMENTS ================= */}
 <div style={notesBlock}>
   <div style={notesTitle}>Announcements</div>
-  <textarea
+<textarea
   style={textarea}
   placeholder="Enter announcements..."
   value={announcements}
+  disabled={!isAdmin()}
   onChange={(e) =>
     setAnnouncements(e.target.value)
   }
   onBlur={(e) =>
-  saveMainPageNote(
-    'announcements',
-    e.target.value
-  )
-}
+    isAdmin() &&
+    saveMainPageNote(
+      'announcements',
+      e.target.value
+    )
+  }
 />
 </div>
 
