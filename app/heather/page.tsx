@@ -197,7 +197,14 @@ export default function Page() {
     </div>
   </div>
 
-  <div style={rightMeta}>
+    <div style={rightMeta}>
+
+    <button
+      style={backButton}
+      onClick={() => router.push('/')}
+    >
+      ← Back to Main
+    </button>
 
     {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
   <button
