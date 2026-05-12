@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts'
+import { COLORS } from '@/lib/colors'
 
 export default function PracticeTrendsCharts() {
   const [productionData, setProductionData] = useState<any[]>([])
@@ -148,7 +149,7 @@ function ChartCard({
           <Line
             type="monotone"
             dataKey="y2025"
-            stroke="#F26C2F"
+            stroke={COLORS.orangePrimary}
             strokeWidth={3}
             name="2025"
           />
@@ -165,24 +166,24 @@ function ChartCard({
     </div>
   )
 }
-
 const headerBar: React.CSSProperties = {
-  backgroundColor: '#F26C2F',
+  backgroundColor: COLORS.orangePrimary,
   padding: 24,
   marginTop: 24,
   borderRadius: 14,
-  boxShadow: '0 4px 14px rgba(0,0,0,0.06)'
+  border: `2px solid ${COLORS.orangeSoft}`,
+  boxShadow: COLORS.shadowSoft
 }
 
 const headerTitle: React.CSSProperties = {
   fontSize: 40,
   fontWeight: 800,
-  color: '#FFFFFF',
+  color: COLORS.white,
   marginBottom: 6
 }
 
 const headerSubtitle: React.CSSProperties = {
-  color: '#FFFFFF',
+  color: COLORS.white,
   fontSize: 15,
   opacity: 0.95
 }
@@ -203,18 +204,18 @@ const startsWrapper: React.CSSProperties = {
 }
 
 const chartCard: React.CSSProperties = {
-  backgroundColor: '#FFFFFF',
+  backgroundColor: COLORS.white,
   width: '100%',
   padding: 28,
   borderRadius: 18,
-  border: '2px solid #D1D5DB',
-  boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+  border: `2px solid ${COLORS.orangeTint}`,
+  boxShadow: COLORS.shadowMedium,
   minHeight: 500
 }
 
 const sectionTitle: React.CSSProperties = {
   fontSize: 24,
   fontWeight: 800,
-  color: '#1E266D',
+  color: COLORS.navy,
   marginBottom: 16
 }
