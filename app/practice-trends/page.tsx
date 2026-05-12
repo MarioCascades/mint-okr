@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import { isAdmin } from '@/lib/auth'
 
 export default function PracticeTrendsPage() {
   const [isEditing, setIsEditing] = useState(false)
@@ -156,19 +157,22 @@ useEffect(() => {
   </p>
 
 <div style={actionRow}>
-  <button
-  style={editButton}
-  onClick={() => {
-    if (isEditing) {
-      handleSave()
-    } else {
-      setIsEditing(true)
-    }
-  }}
->
-  {isEditing ? 'Save' : 'Edit'}
-</button>
+  {isAdmin() && (
+    <button
+      style={editButton}
+      onClick={() => {
+        if (isEditing) {
+          handleSave()
+        } else {
+          setIsEditing(true)
+        }
+      }}
+    >
+      {isEditing ? 'Save' : 'Edit'}
+    </button>
+  )}
 </div>
+
 </div>
 <div style={topRowGrid}>
 <div style={sectionBlock}>
