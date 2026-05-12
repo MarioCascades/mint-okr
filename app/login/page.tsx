@@ -31,7 +31,30 @@ export default function LoginPage() {
     return
   }
 
- setLoading(false)
+ // ================= ROLE DETECTION =================
+
+const loggedInEmail =
+  data.user?.email?.toLowerCase()
+
+if (
+  loggedInEmail ===
+    'mario@cascadeffects.com' ||
+  loggedInEmail ===
+    'okradmin@mintortho.com'
+) {
+  localStorage.setItem('userRole', 'admin')
+}
+
+else if (
+  loggedInEmail ===
+    'okrapp@mintortho.com'
+) {
+  localStorage.setItem('userRole', 'member')
+}
+
+// ================= REDIRECT =================
+
+setLoading(false)
 window.location.href = '/'
 }
 
