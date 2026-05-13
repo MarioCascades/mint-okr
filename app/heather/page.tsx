@@ -85,7 +85,7 @@ export default function Page() {
   const [masterProductionTarget, setMasterProductionTarget] = useState('0')
   const [masterWhiteningTarget, setMasterWhiteningTarget] = useState('0')
   const showHistoricalNotice =
-  selectedMonth < new Date(2026, 2, 1)
+  selectedMonth < new Date(2026, 3, 1)
 
 
   useEffect(() => {
