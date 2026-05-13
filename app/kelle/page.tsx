@@ -18,7 +18,7 @@ import {
 // =========================
 
 const formatPercent = (val: number) =>
-  `${val.toFixed(2)}%`
+  `${(val * 100).toFixed(2)}%`
 
 const timeBoundSet = new Set([
   'NP Scheduled (GF)'
