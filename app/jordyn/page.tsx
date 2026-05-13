@@ -6,12 +6,13 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
 import { supabase } from '../../lib/supabase'
+import { COLORS } from '@/lib/colors'
 import {
   isAdmin,
   isMember,
   canEditSelectedMonth
 } from '@/lib/auth'
-import { COLORS } from '@/lib/colors'
+
 
 
 // =========================
