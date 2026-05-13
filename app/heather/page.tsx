@@ -84,6 +84,9 @@ export default function Page() {
   const [masterStartsTarget, setMasterStartsTarget] = useState('0')
   const [masterProductionTarget, setMasterProductionTarget] = useState('0')
   const [masterWhiteningTarget, setMasterWhiteningTarget] = useState('0')
+  const showHistoricalNotice =
+  selectedMonth.getFullYear() === 2026 &&
+  selectedMonth.getMonth() < 2
 
 
   useEffect(() => {
@@ -146,7 +149,11 @@ export default function Page() {
         <p style={description}>
           Increase revenue for the practice through production and collections while setting the standard for practice culture and patient experience.
         </p>
-
+{showHistoricalNotice && (
+  <div style={historicalNotice}>
+    Data shown for this period reflects previous employee historical performance.
+  </div>
+)}
         <div style={topSection}>
 
   <div style={leftMeta}>
@@ -1328,4 +1335,18 @@ const initiativeRow: React.CSSProperties = {
   backgroundColor: COLORS.orangeTint,
   borderRadius: 12,
   border: `1px solid ${COLORS.orangeSoft}`
+}
+const historicalNotice: React.CSSProperties = {
+  marginTop: 16,
+  marginBottom: 18,
+  padding: '14px 18px',
+  backgroundColor: '#FBE3DC',
+  border: '1px solid #F08A76',
+  borderLeft: '5px solid #EC6951',
+  borderRadius: 12,
+  color: '#1E266D',
+  fontSize: 14,
+  fontWeight: 600,
+  maxWidth: 820,
+  boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
 }
