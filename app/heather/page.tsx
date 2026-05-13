@@ -85,8 +85,7 @@ export default function Page() {
   const [masterProductionTarget, setMasterProductionTarget] = useState('0')
   const [masterWhiteningTarget, setMasterWhiteningTarget] = useState('0')
   const showHistoricalNotice =
-  selectedMonth.getFullYear() === 2026 &&
-  selectedMonth.getMonth() < 2
+  selectedMonth < new Date(2026, 2, 1)
 
 
   useEffect(() => {
