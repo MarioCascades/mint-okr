@@ -1,589 +1,462 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import TopNav from '@/components/TopNav'
-import { COLORS } from '@/lib/colors'
-type KeyResult = {
-  id: string
-  title: string
-  current_value: number
-  target_value: number
-  start_value: number
-  metric_type: string
-  objective_id?: string
-  key_result_template_id?: string
-}
+import { supabase } from '@/lib/supabase'
 
-type Initiative = {
+type KRRow = {
   id: string
-  key_result_id: string
-  title: string
-  owner?: string
-  due_date?: string
+  label: string
+  previous: string
+  target: string
+  current: string
+  score: string
+  editable: boolean
+  mirrored?: boolean
+  displayOnly?: boolean
+  delta?: boolean
 }
 
 type Objective = {
   id: string
   title: string
-  description?: string
-  keyResults: KeyResult[]
+  rows: KRRow[]
 }
 
-const MARKETING_USER_ID = '564f76fd-a853-4bea-a2f1-a9fb6a75aa00'
-
 const MARKETING_DESCRIPTION =
-  'Ensure brand reputatation and experience consistency (across all sources and channels), Marketing strategy incorporates brand awareness and lead generation. New Patient inquiry targets are set and appropriate for hitting TC starts target (based on 70% completed consult to start conversion rate)'
+  'Marketing performance tracking and OKR visibility across referral growth, community engagement, and digital performance.'
 
-const MIRRORED_TEMPLATE_IDS = [
-  'f2024a62-4588-4bdd-a8b4-66c77c775290',
-  '5d61dae9-c93b-4403-9da2-88007cde2a65'
-]
-
-const DISPLAY_ONLY_KRS = [
+const DISPLAY_ONLY_KRS = new Set([
   'MKT Dentist Referrals',
   'MKT Community',
   'MKT Sponsorships',
   'MKT NP Community Referrals',
   'MKT GP Deliveries',
-  'MKT Bright Referral'
-]
+  'MKT Bright Referral',
+])
 
-const DELTA_SCORE_KRS = [
+const DELTA_SCORE_KRS = new Set([
   'MKT Sponsorship Dollars',
-  'MKT Social Posts'
-]
+  'MKT Social Posts',
+])
 
+function formatMonth(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+function getPercentIntoPeriod(selectedMonth: Date) {
+  const now = new Date()
+
+  const isCurrentMonth =
+    now.getMonth() === selectedMonth.getMonth() &&
+    now.getFullYear() === selectedMonth.getFullYear()
+
+  if (!isCurrentMonth) {
+    return 100
+  }
+
+  const daysInMonth = new Date(
+    selectedMonth.getFullYear(),
+    selectedMonth.getMonth() + 1,
+    0
+  ).getDate()
+
+  return Math.round((now.getDate() / daysInMonth) * 100)
+}
+
+function isFutureMonth(selectedMonth: Date) {
+  const now = new Date()
+
+  return (
+    selectedMonth.getFullYear() > now.getFullYear() ||
+    (selectedMonth.getFullYear() === now.getFullYear() &&
+      selectedMonth.getMonth() > now.getMonth())
+  )
+}
+
+function changeMonth(current: Date, offset: number) {
+  const next = new Date(current)
+  next.setMonth(next.getMonth() + offset)
+  return next
+}
+
+function showLegacyDigital(selectedMonth: Date) {
+  return (
+    selectedMonth.getFullYear() < 2026 ||
+    (selectedMonth.getFullYear() === 2026 &&
+      selectedMonth.getMonth() <= 3)
+  )
+}
+
+function ScoreBadge({ score }: { score: string }) {
+  const numeric = parseInt(score)
+
+  let bg = 'bg-red-100 text-red-700'
+
+  if (score === '—') {
+    bg = 'bg-gray-100 text-gray-500'
+  } else if (!isNaN(numeric) && numeric >= 100) {
+    bg = 'bg-green-100 text-green-700'
+  } else if (!isNaN(numeric) && numeric >= 90) {
+    bg = 'bg-yellow-100 text-yellow-700'
+  }
+
+  return (
+    <div
+      className={`px-3 py-2 rounded-lg text-sm font-semibold min-w-[70px] text-center ${bg}`}
+    >
+      {score}
+    </div>
+  )
+}
+
+function KRRowComponent({
+  row,
+  isEditing,
+}: {
+  row: KRRow
+  isEditing: boolean
+}) {
+  const locked = !row.editable || row.mirrored || row.displayOnly
+
+  return (
+    <div className="grid grid-cols-5 gap-3 items-center py-3 border-b border-gray-100">
+      <div className="font-medium text-gray-800">{row.label}</div>
+
+      <div className="bg-gray-100 px-3 py-2 rounded-lg text-center">
+        {row.previous}
+      </div>
+
+      <div className="bg-blue-100 px-3 py-2 rounded-lg text-center">
+        {row.target}
+      </div>
+
+      <div>
+        <input
+          value={row.current}
+          disabled={!isEditing || locked}
+          readOnly={!isEditing || locked}
+          className="w-full border rounded-lg px-3 py-2 text-center disabled:bg-gray-50 disabled:text-gray-500"
+        />
+      </div>
+
+      <ScoreBadge score={row.score} />
+    </div>
+  )
+}
+
+function ObjectiveCard({
+  objective,
+  isEditing,
+}: {
+  objective: Objective
+  isEditing: boolean
+}) {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 className="text-xl font-semibold mb-5">{objective.title}</h2>
+
+      <div className="grid grid-cols-5 gap-3 mb-3 text-sm font-semibold text-gray-500">
+        <div>Key Results</div>
+        <div className="text-center">Last Month</div>
+        <div className="text-center">Target</div>
+        <div className="text-center">This Month</div>
+        <div className="text-center">Score</div>
+      </div>
+
+      {objective.rows.map((row) => (
+        <KRRowComponent
+          key={row.id}
+          row={row}
+          isEditing={isEditing}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function MarketingPage() {
   const router = useRouter()
 
-  const [loading, setLoading] = useState(true)
   const [selectedMonth, setSelectedMonth] = useState(new Date())
-  const [objectives, setObjectives] = useState<Objective[]>([])
-  const [initiatives, setInitiatives] = useState<Initiative[]>([])
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [mirroredAshleyData, setMirroredAshleyData] = useState<KeyResult[]>([])
+  const [userEmail, setUserEmail] = useState<string | null>(null)
 
-const showLegacyDigital =
-  selectedMonth.getFullYear() < 2026 ||
-  (selectedMonth.getFullYear() === 2026 &&
-    selectedMonth.getMonth() <= 3)
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-const formatMonth = (date: Date) => {
-
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric'
-    })
-  }
-
-  const previousMonth = () => {
-    const next = new Date(selectedMonth)
-    next.setMonth(next.getMonth() - 1)
-    setSelectedMonth(next)
-  }
-
-  const nextMonth = () => {
-    const next = new Date(selectedMonth)
-    next.setMonth(next.getMonth() + 1)
-    setSelectedMonth(next)
-  }
-
-  const calculateScore = (
-    kr: KeyResult,
-    previousValue?: number
-  ) => {
-    if (DISPLAY_ONLY_KRS.includes(kr.title)) {
-      return '—'
-    }
-
-    if (DELTA_SCORE_KRS.includes(kr.title)) {
-      if (
-        previousValue === undefined ||
-        kr.target_value === previousValue
-      ) {
-        return '—'
-      }
-
-      const score =
-        ((kr.current_value - previousValue) /
-          (kr.target_value - previousValue)) *
-        100
-
-      return `${Math.max(0, Math.round(score))}%`
-    }
-
-    if (!kr.target_value || kr.target_value === 0) {
-      return '—'
-    }
-
-    const score =
-      (kr.current_value / kr.target_value) * 100
-
-    return `${Math.max(0, Math.round(score))}%`
-  }
-
-const canEdit = () => {
-  return currentUserId === MARKETING_USER_ID
-}
-const saveChanges = async () => {
-  for (const objective of objectives) {
-    for (const kr of objective.keyResults) {
-      if (kr.id.startsWith('mirror-')) {
-  continue
-}
-
-      await supabase
-        .from('key_results')
-        .update({
-          current_value: kr.current_value,
-          target_value: kr.target_value
-        })
-        .eq('id', kr.id)
-    }
-  }
-
-  setIsEditing(false)
-}
-useEffect(() => {
-
-    const fetchData = async () => {
-      setLoading(true)
-
-      const { data: authData } = await supabase.auth.getUser()
-
-      if (!authData.user) {
+      if (!user) {
         router.push('/login')
         return
       }
 
-      setCurrentUserId(authData.user.id)
-
-     const { data: marketingKrs, error: marketingError } =
-  await supabase
-    .from('key_results')
-    .select('*')
-    .eq('owner_id', MARKETING_USER_ID)
-
-      const { data: ashleyUser } = await supabase
-        .from('users')
-        .select('id')
-        .eq('full_name', 'Ashley')
-        .single()
-
-      let mirroredData: KeyResult[] = []
-
-      if (ashleyUser) {
-
-       const { data: ashleyKrs } = await supabase
-  .from('key_results')
-  .select('*')
-  .eq('owner_id', ashleyUser.id)
-
-        mirroredData =
-  ashleyKrs
-    ?.filter((kr: any) =>
-      MIRRORED_TEMPLATE_IDS.includes(
-        kr.key_result_template_id
-      )
-    )
-    .map((kr: any) => ({
-  ...kr,
-  id: `mirror-${kr.id}`,
-  title:
-    kr.key_result_template_id ===
-    'f2024a62-4588-4bdd-a8b4-66c77c775290'
-      ? '# of New Patients Scheduled This Month'
-      : '# of New Patients Scheduled Next Month'
-})) || []
-
-        setMirroredAshleyData(mirroredData)
-      }
-
-      const groupedObjectives: Record<string, Objective> = {}
-
-      marketingKrs?.forEach((kr: any) => {
-  const objectiveId = kr.objective_id
-
-  let objectiveTitle = 'Unknown Objective'
-
-  if (objectiveId === 'cb492826-c9af-4908-b697-e5b55c59cdbc') {
-    objectiveTitle = 'Understanding Referral Mix'
-  }
-
-  if (objectiveId === '1fe201c6-775d-4ee6-8311-d57230a5a3ad') {
-    objectiveTitle = 'Community'
-  }
-
-  if (objectiveId === 'aa3d06ad-ec75-41cf-a666-23efe5a897b3') {
-    objectiveTitle = 'Digital Marketing'
-  }
-
-  if (!objectiveId) return
-
-  if (!groupedObjectives[objectiveId]) {
-    groupedObjectives[objectiveId] = {
-      id: objectiveId,
-      title: objectiveTitle,
-      keyResults: []
+      setUserEmail(user.email ?? null)
     }
-  }
 
-  groupedObjectives[objectiveId].keyResults.push({
-    ...kr,
-    title: kr.title || 'Untitled'
-  })
-})
+    getUser()
+  }, [router])
 
-console.log('MARKETING KRS', marketingKrs)
-console.log('ASHLEY MIRROR', mirroredData)
-console.log('GROUPED', groupedObjectives)
-      const builtObjectives = [
+  const percentIntoPeriod = useMemo(
+    () => getPercentIntoPeriod(selectedMonth),
+    [selectedMonth]
+  )
+
+  const objectives: Objective[] = [
+    {
+      id: 'obj1',
+      title: 'Top of New Patient Funnel',
+      rows: [
         {
-          id: 'mirrored',
-          title: 'Top of New Patient Funnel',
-          keyResults: mirroredData
+          id: '1',
+          label: '# New Patients Scheduled This Month',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '0%',
+          editable: false,
+          mirrored: true,
         },
-        ...Object.values(groupedObjectives)
-      ]
+        {
+          id: '2',
+          label: '# New Patients Scheduled Next Month',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '0%',
+          editable: false,
+          mirrored: true,
+        },
+      ],
+    },
+    {
+      id: 'obj2',
+      title: 'Understanding Referral Mix',
+      rows: [
+        {
+          id: '3',
+          label: 'MKT Dentist Referrals',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '—',
+          editable: false,
+          displayOnly: true,
+        },
+        {
+          id: '4',
+          label: 'MKT Referring Dentists',
+          previous: '0',
+          target: '15',
+          current: '0',
+          score: '0%',
+          editable: true,
+        },
+        {
+          id: '5',
+          label: 'MKT Patient Referrals',
+          previous: '0',
+          target: '15',
+          current: '0',
+          score: '0%',
+          editable: true,
+        },
+        {
+          id: '6',
+          label: 'MKT Digital Marketing',
+          previous: '0',
+          target: '25',
+          current: '0',
+          score: '0%',
+          editable: true,
+        },
+        {
+          id: '7',
+          label: 'MKT Community',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '—',
+          editable: false,
+          displayOnly: true,
+        },
+      ],
+    },
+    {
+      id: 'obj3',
+      title: 'Community',
+      rows: [
+        {
+          id: '8',
+          label: 'MKT Sponsorships',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '—',
+          editable: false,
+          displayOnly: true,
+        },
+        {
+          id: '9',
+          label: 'MKT Sponsorship Dollars',
+          previous: '$0',
+          target: '$10,000',
+          current: '$0',
+          score: '0%',
+          editable: true,
+          delta: true,
+        },
+        {
+          id: '10',
+          label: 'MKT Community Events',
+          previous: '0',
+          target: '1',
+          current: '0',
+          score: '0%',
+          editable: true,
+        },
+        {
+          id: '11',
+          label: 'MKT NP Community Referrals',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '—',
+          editable: false,
+          displayOnly: true,
+        },
+        {
+          id: '12',
+          label: 'MKT GP Deliveries',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '—',
+          editable: false,
+          displayOnly: true,
+        },
+      ],
+    },
+  ]
 
-      setObjectives(
-        builtObjectives.filter((obj) => {
-          if (
-            obj.title === 'Digital Marketing' &&
-            !showLegacyDigital
-          ) {
-            return false
-          }
-
-          return true
-        })
-      )
-
-      setLoading(false)
-    }
-
-    fetchData()
-  }, [selectedMonth])
-    if (loading) {
-    return (
-      <div style={styles.container}>
-        <TopNav />
-        <div style={styles.content}>Loading...</div>
-      </div>
-    )
+  if (showLegacyDigital(selectedMonth)) {
+    objectives.push({
+      id: 'obj4',
+      title: 'Digital Marketing',
+      rows: [
+        {
+          id: '13',
+          label: 'MKT Social Posts',
+          previous: '0',
+          target: '8',
+          current: '0',
+          score: '0%',
+          editable: true,
+          delta: true,
+        },
+        {
+          id: '14',
+          label: 'MKT Google Reviews',
+          previous: '0',
+          target: '10',
+          current: '0',
+          score: '0%',
+          editable: true,
+        },
+        {
+          id: '15',
+          label: 'MKT Bright Referral',
+          previous: '0',
+          target: '0',
+          current: '0',
+          score: '—',
+          editable: false,
+          displayOnly: true,
+        },
+      ],
+    })
   }
 
   return (
-    <div style={styles.container}>
+    <div className="min-h-screen bg-slate-50">
       <TopNav />
 
-      <div style={styles.stickyHeader}>
-        <div style={styles.title}>Marketing</div>
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Marketing
+              </h1>
+              <p className="text-gray-600 mt-2">
+                {MARKETING_DESCRIPTION}
+              </p>
 
-        <div style={styles.description}>
-          {MARKETING_DESCRIPTION}
-        </div>
-
-        <div style={styles.topSection}>
-          <div style={styles.leftMeta}>
-            <div style={styles.monthSelector}>
-              <button
-                style={styles.arrowButton}
-                onClick={previousMonth}
-              >
-                ←
-              </button>
-
-              <div style={styles.monthText}>
-                {formatMonth(selectedMonth)}
+              <div className="flex gap-6 mt-5 text-sm text-gray-600">
+                <div>% Into Period: {percentIntoPeriod}%</div>
+                <div>Date Updated: --</div>
               </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.push('/')}
+                className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50"
+              >
+                Back to Main
+              </button>
 
               <button
-                style={styles.arrowButton}
-                onClick={nextMonth}
+                onClick={() => setIsEditing(!isEditing)}
+                className="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600"
               >
-                →
+                {isEditing ? 'Save' : 'Edit'}
               </button>
             </div>
           </div>
 
-          <div style={styles.rightMeta}>
-            {canEdit() && (
+          <div className="flex justify-center items-center gap-6 mt-8">
+            <button
+              onClick={() =>
+                setSelectedMonth(changeMonth(selectedMonth, -1))
+              }
+              className="text-2xl"
+            >
+              ←
+            </button>
 
-             <button
-  style={styles.editButton}
-  onClick={() => {
-    if (isEditing) {
-      saveChanges()
-    } else {
-      setIsEditing(true)
-    }
-  }}
->
-  {isEditing ? 'Save Changes' : 'Edit'}
-</button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div style={styles.content}>
-        {objectives.map((objective) => (
-          <div
-            key={objective.id}
-            style={styles.objective}
-          >
-            <div style={styles.objectiveTitle}>
-              {objective.title}
+            <div className="text-lg font-semibold">
+              {formatMonth(selectedMonth)}
             </div>
 
-            {objective.keyResults.map((kr) => (
-  <div
-    key={kr.id}
-    style={{
-      padding: 16,
-      marginBottom: 12,
-      border: `1px solid ${COLORS.orangeSoft}`,
-      borderRadius: 12,
-      backgroundColor: COLORS.white
-    }}
-  >
-    <div
-      style={{
-        fontWeight: 700,
-        marginBottom: 10
-      }}
-    >
-      {kr.title}
-    </div>
-
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
-        gap: 12
-      }}
-    >
-      <div>
-        <div style={{ fontSize: 12 }}>Current</div>
-
-        {isEditing &&
-        !kr.id.startsWith('mirror-') ? (
-          <input
-            type="number"
-            value={kr.current_value}
-            onChange={(e) => {
-              setObjectives((prev) =>
-                prev.map((obj) => ({
-                  ...obj,
-                  keyResults: obj.keyResults.map((item) =>
-                    item.id === kr.id
-                      ? {
-                          ...item,
-                          current_value:
-                            Number(e.target.value)
-                        }
-                      : item
-                  )
-                }))
-              )
-            }}
-            style={styles.inputSmall}
-          />
-        ) : (
-          <div>{kr.current_value}</div>
-        )}
-      </div>
-
-      <div>
-        <div style={{ fontSize: 12 }}>Target</div>
-
-        {isEditing &&
-        !DISPLAY_ONLY_KRS.includes(kr.title) &&
-        !kr.id.startsWith('mirror-') ? (
-          <input
-            type="number"
-            value={kr.target_value}
-            onChange={(e) => {
-              setObjectives((prev) =>
-                prev.map((obj) => ({
-                  ...obj,
-                  keyResults: obj.keyResults.map((item) =>
-                    item.id === kr.id
-                      ? {
-                          ...item,
-                          target_value:
-                            Number(e.target.value)
-                        }
-                      : item
-                  )
-                }))
-              )
-            }}
-            style={styles.inputSmall}
-          />
-        ) : (
-          <div>{kr.target_value || '—'}</div>
-        )}
-      </div>
-
-      <div>
-        <div style={{ fontSize: 12 }}>Score</div>
-        <div>{calculateScore(kr)}</div>
-      </div>
-    </div>
-  </div>
-))}
+            <button
+              disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
+              onClick={() =>
+                setSelectedMonth(changeMonth(selectedMonth, 1))
+              }
+              className="text-2xl disabled:opacity-30"
+            >
+              →
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
+
+        <div className="space-y-8">
+          {objectives.map((objective) => (
+            <ObjectiveCard
+              key={objective.id}
+              objective={objective}
+              isEditing={isEditing}
+            />
+          ))}
+        </div>
+      </main>
     </div>
   )
-}
-const styles = {
-  container: {
-    backgroundColor: COLORS.grayAppBackground,
-    minHeight: '100vh',
-    color: COLORS.navy
-  },
-
-  stickyHeader: {
-    position: 'sticky' as const,
-    top: 60,
-    zIndex: 10,
-    background: `linear-gradient(90deg, ${COLORS.orangePrimary} 0%, ${COLORS.orangeSoft} 100%)`,
-    padding: 24,
-    borderBottom: `1px solid ${COLORS.orangeSoft}`,
-    borderRadius: 16,
-    margin: 16,
-    boxShadow: '0 8px 24px rgba(0,0,0,0.06)'
-  },
-
-  content: {
-    padding: 20,
-    overflowX: 'auto' as const
-  },
-
-  title: {
-    fontSize: 38,
-    fontWeight: 700,
-    color: COLORS.white,
-    marginBottom: 8
-  },
-
-  description: {
-    fontSize: 16,
-    color: COLORS.white,
-    marginBottom: 24,
-    maxWidth: 900,
-    lineHeight: 1.5
-  },
-
-  topSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 24,
-    alignItems: 'flex-start'
-  },
-
-  leftMeta: {
-    display: 'flex',
-    flexDirection: 'row' as const,
-    gap: 16,
-    flexWrap: 'wrap' as const,
-    alignItems: 'flex-end'
-  },
-
-  rightMeta: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: 14,
-    alignItems: 'stretch',
-    minWidth: 220
-  },
-
-  metaItem: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    minWidth: 220
-  },
-
-  label: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: COLORS.white,
-    marginBottom: 6
-  },
-
-  inputSmall: {
-    height: 44,
-    padding: '10px 14px',
-    borderRadius: 10,
-    border: `1px solid ${COLORS.orangeSoft}`,
-    backgroundColor: COLORS.white,
-    color: COLORS.navy,
-    fontSize: 15,
-    fontWeight: 500
-  },
-
-  monthSelector: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: 8,
-    borderRadius: 12,
-    backgroundColor: COLORS.orangeSoft
-  },
-
-  arrowButton: {
-    backgroundColor: COLORS.navy,
-    border: 'none',
-    padding: '10px 14px',
-    borderRadius: 8,
-    color: COLORS.white,
-    cursor: 'pointer'
-  },
-
-  editButton: {
-    backgroundColor: COLORS.navy,
-    border: 'none',
-    padding: '12px 20px',
-    borderRadius: 10,
-    color: COLORS.white,
-    fontWeight: 600,
-    cursor: 'pointer',
-    fontSize: 15,
-    width: '100%',
-    height: 52
-  },
-
-  monthText: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: COLORS.navy,
-    minWidth: 120,
-    textAlign: 'center' as const
-  },
-
-  objective: {
-    marginBottom: 32,
-    backgroundColor: COLORS.white,
-    border: `2px solid ${COLORS.orangeSoft}`,
-    borderRadius: 18,
-    padding: 24,
-    boxShadow: '0 10px 24px rgba(0,0,0,0.06)'
-  },
-
-  objectiveTitle: {
-    color: COLORS.navy,
-    fontSize: 30,
-    fontWeight: 800,
-    marginBottom: 18,
-    paddingBottom: 12,
-    borderBottom: `2px solid ${COLORS.orangeSoft}`
-  }
 }
