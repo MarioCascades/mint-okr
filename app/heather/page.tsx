@@ -308,7 +308,7 @@ derivedTarget={undefined}
         </Objective>
 
                {/* OBJECTIVE 5 */}
-<Objective title="Objective 5: TC Whitening Kits">
+<Objective title="Objective 5: TC Total Whitening Kits">
   <KeyResult
     label="Total Whitening Kits"
     selectedMonth={selectedMonth}
