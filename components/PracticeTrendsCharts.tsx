@@ -72,10 +72,39 @@ export default function PracticeTrendsCharts() {
         }
       })
 
-      setProductionData(Object.values(productionMap))
-      setCollectionsData(Object.values(collectionsMap))
-      setStartsData(Object.values(startsMap))
+      setProductionData(
+  sortByMonth(Object.values(productionMap))
+)
+
+setCollectionsData(
+  sortByMonth(Object.values(collectionsMap))
+)
+
+setStartsData(
+  sortByMonth(Object.values(startsMap))
+)
     }
+    const monthOrder = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec'
+]
+
+const sortByMonth = (arr: any[]) =>
+  arr.sort(
+    (a, b) =>
+      monthOrder.indexOf(a.month) -
+      monthOrder.indexOf(b.month)
+  )
 
     fetchDashboardData()
   }, [])

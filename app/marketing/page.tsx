@@ -36,9 +36,9 @@ const MARKETING_USER_ID = '564f76fd-a853-4bea-a2f1-a9fb6a75aa00'
 const MARKETING_DESCRIPTION =
   'Ensure brand reputatation and experience consistency (across all sources and channels), Marketing strategy incorporates brand awareness and lead generation. New Patient inquiry targets are set and appropriate for hitting TC starts target (based on 70% completed consult to start conversion rate)'
 
-const MIRRORED_KRS = [
-  'FD NP Scheduled (GF)',
-  'FD NP Scheduled Next Month'
+const MIRRORED_TEMPLATE_IDS = [
+  'f2024a62-4588-4bdd-a8b4-66c77c775290',
+  '5d61dae9-c93b-4403-9da2-88007cde2a65'
 ]
 
 const DISPLAY_ONLY_KRS = [
@@ -132,9 +132,9 @@ const canEdit = () => {
 const saveChanges = async () => {
   for (const objective of objectives) {
     for (const kr of objective.keyResults) {
-      if (MIRRORED_KRS.includes(kr.title)) {
-        continue
-      }
+      if (kr.id.startsWith('mirror-')) {
+  continue
+}
 
       await supabase
         .from('key_results')
@@ -162,19 +162,11 @@ useEffect(() => {
 
       setCurrentUserId(authData.user.id)
 
-      const { data: marketingKrs } = await supabase
-        .from('key_results')
-        .select(`
-          *,
-          key_result_templates (
-            title
-          ),
-          objectives (
-            id,
-            title
-          )
-        `)
-        .eq('owner_id', MARKETING_USER_ID)
+     const { data: marketingKrs, error: marketingError } =
+  await supabase
+    .from('key_results')
+    .select('*')
+    .eq('owner_id', MARKETING_USER_ID)
 
       const { data: ashleyUser } = await supabase
         .from('users')
@@ -185,27 +177,28 @@ useEffect(() => {
       let mirroredData: KeyResult[] = []
 
       if (ashleyUser) {
-        const { data: ashleyKrs } = await supabase
-          .from('key_results')
-          .select(`
-            *,
-            key_result_templates (
-              title
-            )
-          `)
-          .eq('owner_id', ashleyUser.id)
+
+       const { data: ashleyKrs } = await supabase
+  .from('key_results')
+  .select('*')
+  .eq('owner_id', ashleyUser.id)
 
         mirroredData =
-          ashleyKrs
-            ?.filter((kr: any) =>
-              MIRRORED_KRS.includes(
-                kr.key_result_templates?.title
-              )
-            )
-            .map((kr: any) => ({
-              ...kr,
-              title: kr.key_result_templates.title
-            })) || []
+  ashleyKrs
+    ?.filter((kr: any) =>
+      MIRRORED_TEMPLATE_IDS.includes(
+        kr.key_result_template_id
+      )
+    )
+    .map((kr: any) => ({
+  ...kr,
+  id: `mirror-${kr.id}`,
+  title:
+    kr.key_result_template_id ===
+    'f2024a62-4588-4bdd-a8b4-66c77c775290'
+      ? '# of New Patients Scheduled This Month'
+      : '# of New Patients Scheduled Next Month'
+})) || []
 
         setMirroredAshleyData(mirroredData)
       }
@@ -213,25 +206,41 @@ useEffect(() => {
       const groupedObjectives: Record<string, Objective> = {}
 
       marketingKrs?.forEach((kr: any) => {
-        const objectiveId = kr.objectives?.id
-        const objectiveTitle = kr.objectives?.title
+  const objectiveId = kr.objective_id
 
-        if (!objectiveId || !objectiveTitle) return
+  let objectiveTitle = 'Unknown Objective'
 
-        if (!groupedObjectives[objectiveId]) {
-          groupedObjectives[objectiveId] = {
-            id: objectiveId,
-            title: objectiveTitle,
-            keyResults: []
-          }
-        }
+  if (objectiveId === 'cb492826-c9af-4908-b697-e5b55c59cdbc') {
+    objectiveTitle = 'Understanding Referral Mix'
+  }
 
-        groupedObjectives[objectiveId].keyResults.push({
-          ...kr,
-          title: kr.key_result_templates?.title || 'Untitled'
-        })
-      })
+  if (objectiveId === '1fe201c6-775d-4ee6-8311-d57230a5a3ad') {
+    objectiveTitle = 'Community'
+  }
 
+  if (objectiveId === 'aa3d06ad-ec75-41cf-a666-23efe5a897b3') {
+    objectiveTitle = 'Digital Marketing'
+  }
+
+  if (!objectiveId) return
+
+  if (!groupedObjectives[objectiveId]) {
+    groupedObjectives[objectiveId] = {
+      id: objectiveId,
+      title: objectiveTitle,
+      keyResults: []
+    }
+  }
+
+  groupedObjectives[objectiveId].keyResults.push({
+    ...kr,
+    title: kr.title || 'Untitled'
+  })
+})
+
+console.log('MARKETING KRS', marketingKrs)
+console.log('ASHLEY MIRROR', mirroredData)
+console.log('GROUPED', groupedObjectives)
       const builtObjectives = [
         {
           id: 'mirrored',
@@ -363,7 +372,7 @@ useEffect(() => {
         <div style={{ fontSize: 12 }}>Current</div>
 
         {isEditing &&
-        !MIRRORED_KRS.includes(kr.title) ? (
+        !kr.id.startsWith('mirror-') ? (
           <input
             type="number"
             value={kr.current_value}
@@ -395,7 +404,7 @@ useEffect(() => {
 
         {isEditing &&
         !DISPLAY_ONLY_KRS.includes(kr.title) &&
-        !MIRRORED_KRS.includes(kr.title) ? (
+        !kr.id.startsWith('mirror-') ? (
           <input
             type="number"
             value={kr.target_value}
