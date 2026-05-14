@@ -277,17 +277,42 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false, isPerc
   '',
   ''
 ])
+const isLowerBetter = (label: string) => {
+  return [
+    '# of Patients Waited 10+ Minutes',
+    '# of Missed Calls'
+  ].includes(label)
+}
 
 const getScoreStyle = () => {
   const num = Number(score.replace('%', ''))
 
-  if (isNaN(num)) return { backgroundColor: '#FFFFFF' }
+  if (isNaN(num)) {
+    return { backgroundColor: '#FFFFFF' }
+  }
 
-  if (num >= 100) return { backgroundColor: '#acf3c3d7' }
-  if (num >= 90) return { backgroundColor: '#fff4ccf3' }
+  if (isLowerBetter(label)) {
+    if (num <= 100) {
+      return { backgroundColor: '#acf3c3d7' }
+    }
+
+    if (num <= 110) {
+      return { backgroundColor: '#fff4ccf3' }
+    }
+
+    return { backgroundColor: '#f3b8b8d8' }
+  }
+
+  if (num >= 100) {
+    return { backgroundColor: '#acf3c3d7' }
+  }
+
+  if (num >= 90) {
+    return { backgroundColor: '#fff4ccf3' }
+  }
+
   return { backgroundColor: '#f3b8b8d8' }
 }
-
   useEffect(() => {
 
     const fetchData = async () => {
