@@ -708,8 +708,8 @@ const conversion =
   isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
   
 
-  
 />
+
         <Card 
   title="Total Whitening Kits" 
   value={kits}

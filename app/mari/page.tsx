@@ -495,6 +495,18 @@ const getScoreBackground = () => {
     return '#FFFFFF'
   }
 
+  if (isLowerBetter(label)) {
+    if (num <= 100) {
+      return '#acf3c3d7' // green
+    }
+
+    if (num <= 110) {
+      return '#fff4ccf3' // yellow
+    }
+
+    return '#f3b8b8d8' // red
+  }
+
   if (num >= 100) {
     return '#acf3c3d7' // green
   }

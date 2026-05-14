@@ -572,15 +572,7 @@ const [isSaving, setIsSaving] = useState(false)
 
   let percent = 0
 
-  if (direction === 'increase') {
-    percent = Math.round((safeActual / effectiveTarget) * 100)
-  } else {
-    percent =
-      safeActual === 0
-        ? 100
-        : Math.round((effectiveTarget / safeActual) * 100)
-  }
-
+ percent = Math.round((safeActual / effectiveTarget) * 100)
   return percent + '%'
 }
   
@@ -1029,9 +1021,17 @@ onChange={(e) => {
 
       if (isNaN(value)) return '#FFFFFF'
 
-      if (value >= 100) return '#acf3c3d7'
-      if (value >= 90) return '#fff4ccf3'
-      return '#f3b8b8d8'
+      const direction = directionMap[label] || 'increase'
+
+if (direction === 'decrease') {
+  if (value <= 100) return '#acf3c3d7'
+  if (value <= 110) return '#fff4ccf3'
+  return '#f3b8b8d8'
+}
+
+if (value >= 100) return '#acf3c3d7'
+if (value >= 90) return '#fff4ccf3'
+return '#f3b8b8d8'
     })()
   }}
   value={score}
