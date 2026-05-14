@@ -485,7 +485,8 @@ const isLowerBetter = (label: string) => {
     l.includes('wait') ||
     l.includes('miss') ||
     l.includes('call out') ||
-    l.includes('reschedule')
+    l.includes('reschedule')||
+    l.includes('tlc')
   )
 }
 const getScoreBackground = () => {
