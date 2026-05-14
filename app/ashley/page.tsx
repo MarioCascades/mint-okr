@@ -469,7 +469,7 @@ const directionMap: Record<string, 'increase' | 'decrease' | 'none'> = {
   "FD NP NSC": "decrease",
   "# of Patients Waited 10+ Minutes": "decrease",
   "FD NP Incomplete Appointment": "decrease",
-  "Missing NP Info (EOD Prep)": "decrease",
+"FD New Patients Missing Information (EOD NP Prep)": "decrease",
 
   // No score metrics
   "FD # of tasks in Lead Sigma": "none",
