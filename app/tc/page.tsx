@@ -708,15 +708,6 @@ const conversion =
   isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
   
 
-/>
-
-        <Card 
-  title="New Patient Kept / Scheduled"
-  value={conversion}
-  prev={prevConversion}
-  target={conversionTarget}
-  percentIntoPeriod={localPercent}
-  isCurrentMonth={selectedMonth.getMonth() === new Date().getMonth() && selectedMonth.getFullYear() === new Date().getFullYear()}
   
 />
         <Card 
