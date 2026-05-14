@@ -71,6 +71,37 @@ function showLegacyDigital(selectedMonth: Date) {
   )
 }
 
+function ScoreBadge({ score }: { score: string }) {
+  let background = '#fee2e2'
+  let color = '#b91c1c'
+
+  if (score === '—') {
+    background = '#f1f5f9'
+    color = '#64748b'
+  } else if (score.startsWith('10') || score === '100%') {
+    background = '#dcfce7'
+    color = '#166534'
+  } else if (score.startsWith('9')) {
+    background = '#fef3c7'
+    color = '#92400e'
+  }
+
+  return (
+    <div
+      style={{
+        backgroundColor: background,
+        color,
+        borderRadius: '12px',
+        padding: '10px',
+        textAlign: 'center',
+        fontWeight: 700,
+      }}
+    >
+      {score}
+    </div>
+  )
+}
+
 const styles = {
   container: {
     minHeight: '100vh',
@@ -172,8 +203,30 @@ const styles = {
     gridTemplateColumns: '2.4fr 1fr 1fr 1fr 1fr',
     gap: '12px',
     alignItems: 'center',
-    padding: '10px 0',
+    padding: '12px 0',
     borderTop: '1px solid #f1f5f9',
+  },
+  valueCell: {
+    backgroundColor: '#f8fafc',
+    borderRadius: '12px',
+    padding: '10px',
+    textAlign: 'center' as const,
+    border: '1px solid #e2e8f0',
+  },
+  targetCell: {
+    backgroundColor: '#dbeafe',
+    borderRadius: '12px',
+    padding: '10px',
+    textAlign: 'center' as const,
+    border: '1px solid #bfdbfe',
+  },
+  inputCell: {
+    width: '100%',
+    borderRadius: '12px',
+    border: '1px solid #cbd5e1',
+    padding: '10px',
+    textAlign: 'center' as const,
+    fontSize: '14px',
   },
 }
 
@@ -285,15 +338,30 @@ export default function MarketingPage() {
               <div>This Month</div>
               <div>Score</div>
             </div>
-            {obj.rows.map((row) => (
-              <div key={row.id} style={styles.krRow}>
-                <div>{row.label}</div>
-                <div>{row.previous}</div>
-                <div>{row.target}</div>
-                <div>{row.current}</div>
-                <div>{row.score}</div>
-              </div>
-            ))}
+            {obj.rows.map((row) => {
+              const locked = row.mirrored || row.displayOnly
+
+              return (
+                <div key={row.id} style={styles.krRow}>
+                  <div style={{ fontWeight: 500 }}>{row.label}</div>
+                  <div style={styles.valueCell}>{row.previous}</div>
+                  <div style={styles.targetCell}>{row.target}</div>
+                  <div>
+                    <input
+                      value={row.current}
+                      readOnly={!isEditing || locked}
+                      style={{
+                        ...styles.inputCell,
+                        backgroundColor:
+                          !isEditing || locked ? '#f8fafc' : '#ffffff',
+                        color: !isEditing || locked ? '#64748b' : '#0f172a',
+                      }}
+                    />
+                  </div>
+                  <ScoreBadge score={row.score} />
+                </div>
+              )
+            })}
           </div>
         ))}
       </div>
