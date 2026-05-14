@@ -279,6 +279,9 @@ const KeyResult = ({ label, selectedMonth, isEditing, isCurrency = false, isPerc
 ])
 const isLowerBetter = (label: string) => {
   return [
+    'FD Overdue Patient Accounts',
+    'FD Obs Overdue 30+',
+    'FD Total Active Patients Needing Appointment',
     '# of Patients Waited 10+ Minutes',
     '# of Missed Calls'
   ].includes(label)
@@ -520,7 +523,7 @@ const { data: prevData } = await supabase
 )
 
       if (isPercent) {
-  setScore(c + '%')
+  setScore((c * 100).toFixed(2) + '%')
 } else if (t > 0) {
   const percent = Math.round((c / t) * 100)
   setScore(percent + '%')
