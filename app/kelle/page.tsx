@@ -17,8 +17,10 @@ import {
 // HELPERS
 // =========================
 
-const formatPercent = (val: number) =>
-  `${(val * 100).toFixed(2)}%`
+const formatPercent = (val: number) => {
+  const normalized = val > 1 ? val : val * 100
+  return `${normalized.toFixed(2)}%`
+}
 
 const timeBoundSet = new Set([
   'NP Scheduled (GF)'
