@@ -439,8 +439,13 @@ const handleSave = async () => {
   const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
   const reportingDate = `${y}-${m}-01`
 
-  const cleanValue = parseFloat(String(value).replace('%', '')) || 0
-  const parsedTarget = parseFloat(String(target).replace('%', ''))
+const cleanValue = isPercent
+  ? (parseFloat(String(value).replace('%', '')) || 0) / 100
+  : parseFloat(String(value).replace('%', '')) || 0
+
+const parsedTarget = isPercent
+  ? parseFloat(String(target).replace('%', '')) / 100
+  : parseFloat(String(target).replace('%', ''))
 
   const payload: any = {
     key_result_id: keyResultId,

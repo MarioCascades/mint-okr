@@ -409,15 +409,12 @@ if (!numericTarget || numericTarget === 0) {
   return
 }
 
-let percent = 0
-
-// LOWER IS BETTER
-if (numericValue === 0) {
-  percent = 100
-} else {
-  percent = Math.round((numericTarget / numericValue) * 100)
+if (!numericValue || numericValue === 0) {
+  setScore('—')
+  return
 }
 
+const percent = Math.round((numericTarget / numericValue) * 100)
 setScore(percent + '%')
     }
 
