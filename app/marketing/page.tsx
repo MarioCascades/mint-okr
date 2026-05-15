@@ -127,8 +127,9 @@ const router = useRouter()
 const [selectedMonth, setSelectedMonth] = useState(new Date())
 const [editing, setEditing] = useState(false)
 const [currentUser, setCurrentUser] = useState<string | null>(null)
-
+const [lastUpdated, setLastUpdated] = useState('')
 const [mirroredRows, setMirroredRows] = useState({
+
   mirrored_np_this: {
     previous: 0,
     target: 0,
@@ -142,6 +143,8 @@ const [mirroredRows, setMirroredRows] = useState({
     score: '—'
   }
 })
+
+
 
 useEffect(() => {
   const init = async () => {
@@ -238,8 +241,26 @@ setMirroredRows(nextMirroredState)
   init()
 }, [router, selectedMonth])
 
+useEffect(() => {
+  const fetchLastUpdated = async () => {
+    const { data } = await supabase
+      .from('key_result_updates')
+      .select('last_updated_at')
+      .order('last_updated_at', { ascending: false })
+      .limit(1)
+
+    if (data && data.length > 0) {
+      setLastUpdated(
+        new Date(data[0].last_updated_at).toLocaleString()
+      )
+    }
+  }
+
+  fetchLastUpdated()
+}, [])
+
 const percentIntoPeriod = getPercentIntoPeriod(selectedMonth)
-const lastUpdated = new Date().toLocaleString()
+
 
 const tenState = '10 State'
 
@@ -248,177 +269,15 @@ return (
     <TopNav />
 
     <div style={content}>
-      <div style={stickyHeader}>
-        <div style={topSection}>
-          <div>
-            <div style={title}>Marketing</div>
-            <div style={description}>
-              Marketing performance tracking and OKR visibility across referral
-              growth, community engagement, and digital performance.
-            </div>
-
-            <div style={leftMeta}>
-  <div style={metaItem}>
-    <div style={label}>Date Updated</div>
-    <input
-      value={lastUpdated}
-      readOnly
-      style={inputSmall}
-    />
-  </div>
-
-  <div style={metaItem}>
-    <div style={label}>10 State</div>
-    <input
-      value={tenState}
-      readOnly
-      style={inputSmall}
-    />
-  </div>
-
-  <div style={metaItem}>
-    <div style={label}>% Into Period</div>
-    <input
-      value={`${percentIntoPeriod}%`}
-      readOnly
-      style={inputSmall}
-    />
-  </div>
-
-  <div style={metaItem}>
-    <div style={label}>OKR Time Frame</div>
-
-    <div style={monthSelector}>
-      <button
-        style={arrowButton}
-        onClick={() =>
-          setSelectedMonth(changeMonth(selectedMonth, -1))
-        }
-      >
-        ←
-      </button>
-
-      <div style={monthText}>
-        {formatMonth(selectedMonth)}
-      </div>
-
-      <button
-        style={arrowButton}
-        disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
-        onClick={() =>
-          setSelectedMonth(changeMonth(selectedMonth, 1))
-        }
-      >
-        →
-      </button>
-    </div>
-  </div>
-</div>
-          </div>
-
-          <div style={rightMeta}>
-  <button
-    style={backButton}
-    onClick={() => router.push('/')}
-  >
-    ← Back to Main
-  </button>
-
-  <button
-    style={editButton}
-    onClick={() => setEditing(!editing)}
-  >
-    {editing ? 'Save' : 'Edit'}
-  </button>
-</div>
-
-            <button
-              style={editButton}
-              onClick={() => setEditing(!editing)}
-            >
-              {editing ? 'Save' : 'Edit'}
-            </button>
-
-            <button
-              style={backButton}
-              onClick={() => router.push('/')}
-            >
-              Back to Main
-            </button>
-          </div>
-        </div>
-      </div>
-            <div style={objective}>
-        <div style={objectiveTitle}>
-          Top of New Patient Funnel
-        </div>
-
-        <div style={headerRow}>
-          <div>Key Result</div>
-          <div>Previous</div>
-          <div>Target</div>
-          <div>Current</div>
-          <div>Score</div>
-          <div>Actions</div>
-        </div>
-
-        <div style={row}>
-  <div># New Patients Scheduled This Month</div>
-
-  <div style={prevCell}>
-    {mirroredRows.mirrored_np_this.previous}
-  </div>
-
-  <div style={targetCell}>
-    {mirroredRows.mirrored_np_this.target}
-  </div>
-
-  <input
-    value={String(mirroredRows.mirrored_np_this.current)}
-    readOnly
-    style={currentCell}
-  />
-
-  <div style={cell}>
-    {mirroredRows.mirrored_np_this.score}
-  </div>
-
-  <button style={button}>
-    Mirrored
-  </button>
-</div>
-
-       <div style={row}>
-  <div># New Patients Scheduled Next Month</div>
-
-  <div style={prevCell}>
-    {mirroredRows.mirrored_np_next.previous}
-  </div>
-
-  <div style={targetCell}>
-    {mirroredRows.mirrored_np_next.target}
-  </div>
-
-  <input
-    value={String(mirroredRows.mirrored_np_next.current)}
-    readOnly
-    style={currentCell}
-  />
-
-  <div style={cell}>
-    {mirroredRows.mirrored_np_next.score}
-  </div>
-
-  <button style={button}>
-    Mirrored
-  </button>
-</div>
-
+          
+    
       </div>
     </div>
-  
-)
-}
+    
+  )
+  }
+
+
 // =========
 // STYLES
 // =========
