@@ -279,75 +279,65 @@ return (
   </p>
 
   <div style={topSection}>
-    
+  
     <div style={leftMeta}>
-  <div style={metaItem}>
-    <label style={label}>Date Updated</label>
+      <div style={metaItem}>
+        <label style={label}>Date Updated</label>
+        <div style={inputSmall}>{lastUpdated || '—'}</div>
+        <input
+          type="text"
+          placeholder="10 State"
+          style={inputSmall}
+        />
+      </div>
+  
+      <div style={metaItem}>
+        <label style={label}>% Into Period</label>
+        <input
+          style={inputSmall}
+          value={(percentIntoPeriod || 0).toFixed(2) + '%'}
+          readOnly
+        />
+      </div>
+  
+      <div style={metaItem}>
+        <label style={label}>OKR Time Frame</label>
+  
+        <div style={monthSelector}>
+          <button
+            style={arrowButton}
 
-    <input
-      value={lastUpdated || '—'}
-      readOnly
-      style={inputSmall}
-    />
-
-    <input
-      value=""
-      readOnly
-      placeholder="10 State"
-      style={{
-        ...inputSmall,
-        marginTop: 8
-      }}
-    />
-  </div>
-
-  <div style={metaItem}>
-    <label style={label}>% Into Period</label>
-
-    <input
-      value={`${percentIntoPeriod}%`}
-      readOnly
-      style={inputSmall}
-    />
-  </div>
-
-  <div style={metaItem}>
-    <label style={label}>OKR Time Frame</label>
-
-    <div style={monthSelector}>
-      <button
-        style={arrowButton}
-        onClick={() =>
-          setSelectedMonth(changeMonth(selectedMonth, -1))
-        }
-      >
-        ←
-      </button>
-
-      <span style={monthText}>
-        {formatMonth(selectedMonth)}
-      </span>
-
-      <button
-        style={{
-          ...arrowButton,
-          opacity: isFutureMonth(changeMonth(selectedMonth, 1))
-            ? 0.3
-            : 1
-        }}
-        disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
-        onClick={() =>
-          setSelectedMonth(changeMonth(selectedMonth, 1))
-        }
-      >
-        →
-      </button>
+           onClick={() =>
+  setSelectedMonth(changeMonth(selectedMonth, -1))
+}
+          >
+            ←
+          </button>
+  
+          <span style={monthText}>
+            {formatMonth(selectedMonth)}
+          </span>
+  
+          <button
+            style={{
+  ...arrowButton,
+  opacity: isFutureMonth(changeMonth(selectedMonth, 1))
+    ? 0.3
+    : 1
+}}
+            disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
+            onClick={() =>
+  setSelectedMonth(changeMonth(selectedMonth, 1))
+}
+          >
+            →
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-    
-
+  
     <div style={rightMeta}>
+  
       <button
         style={backButton}
         onClick={() => router.push('/')}
@@ -355,15 +345,22 @@ return (
         ← Back to Main
       </button>
 
-      <button
-        style={editButton}
-        onClick={() => setEditing(!editing)}
-      >
-        {editing ? 'Save' : 'Edit'}
-      </button>
+
+  
+  {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
+  <button
+    style={editButton}
+    onClick={() => setEditing(!editing)}
+  >
+    {editing ? 'Save' : 'Edit'}
+  </button>
+)}
+  
     </div>
+  
   </div>
-</div>
+        </div>
+  
 
 <div style={objective}>
   <div style={objectiveTitle}>
