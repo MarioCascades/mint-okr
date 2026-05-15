@@ -7,6 +7,7 @@ import { COLORS } from '@/lib/colors'
 
 const users = [
   { name: 'Main', path: '/' },
+  { name: 'Marketing', path: '/marketing' },
   { name: 'Mari', path: '/mari' },
   { name: 'Emily', path: '/emily' },
   { name: 'TC Team', path: '/tc' },

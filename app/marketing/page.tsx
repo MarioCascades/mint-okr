@@ -441,7 +441,9 @@ setTarget(resolvedTarget?.toString() ?? '')
          const currentValue =
   currentRow && currentRow.value !== null
     ? currentRow.value
-    : base.current_value ?? ''
+    : sourceUser
+      ? base.current_value ?? ''
+      : ''
 
 setValue(prev => {
   if (isDirty) return prev
