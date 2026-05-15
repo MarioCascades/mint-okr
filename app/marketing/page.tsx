@@ -395,6 +395,12 @@ const { data: currentRow } = await supabase
   .eq('reporting_month', currentDate)
   .maybeSingle()
 
+  console.log('SOURCE USER:', sourceUser)
+console.log('SOURCE LABEL:', sourceLabel)
+console.log('BASE RESULT:', base)
+console.log('prevData:', prevData)
+console.log('currentRow:', currentRow)
+
 // PREVIOUS TARGET (carry forward)
 const { data: prevRow } = await supabase
   .from('key_result_updates')
