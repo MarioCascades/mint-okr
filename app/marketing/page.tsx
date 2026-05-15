@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
@@ -9,244 +10,24 @@ import { supabase } from '../../lib/supabase'
 import { COLORS } from '@/lib/colors'
 import {
   isAdmin,
-  isMember,
   canEditSelectedMonth
 } from '@/lib/auth'
 
 
-// =========================
-// LABEL MAP
-// =========================
 
+export default function Page() {
 
-const MARKETING_LABEL_MAP: Record<string, string> = {
-  mirrored_np_this: '# New Patients Scheduled This Month',
-  mirrored_np_next: '# New Patients Scheduled Next Month',
+  const router = useRouter()
 
-  mkt_dentist_referrals: 'MKT Dentist Referrals',
-  mkt_referring_dentists: 'MKT Referring Dentists',
-  mkt_patient_referrals: 'MKT Patient Referrals',
-  mkt_digital_marketing: 'MKT Digital Marketing',
-  mkt_community: 'MKT Community',
-
-  mkt_sponsorships: 'MKT Sponsorships',
-  mkt_sponsorship_dollars: 'MKT Sponsorship Dollars',
-  mkt_community_events: 'MKT Community Events',
-  mkt_np_community_referrals: 'MKT NP Community Referrals',
-  mkt_gp_deliveries: 'MKT GP Deliveries',
-
-  mkt_social_posts: 'MKT Social Posts',
-  mkt_google_reviews: 'MKT Google Reviews',
-  mkt_bright_referral: 'MKT Bright Referral',
-}
-const DISPLAY_ONLY_KRS = new Set([
-  'mkt_dentist_referrals',
-  'mkt_community',
-  'mkt_sponsorships',
-  'mkt_np_community_referrals',
-  'mkt_gp_deliveries',
-  'mkt_bright_referral',
-])
-const DELTA_SCORE_KRS = new Set([
-  'mkt_sponsorship_dollars',
-  'mkt_social_posts',
-])
-const MIRRORED_KRS = new Set([
-  'mirrored_np_this',
-  'mirrored_np_next',
-])
-const LEGACY_DIGITAL_KRS = new Set([
-  'mkt_social_posts',
-  'mkt_google_reviews',
-  'mkt_bright_referral',
-])
-const MIRRORED_TEMPLATE_IDS = {
-  mirrored_np_this: 'f2024a62-4588-4bdd-a8b4-66c77c775290',
-  mirrored_np_next: '5d61dae9-c93b-4403-9da2-88007cde2a65',
-}
-
-function formatMonth(date: Date) {
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), 1)
   })
-}
 
-function changeMonth(current: Date, offset: number) {
-  const next = new Date(current)
-  next.setMonth(next.getMonth() + offset)
-  return next
-}
-
-function isFutureMonth(selectedMonth: Date) {
-  const now = new Date()
-
-  return (
-    selectedMonth.getFullYear() > now.getFullYear() ||
-    (
-      selectedMonth.getFullYear() === now.getFullYear() &&
-      selectedMonth.getMonth() > now.getMonth()
-    )
-  )
-}
-
-function getPercentIntoPeriod(selectedMonth: Date) {
-  const now = new Date()
-
-  const isCurrentMonth =
-    now.getMonth() === selectedMonth.getMonth() &&
-    now.getFullYear() === selectedMonth.getFullYear()
-
-  if (!isCurrentMonth) return 100
-
-  const daysInMonth = new Date(
-    selectedMonth.getFullYear(),
-    selectedMonth.getMonth() + 1,
-    0
-  ).getDate()
-
-  return Math.round((now.getDate() / daysInMonth) * 100)
-}
-
-function showLegacyDigital(selectedMonth: Date) {
-  return (
-    selectedMonth.getFullYear() < 2026 ||
-    (
-      selectedMonth.getFullYear() === 2026 &&
-      selectedMonth.getMonth() <= 3
-    )
-  )
-}
-
-type MarketingKR = {
-  key: string
-  label: string
-  previous: number
-  target: number
-  current: number
-  score: string
-  mirrored?: boolean
-}
-export default function MarketingPage() {
-const router = useRouter()
-
-const [selectedMonth, setSelectedMonth] = useState(new Date())
-const [editing, setEditing] = useState(false)
-const [currentUser, setCurrentUser] = useState<string | null>(null)
-const [lastUpdated, setLastUpdated] = useState('')
-const [mirroredRows, setMirroredRows] = useState({
-
-  mirrored_np_this: {
-    previous: 0,
-    target: 0,
-    current: 0,
-    score: '—'
-  },
-  mirrored_np_next: {
-    previous: 0,
-    target: 0,
-    current: 0,
-    score: '—'
-  }
-})
-
-
-
-useEffect(() => {
-  const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      router.push('/login')
-      return
-    }
-
-    setCurrentUser(user.id)
-
-    const reportingMonth = new Date(
-  selectedMonth.getFullYear(),
-  selectedMonth.getMonth(),
-  1
-).toISOString().split('T')[0]
-
-const previousMonth = new Date(
-  selectedMonth.getFullYear(),
-  selectedMonth.getMonth() - 1,
-  1
-).toISOString().split('T')[0]
-
-const templateIds = Object.values(MIRRORED_TEMPLATE_IDS)
-
-const { data: mirroredKRs } = await supabase
-  .from('key_results')
-  .select('id, key_result_template_id, target_value, current_value')
-  .in('key_result_template_id', templateIds)
-
-if (!mirroredKRs) return
-const krIds = mirroredKRs.map((kr) => kr.id)
-
-const { data: currentUpdates } = await supabase
-  .from('key_result_updates')
-  .select('key_result_id, current_value')
-  .eq('reporting_month', reportingMonth)
-  .in('key_result_id', krIds)
-
-const { data: previousUpdates } = await supabase
-  .from('key_result_updates')
-  .select('key_result_id, current_value')
-  .eq('reporting_month', previousMonth)
-  .in('key_result_id', krIds)
-  const nextMirroredState = {
-  mirrored_np_this: {
-    previous: 0,
-    target: 0,
-    current: 0,
-    score: '—'
-  },
-  mirrored_np_next: {
-    previous: 0,
-    target: 0,
-    current: 0,
-    score: '—'
-  }
-}
-
-for (const kr of mirroredKRs) {
-  const currentUpdate = currentUpdates?.find(
-    (u) => u.key_result_id === kr.id
-  )
-
-  const previousUpdate = previousUpdates?.find(
-    (u) => u.key_result_id === kr.id
-  )
-
-  const currentValue = Number(currentUpdate?.current_value || 0)
-  const previousValue = Number(previousUpdate?.current_value || 0)
-  const targetValue = Number(kr.target_value || 0)
-
-  const key =
-    kr.key_result_template_id === MIRRORED_TEMPLATE_IDS.mirrored_np_this
-      ? 'mirrored_np_this'
-      : 'mirrored_np_next'
-
-  nextMirroredState[key] = {
-    previous: previousValue,
-    target: targetValue,
-    current: currentValue,
-    score: targetValue > 0
-      ? `${Math.round((currentValue / targetValue) * 100)}%`
-      : '—'
-  }
-}
-
-setMirroredRows(nextMirroredState)
-  }
-
-  init()
-}, [router, selectedMonth])
-
+  const [lastUpdated, setLastUpdated] = useState('')
+  const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
+  
 useEffect(() => {
   const fetchLastUpdated = async () => {
     const { data } = await supabase
@@ -256,200 +37,583 @@ useEffect(() => {
       .limit(1)
 
     if (data && data.length > 0) {
-      setLastUpdated(
-        new Date(data[0].last_updated_at).toLocaleString()
-      )
+      const formatted = new Date(data[0].last_updated_at).toLocaleString()
+      setLastUpdated(formatted)
     }
   }
 
   fetchLastUpdated()
 }, [])
+useEffect(() => {
+  const today = new Date()
+  const year = selectedMonth.getFullYear()
+  const month = selectedMonth.getMonth()
+  const endOfMonth = new Date(year, month + 1, 0)
 
-const percentIntoPeriod = getPercentIntoPeriod(selectedMonth)
+  let percent = 0
 
-
-const tenState = '10 State'
-
-return (
-  <div style={container}>
-    <TopNav />
-
-    <div style={content}>
-          
-    <div style={stickyHeader}>
-  <h1 style={title}>Marketing</h1>
-
-  <p style={description}>
-    Marketing performance tracking and OKR visibility across referral growth,
-    community engagement, and digital performance.
-  </p>
-
-  <div style={topSection}>
-  
-    <div style={leftMeta}>
-      <div style={metaItem}>
-        <label style={label}>Date Updated</label>
-        <input
-  value={lastUpdated || '—'}
-  readOnly
-  style={inputSmall}
-/>
-        <input
-          type="text"
-          placeholder="10 State"
-          style={inputSmall}
-        />
-      </div>
-  
-      <div style={metaItem}>
-        <label style={label}>% Into Period</label>
-        <input
-          style={inputSmall}
-          value={(percentIntoPeriod || 0).toFixed(2) + '%'}
-          readOnly
-        />
-      </div>
-  
-      <div style={metaItem}>
-        <label style={label}>OKR Time Frame</label>
-  
-        <div style={monthSelector}>
-          <button
-            style={arrowButton}
-
-           onClick={() =>
-  setSelectedMonth(changeMonth(selectedMonth, -1))
-}
-          >
-            ←
-          </button>
-  
-          <span style={monthText}>
-            {formatMonth(selectedMonth)}
-          </span>
-  
-          <button
-            style={{
-  ...arrowButton,
-  opacity: isFutureMonth(changeMonth(selectedMonth, 1))
-    ? 0.3
-    : 1
-}}
-            disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
-            onClick={() =>
-  setSelectedMonth(changeMonth(selectedMonth, 1))
-}
-          >
-            →
-          </button>
-        </div>
-      </div>
-    </div>
-  
-    <div style={rightMeta}>
-  
-      <button
-        style={backButton}
-        onClick={() => router.push('/')}
-      >
-        ← Back to Main
-      </button>
-
-
-  
-  {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
-  <button
-    style={editButton}
-    onClick={() => setEditing(!editing)}
-  >
-    {editing ? 'Save' : 'Edit'}
-  </button>
-)}
-  
-    </div>
-  
-  </div>
-        </div>
-  
-
-<div style={objective}>
-  <div style={objectiveTitle}>
-    Top of New Patient Funnel
-  </div>
-
-  <div style={headerRow}>
-    <div>Key Result</div>
-    <div>Previous</div>
-    <div>Target</div>
-    <div>Current</div>
-    <div>Score</div>
-    <div>Actions</div>
-  </div>
-
-  <div style={row}>
-    <div># New Patients Scheduled This Month</div>
-
-    <div style={prevCell}>
-      {mirroredRows.mirrored_np_this.previous}
-    </div>
-
-    <div style={targetCell}>
-      {mirroredRows.mirrored_np_this.target}
-    </div>
-
-    <input
-      value={String(mirroredRows.mirrored_np_this.current)}
-      readOnly
-      style={currentCell}
-    />
-
-    <div style={cell}>
-      {mirroredRows.mirrored_np_this.score}
-    </div>
-
-    <button style={button}>
-      Mirrored
-    </button>
-  </div>
-
-  <div style={row}>
-    <div># New Patients Scheduled Next Month</div>
-
-    <div style={prevCell}>
-      {mirroredRows.mirrored_np_next.previous}
-    </div>
-
-    <div style={targetCell}>
-      {mirroredRows.mirrored_np_next.target}
-    </div>
-
-    <input
-      value={String(mirroredRows.mirrored_np_next.current)}
-      readOnly
-      style={currentCell}
-    />
-
-    <div style={cell}>
-      {mirroredRows.mirrored_np_next.score}
-    </div>
-
-    <button style={button}>
-      Mirrored
-    </button>
-  </div>
-</div>
-
-    </div>
-  </div>
-    
-  )
+  if (today.getFullYear() === year && today.getMonth() === month) {
+    percent = (today.getDate() / endOfMonth.getDate()) * 100
+  } else if (today > endOfMonth) {
+    percent = 100
   }
 
+  setPercentIntoPeriod(Math.round(percent) + '%')
+}, [selectedMonth])
 
-// =========
+  const formatMonth = (date: Date) =>
+    date.toLocaleString('default', { month: 'short', year: 'numeric' })
+
+  const changeMonth = (offset: number) => {
+    setSelectedMonth(prev => {
+      const newDate = new Date(prev)
+      newDate.setMonth(prev.getMonth() + offset)
+      return newDate
+    })
+  }
+
+  const isFutureMonth = () => {
+    const now = new Date()
+    return selectedMonth > new Date(now.getFullYear(), now.getMonth(), 1)
+  }
+
+  return (
+    <div style={container}>
+      <TopNav />
+
+      <div style={stickyHeader}>
+        <h1 style={title}>Mari - Clinical Operations Manager</h1>
+
+        <p style={description}>
+          The clinical team’s primary support and resource, providing guidance, training, and oversight to drive consistency, accountability, and exceptional patient outcomes. In addition, efficiently manage digital workflows and clinical supply/inventory.
+        </p>
+
+       <div style={topSection}>
+
+  <div style={leftMeta}>
+    <div style={metaItem}>
+      <label style={label}>Date Updated</label>
+      <div style={inputSmall}>{lastUpdated || '—'}</div>
+      <input
+        type="text"
+        placeholder="10 State"
+        style={inputSmall}
+      />
+    </div>
+
+    <div style={metaItem}>
+      <label style={label}>% Into Period</label>
+      <input
+        style={inputSmall}
+        value={percentIntoPeriod}
+        readOnly
+      />
+    </div>
+
+    <div style={metaItem}>
+      <label style={label}>OKR Time Frame</label>
+
+      <div style={monthSelector}>
+        <button
+          style={arrowButton}
+          onClick={() => changeMonth(-1)}
+        >
+          ←
+        </button>
+
+        <span style={monthText}>
+          {formatMonth(selectedMonth)}
+        </span>
+
+        <button
+          style={{
+            ...arrowButton,
+            opacity: isFutureMonth() ? 0.3 : 1
+          }}
+          disabled={isFutureMonth()}
+          onClick={() => changeMonth(1)}
+        >
+          →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style={rightMeta}>
+    <button
+      style={backButton}
+      onClick={() => router.push('/')}
+    >
+      ← Back to Main
+    </button>
+
+    {(isAdmin() || canEditSelectedMonth(selectedMonth)) && (
+  <button
+    style={editButton}
+    onClick={() => setIsEditing(!isEditing)}
+  >
+    {isEditing ? 'Save' : 'Edit'}
+  </button>
+)}
+
+  </div>
+
+
+        </div>
+      </div>
+
+      <div style={content}>
+        <Objective title="Objective 1: Ensure Patient Flow and Completion">
+          <KeyResult label="# of Patients OVER ECD – LightForce" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of Patients OVER ECD – Aligners" selectedMonth={selectedMonth} isEditing={isEditing} />
+        </Objective>
+
+        <Objective title="Objective 2: Mentoring and Training the Clinical Team">
+          <KeyResult label="Monthly 1:1 with Team" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of Patients Waited 10+ Minutes" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of TLC Appts Scheduled" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of Same Day Call Outs" selectedMonth={selectedMonth} isEditing={isEditing} />
+        </Objective>
+
+        <Objective title="Objective 3: Ensure Complete and On Time Case/Appliance Ordering and Delivery">
+          <KeyResult label="# of Submissions Missed (OrthoFi Audit)" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult
+  label="# of Submissions Missed (Scan Report)"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  sourceUser="Ashlynn"
+  sourceLabel="CO Orders Missing from Scan Report"
+  note="Pulls from Ashlynn"
+/>
+          <KeyResult label="# of Patients Rescheduled due to delayed case" selectedMonth={selectedMonth} isEditing={isEditing} />
+        </Objective>
+      </div>
+    </div>
+  )
+}
+
+// =========================
+// OBJECTIVE
+// =========================
+
+const Objective = ({ title, children }: any) => (
+  <div style={objective}>
+    <h2 style={objectiveTitle}>{title}</h2>
+
+    <div style={headerRow}>
+      <span>Key Results</span>
+      <span>Last Month</span>
+      <span>Target</span>
+      <span>This Month</span>
+      <span>Score</span>
+      <span></span>
+    </div>
+
+    {children}
+  </div>
+)
+
+// =========================
+// KEY RESULT
+// =========================
+
+const KeyResult = ({
+  label,
+  selectedMonth,
+  isEditing,
+  sourceUser,
+  sourceLabel,
+  note
+}: any) => {
+
+  const [value, setValue] = useState('')
+  const [lastMonth, setLastMonth] = useState('')
+  const [target, setTarget] = useState('')
+  const [score, setScore] = useState('')
+  const [keyResultId, setKeyResultId] = useState<string | null>(null)
+  const [showInitiatives, setShowInitiatives] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
+
+  const [initiatives, setInitiatives] = useState([
+  '',
+  '',
+  ''
+])
+
+  const handleEnter = (e: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+
+      const inputs = Array.from(document.querySelectorAll('input'))
+      const index = inputs.indexOf(e.target)
+
+      if (index > -1 && index < inputs.length - 1) {
+        (inputs[index + 1] as HTMLElement).focus()
+      }
+    }
+  }
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+
+      const { data: base } = await supabase
+      .from('dashboard_okr_data')
+      .select('*')
+      .eq('user_name', sourceUser || 'Mari')
+      .eq('key_result_title', sourceLabel || label)
+      .maybeSingle()
+
+      if (!base) return
+
+      console.log('SOURCE USER:', sourceUser)
+console.log('SOURCE LABEL:', sourceLabel)
+console.log('BASE RESULT:', base)
+
+      setKeyResultId(base.key_result_id)
+
+      const initiativeDate = `${selectedMonth.getFullYear()}-${String(
+  selectedMonth.getMonth() + 1
+).padStart(2, '0')}-01`
+
+const { data: currentInitiatives } = await supabase
+  .from('initiatives')
+  .select('initiative_index, text')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', initiativeDate)
+  .order('initiative_index', { ascending: true })
+
+let loaded = ['', '', '']
+
+if (currentInitiatives && currentInitiatives.length > 0) {
+  currentInitiatives.forEach((row) => {
+    if (
+      row.initiative_index >= 1 &&
+      row.initiative_index <= 3
+    ) {
+      loaded[row.initiative_index - 1] = row.text || ''
+    }
+  })
+} else {
+  const { data: previousInitiatives } = await supabase
+    .from('initiatives')
+    .select('initiative_index, text, reporting_month')
+    .eq('key_result_id', base.key_result_id)
+    .lt('reporting_month', initiativeDate)
+    .order('reporting_month', { ascending: false })
+    .order('initiative_index', { ascending: true })
+
+  if (previousInitiatives && previousInitiatives.length > 0) {
+    const latestMonth =
+      previousInitiatives[0].reporting_month
+
+    previousInitiatives
+      .filter((row) => row.reporting_month === latestMonth)
+      .forEach((row) => {
+        if (
+          row.initiative_index >= 1 &&
+          row.initiative_index <= 3
+        ) {
+          loaded[row.initiative_index - 1] =
+            row.text || ''
+        }
+      })
+  }
+}
+
+setInitiatives(loaded)
+
+    // ------------------------
+// FETCH CURRENT TARGET
+// ------------------------
+
+const formatDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+
+const currentDate = formatDate(selectedMonth)
+
+const prev = new Date(selectedMonth)
+prev.setMonth(prev.getMonth() - 1)
+const prevDate = formatDate(prev)
+
+const { data: prevData } = await supabase
+        .from('key_result_updates')
+        .select('value')
+        .eq('key_result_id', base.key_result_id)
+        .eq('reporting_month', formatDate(prev))
+        .maybeSingle()
+
+
+// CURRENT ROW
+const { data: currentRow } = await supabase
+  .from('key_result_updates')
+  .select('value, target_value')
+  .eq('key_result_id', base.key_result_id)
+  .eq('reporting_month', currentDate)
+  .maybeSingle()
+
+// PREVIOUS TARGET (carry forward)
+const { data: prevRow } = await supabase
+  .from('key_result_updates')
+  .select('target_value')
+  .eq('key_result_id', base.key_result_id)
+  .lt('reporting_month', currentDate)
+  .not('target_value', 'is', null)
+  .order('reporting_month', { ascending: false })
+  .limit(1)
+  .maybeSingle()
+
+// RESOLVE TARGET
+let resolvedTarget =
+  currentRow?.target_value ??
+  prevRow?.target_value ??
+  null
+
+// FORCE COMPUTED TARGET FOR TLC APPTS
+if (label === "# of TLC Appts Scheduled") {
+  const prevValue =
+    prevData?.value !== null && prevData?.value !== undefined
+      ? Number(prevData.value)
+      : 0
+
+  resolvedTarget = Math.round(prevValue * 0.9)
+}
+
+// AUTO CREATE ROW FOR MONTH (carry forward target)
+if (!currentRow && resolvedTarget !== '') {
+  await supabase
+    .from('key_result_updates')
+    .upsert({
+      key_result_id: base.key_result_id,
+      reporting_month: currentDate,
+      target_value: Number(resolvedTarget),
+    }, {
+      onConflict: 'key_result_id,reporting_month'
+    })
+}
+
+// SET TARGET
+setTarget(prev => {
+  // only set if empty (prevents overwrite)
+  if (prev === '') {
+    return resolvedTarget.toString()
+  }
+  return prev
+})
+
+         const currentValue =
+  currentRow && currentRow.value !== null
+    ? currentRow.value
+    : ''
+
+setValue(prev => {
+  if (prev === '') {
+    return currentValue.toString()
+  }
+  return prev
+})
+
+
+      setLastMonth(prevData?.value ?? '')
+
+     const c = Number(currentValue || 0)
+    const t = Number(resolvedTarget || 0)
+
+if (t <= 0) {
+  setScore('')
+  return
+}
+
+const percent = Math.round((c / t) * 100)
+setScore(`${percent}%`)
+    }
+
+    fetchData()
+
+    
+
+  }, [label, selectedMonth])
+
+  const handleSave = async () => {
+
+    if (!keyResultId) return
+
+    const y = selectedMonth.getFullYear()
+    const m = String(selectedMonth.getMonth() + 1).padStart(2, '0')
+    const reportingDate = `${y}-${m}-01`
+
+   await supabase.from('key_result_updates').upsert(
+  {
+    key_result_id: keyResultId,
+    reporting_month: reportingDate,
+    value: value === '' ? null : Number(value),
+    target_value: target === '' ? null : Number(target),
+  },
+  { onConflict: 'key_result_id,reporting_month' }
+)
+  }
+
+  const handleInitiativeSave = async (
+  index: number,
+  text: string
+) => {
+  if (!keyResultId) return
+
+  const reportingDate = `${selectedMonth.getFullYear()}-${String(
+    selectedMonth.getMonth() + 1
+  ).padStart(2, '0')}-01`
+
+  await supabase
+    .from('initiatives')
+    .upsert(
+      {
+        key_result_id: keyResultId,
+        reporting_month: reportingDate,
+        initiative_index: index + 1,
+        text
+      },
+      {
+        onConflict:
+          'key_result_id,reporting_month,initiative_index'
+      }
+    )
+}
+const isLowerBetter = (label: string) => {
+  const l = label.toLowerCase()
+
+  return (
+    l.includes('wait') ||
+    l.includes('miss') ||
+    l.includes('call out') ||
+    l.includes('reschedule')||
+    l.includes('tlc')
+  )
+}
+const getScoreBackground = () => {
+  const num = Number(score.replace('%', ''))
+
+  if (!num && num !== 0) {
+    return '#FFFFFF'
+  }
+
+  if (isLowerBetter(label)) {
+    if (num <= 100) {
+      return '#acf3c3d7' // green
+    }
+
+    if (num <= 110) {
+      return '#fff4ccf3' // yellow
+    }
+
+    return '#f3b8b8d8' // red
+  }
+
+  if (num >= 100) {
+    return '#acf3c3d7' // green
+  }
+
+  if (num >= 90) {
+    return '#fff4ccf3' // yellow
+  }
+
+  return '#f3b8b8d8' // red
+}
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={row}>
+        <span>
+  {label}
+  {note && (
+    <span
+      style={{
+        fontSize: 13,
+        color: '#6B7280',
+        marginLeft: 6,
+        fontStyle: 'italic',
+        opacity: 0.9
+      }}
+    >
+      ({note})
+    </span>
+  )}
+</span>
+
+        <input style={prevCell} value={lastMonth} readOnly />
+
+        <input
+  style={targetCell}
+  value={target}
+          disabled={!isEditing}
+          onChange={(e) => {
+  const val = e.target.value.replace(/[^0-9.]/g, '')
+  setTarget(val)
+  setIsDirty(true)
+}}
+          onKeyDown={handleEnter}
+        />
+
+       <input
+  style={currentCell}
+  value={value}
+          disabled={!isEditing}
+          onChange={(e) => {
+  const val = e.target.value.replace(/[^0-9]/g, '')
+  setValue(val)
+  setIsDirty(true)
+}}
+          onBlur={handleSave}
+          onKeyDown={handleEnter}
+        />
+
+        <input
+  style={{
+    ...cell,
+    backgroundColor: getScoreBackground(),
+    fontWeight: 800,
+    color: '#1E266D'
+  }}
+  value={score}
+  readOnly
+/>
+
+        <button style={button} onClick={() => setShowInitiatives(!showInitiatives)}>
+          {showInitiatives ? 'Hide' : '+ Initiatives'}
+        </button>
+      </div>
+
+{showInitiatives && (
+  <div style={initiativeRow}>
+    {initiatives.map((item, index) => (
+      <input
+        key={index}
+        style={cell}
+        placeholder={`Initiative ${index + 1}`}
+        value={item}
+        disabled={!isEditing}
+        onChange={(e) => {
+          const updated = [...initiatives]
+          updated[index] = e.target.value
+          setInitiatives(updated)
+        }}
+        onBlur={() =>
+          handleInitiativeSave(
+            index,
+            initiatives[index]
+          )
+        }
+      />
+    ))}
+  </div>
+)}
+    
+    </div>
+  )
+  
+}
+
+// =========================
 // STYLES
-// =========
-
+// =========================
 
 const container: React.CSSProperties = {
   backgroundColor: COLORS.grayAppBackground,
@@ -464,7 +628,7 @@ const stickyHeader: React.CSSProperties = {
   background: `linear-gradient(90deg, ${COLORS.orangePrimary} 0%, ${COLORS.orangeSoft} 100%)`,
   padding: 24,
   borderBottom: `1px solid ${COLORS.orangeSoft}`,
-  borderRadius: 20,
+  borderRadius: 16,
   margin: 16,
   boxShadow: COLORS.shadowMedium
 }
@@ -478,16 +642,14 @@ const title: React.CSSProperties = {
   fontSize: 38,
   fontWeight: 700,
   color: COLORS.white,
-  marginTop: 0,
   marginBottom: 8
 }
 
 const description: React.CSSProperties = {
   fontSize: 16,
   color: COLORS.white,
-  marginTop: 0,
-  marginBottom: 16,
-  maxWidth: 620,
+  marginBottom: 24,
+  maxWidth: 900,
   lineHeight: 1.5
 }
 
@@ -551,7 +713,7 @@ const arrowButton: React.CSSProperties = {
   backgroundColor: COLORS.navy,
   border: 'none',
   padding: '10px 14px',
-  borderRadius: 10,
+  borderRadius: 8,
   color: COLORS.white,
   cursor: 'pointer',
   fontWeight: 600
@@ -593,9 +755,9 @@ const monthText: React.CSSProperties = {
 
 const objective: React.CSSProperties = {
   marginBottom: 32,
-  backgroundColor: COLORS.grayPanel,
-  border: `1px solid ${COLORS.orangeSoft}`,
-  borderRadius: 20,
+  backgroundColor: COLORS.white,
+  border: `2px solid ${COLORS.orangeSoft}`,
+  borderRadius: 18,
   padding: 24,
   boxShadow: COLORS.shadowSoft,
   overflow: 'hidden'
@@ -629,8 +791,9 @@ const row: React.CSSProperties = {
   padding: 12,
   backgroundColor: COLORS.white,
   border: `1px solid ${COLORS.orangeSoft}`,
-  borderRadius: 14,
-  alignItems: 'center'
+  borderRadius: 12,
+  alignItems: 'center',
+  boxShadow: COLORS.shadowSoft
 }
 
 const cell: React.CSSProperties = {
@@ -638,8 +801,8 @@ const cell: React.CSSProperties = {
   padding: '10px 12px',
   backgroundColor: COLORS.white,
   border: `1px solid ${COLORS.orangeSoft}`,
-  borderRadius: 10,
-  color: COLORS.textPrimary,
+  borderRadius: 8,
+  color: COLORS.navy,
   fontSize: 14,
   fontWeight: 500,
   textAlign: 'center',
@@ -664,7 +827,7 @@ const currentCell: React.CSSProperties = {
 const button: React.CSSProperties = {
   backgroundColor: COLORS.orangePrimary,
   border: 'none',
-  borderRadius: 10,
+  borderRadius: 8,
   padding: '10px 14px',
   cursor: 'pointer',
   color: COLORS.white,
