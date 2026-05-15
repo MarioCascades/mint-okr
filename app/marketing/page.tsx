@@ -279,64 +279,74 @@ return (
   </p>
 
   <div style={topSection}>
+    
     <div style={leftMeta}>
-      <div style={metaItem}>
-        <label style={label}>Date Updated</label>
-        <input
-          value={lastUpdated || '—'}
-          readOnly
-          style={inputSmall}
-        />
-      </div>
+  <div style={metaItem}>
+    <label style={label}>Date Updated</label>
 
-      <div style={metaItem}>
-        <label style={label}>10 State</label>
-        <input
-          value=""
-          readOnly
-          style={inputSmall}
-        />
-      </div>
+    <input
+      value={lastUpdated || '—'}
+      readOnly
+      style={inputSmall}
+    />
 
-      <div style={metaItem}>
-        <label style={label}>% Into Period</label>
-        <input
-          value={(percentIntoPeriod || 0).toFixed(2) + '%'}
-          readOnly
-          style={inputSmall}
-        />
-      </div>
+    <input
+      value=""
+      readOnly
+      placeholder="10 State"
+      style={{
+        ...inputSmall,
+        marginTop: 8
+      }}
+    />
+  </div>
 
-      <div style={metaItem}>
-        <label style={label}>OKR Time Frame</label>
+  <div style={metaItem}>
+    <label style={label}>% Into Period</label>
 
-        <div style={monthSelector}>
-          <button
-            style={arrowButton}
-            onClick={() => setSelectedMonth(changeMonth(selectedMonth, -1))}
-          >
-            ←
-          </button>
+    <input
+      value={`${percentIntoPeriod}%`}
+      readOnly
+      style={inputSmall}
+    />
+  </div>
 
-          <span style={monthText}>
-            {formatMonth(selectedMonth)}
-          </span>
+  <div style={metaItem}>
+    <label style={label}>OKR Time Frame</label>
 
-          <button
-            style={{
-              ...arrowButton,
-              opacity: isFutureMonth(changeMonth(selectedMonth, 1)) ? 0.3 : 1
-            }}
-            disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
-            onClick={() =>
-              setSelectedMonth(changeMonth(selectedMonth, 1))
-            }
-          >
-            →
-          </button>
-        </div>
-      </div>
+    <div style={monthSelector}>
+      <button
+        style={arrowButton}
+        onClick={() =>
+          setSelectedMonth(changeMonth(selectedMonth, -1))
+        }
+      >
+        ←
+      </button>
+
+      <span style={monthText}>
+        {formatMonth(selectedMonth)}
+      </span>
+
+      <button
+        style={{
+          ...arrowButton,
+          opacity: isFutureMonth(changeMonth(selectedMonth, 1))
+            ? 0.3
+            : 1
+        }}
+        disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
+        onClick={() =>
+          setSelectedMonth(changeMonth(selectedMonth, 1))
+        }
+      >
+        →
+      </button>
     </div>
+  </div>
+</div>
+    
+
     <div style={rightMeta}>
       <button
         style={backButton}
@@ -474,16 +484,14 @@ const description: React.CSSProperties = {
 const topSection: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
-  gap: 24,
-  alignItems: 'flex-start'
+  alignItems: 'center',
+  gap: 24
 }
 
 const leftMeta: React.CSSProperties = {
   display: 'flex',
-  flexDirection: 'row',
   gap: 16,
-  flexWrap: 'wrap',
-  alignItems: 'flex-end'
+  alignItems: 'flex-start'
 }
 
 const rightMeta: React.CSSProperties = {
@@ -497,7 +505,7 @@ const rightMeta: React.CSSProperties = {
 const metaItem: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  minWidth: 220
+  minWidth: 140
 }
 
 const label: React.CSSProperties = {
@@ -522,9 +530,10 @@ const monthSelector: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 12,
-  padding: 8,
-  borderRadius: 12,
-  backgroundColor: COLORS.orangeAccent
+  padding: 6,
+  borderRadius: 10,
+  backgroundColor: COLORS.orangeAccent,
+  width: 170
 }
 
 const arrowButton: React.CSSProperties = {
