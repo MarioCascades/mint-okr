@@ -1,29 +1,63 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TopNav from '@/components/TopNav'
+import { supabase } from '../../lib/supabase'
+import { COLORS } from '@/lib/colors'
+import {
+  isAdmin,
+  isMember,
+  canEditSelectedMonth
+} from '@/lib/auth'
 
-type KRRow = {
-  id: string
-  label: string
-  previous: string
-  target: string
-  current: string
-  score: string
-  editable?: boolean
-  mirrored?: boolean
-  displayOnly?: boolean
+const MARKETING_LABEL_MAP: Record<string, string> = {
+  mirrored_np_this: '# New Patients Scheduled This Month',
+  mirrored_np_next: '# New Patients Scheduled Next Month',
+
+  mkt_dentist_referrals: 'MKT Dentist Referrals',
+  mkt_referring_dentists: 'MKT Referring Dentists',
+  mkt_patient_referrals: 'MKT Patient Referrals',
+  mkt_digital_marketing: 'MKT Digital Marketing',
+  mkt_community: 'MKT Community',
+
+  mkt_sponsorships: 'MKT Sponsorships',
+  mkt_sponsorship_dollars: 'MKT Sponsorship Dollars',
+  mkt_community_events: 'MKT Community Events',
+  mkt_np_community_referrals: 'MKT NP Community Referrals',
+  mkt_gp_deliveries: 'MKT GP Deliveries',
+
+  mkt_social_posts: 'MKT Social Posts',
+  mkt_google_reviews: 'MKT Google Reviews',
+  mkt_bright_referral: 'MKT Bright Referral',
 }
-
-type Objective = {
-  id: string
-  title: string
-  rows: KRRow[]
+const DISPLAY_ONLY_KRS = new Set([
+  'mkt_dentist_referrals',
+  'mkt_community',
+  'mkt_sponsorships',
+  'mkt_np_community_referrals',
+  'mkt_gp_deliveries',
+  'mkt_bright_referral',
+])
+const DELTA_SCORE_KRS = new Set([
+  'mkt_sponsorship_dollars',
+  'mkt_social_posts',
+])
+const MIRRORED_KRS = new Set([
+  'mirrored_np_this',
+  'mirrored_np_next',
+])
+const LEGACY_DIGITAL_KRS = new Set([
+  'mkt_social_posts',
+  'mkt_google_reviews',
+  'mkt_bright_referral',
+])
+const MIRRORED_TEMPLATE_IDS = {
+  mirrored_np_this: 'f2024a62-4588-4bdd-a8b4-66c77c775290',
+  mirrored_np_next: '5d61dae9-c93b-4403-9da2-88007cde2a65',
 }
-
-const MARKETING_DESCRIPTION =
-  'Marketing performance tracking and OKR visibility across referral growth, community engagement, and digital performance.'
 
 function formatMonth(date: Date) {
   return date.toLocaleDateString('en-US', {
@@ -40,15 +74,19 @@ function changeMonth(current: Date, offset: number) {
 
 function isFutureMonth(selectedMonth: Date) {
   const now = new Date()
+
   return (
     selectedMonth.getFullYear() > now.getFullYear() ||
-    (selectedMonth.getFullYear() === now.getFullYear() &&
-      selectedMonth.getMonth() > now.getMonth())
+    (
+      selectedMonth.getFullYear() === now.getFullYear() &&
+      selectedMonth.getMonth() > now.getMonth()
+    )
   )
 }
 
 function getPercentIntoPeriod(selectedMonth: Date) {
   const now = new Date()
+
   const isCurrentMonth =
     now.getMonth() === selectedMonth.getMonth() &&
     now.getFullYear() === selectedMonth.getFullYear()
@@ -67,304 +105,497 @@ function getPercentIntoPeriod(selectedMonth: Date) {
 function showLegacyDigital(selectedMonth: Date) {
   return (
     selectedMonth.getFullYear() < 2026 ||
-    (selectedMonth.getFullYear() === 2026 && selectedMonth.getMonth() <= 3)
+    (
+      selectedMonth.getFullYear() === 2026 &&
+      selectedMonth.getMonth() <= 3
+    )
   )
 }
 
-function ScoreBadge({ score }: { score: string }) {
-  let background = '#fee2e2'
-  let color = '#b91c1c'
-
-  if (score === '—') {
-    background = '#f1f5f9'
-    color = '#64748b'
-  } else if (score.startsWith('10') || score === '100%') {
-    background = '#dcfce7'
-    color = '#166534'
-  } else if (score.startsWith('9')) {
-    background = '#fef3c7'
-    color = '#92400e'
-  }
-
-  return (
-    <div
-      style={{
-        backgroundColor: background,
-        color,
-        borderRadius: '12px',
-        padding: '10px',
-        textAlign: 'center',
-        fontWeight: 700,
-      }}
-    >
-      {score}
-    </div>
-  )
+type MarketingKR = {
+  key: string
+  label: string
+  previous: number
+  target: number
+  current: number
+  score: string
+  mirrored?: boolean
 }
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    maxWidth: '1400px',
-    margin: '0 auto',
-    padding: '32px',
-  },
-  stickyHeader: {
-    position: 'sticky' as const,
-    top: 0,
-    zIndex: 10,
-    backgroundColor: '#f8fafc',
-    paddingBottom: '20px',
-  },
-  topSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '20px',
-  },
-  title: {
-    fontSize: '32px',
-    fontWeight: 700,
-    color: '#1e293b',
-    marginBottom: '8px',
-  },
-  description: {
-    fontSize: '16px',
-    color: '#64748b',
-    marginBottom: '16px',
-  },
-  metaRow: {
-    display: 'flex',
-    gap: '24px',
-    color: '#475569',
-    fontSize: '14px',
-  },
-  buttonRow: {
-    display: 'flex',
-    gap: '12px',
-  },
-  backButton: {
-    padding: '10px 18px',
-    borderRadius: '10px',
-    border: '1px solid #cbd5e1',
-    backgroundColor: '#fff',
-    cursor: 'pointer',
-  },
-  editButton: {
-    padding: '10px 18px',
-    borderRadius: '10px',
-    border: 'none',
-    backgroundColor: '#f97316',
-    color: '#fff',
-    cursor: 'pointer',
-    fontWeight: 600,
-  },
-  monthSelector: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '20px',
-    marginBottom: '32px',
-  },
-  arrowButton: {
-    fontSize: '28px',
-    border: 'none',
-    background: 'transparent',
-    cursor: 'pointer',
-  },
-  objective: {
-    backgroundColor: '#fff',
-    borderRadius: '20px',
-    padding: '24px',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-    marginBottom: '28px',
-  },
-  objectiveTitle: {
-    fontSize: '22px',
-    fontWeight: 700,
-    marginBottom: '18px',
-    color: '#1e293b',
-  },
-  headerRow: {
-    display: 'grid',
-    gridTemplateColumns: '2.4fr 1fr 1fr 1fr 1fr',
-    gap: '12px',
-    fontSize: '13px',
-    fontWeight: 700,
-    color: '#64748b',
-    marginBottom: '12px',
-  },
-  krRow: {
-    display: 'grid',
-    gridTemplateColumns: '2.4fr 1fr 1fr 1fr 1fr',
-    gap: '12px',
-    alignItems: 'center',
-    padding: '12px 0',
-    borderTop: '1px solid #f1f5f9',
-  },
-  valueCell: {
-    backgroundColor: '#f8fafc',
-    borderRadius: '12px',
-    padding: '10px',
-    textAlign: 'center' as const,
-    border: '1px solid #e2e8f0',
-  },
-  targetCell: {
-    backgroundColor: '#dbeafe',
-    borderRadius: '12px',
-    padding: '10px',
-    textAlign: 'center' as const,
-    border: '1px solid #bfdbfe',
-  },
-  inputCell: {
-    width: '100%',
-    borderRadius: '12px',
-    border: '1px solid #cbd5e1',
-    padding: '10px',
-    textAlign: 'center' as const,
-    fontSize: '14px',
-  },
-}
-
 export default function MarketingPage() {
-  const router = useRouter()
-  const [selectedMonth, setSelectedMonth] = useState(new Date())
-  const [isEditing, setIsEditing] = useState(false)
+const router = useRouter()
 
-  const percentIntoPeriod = useMemo(
-    () => getPercentIntoPeriod(selectedMonth),
-    [selectedMonth]
+const [selectedMonth, setSelectedMonth] = useState(new Date())
+const [editing, setEditing] = useState(false)
+const [currentUser, setCurrentUser] = useState<string | null>(null)
+
+const [mirroredRows, setMirroredRows] = useState({
+  mirrored_np_this: {
+    previous: 0,
+    target: 0,
+    current: 0,
+    score: '—'
+  },
+  mirrored_np_next: {
+    previous: 0,
+    target: 0,
+    current: 0,
+    score: '—'
+  }
+})
+
+useEffect(() => {
+  const init = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    setCurrentUser(user.id)
+
+    const reportingMonth = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth(),
+  1
+).toISOString().split('T')[0]
+
+const previousMonth = new Date(
+  selectedMonth.getFullYear(),
+  selectedMonth.getMonth() - 1,
+  1
+).toISOString().split('T')[0]
+
+const templateIds = Object.values(MIRRORED_TEMPLATE_IDS)
+
+const { data: mirroredKRs } = await supabase
+  .from('key_results')
+  .select('id, key_result_template_id, target_value, current_value')
+  .in('key_result_template_id', templateIds)
+
+if (!mirroredKRs) return
+const krIds = mirroredKRs.map((kr) => kr.id)
+
+const { data: currentUpdates } = await supabase
+  .from('key_result_updates')
+  .select('key_result_id, current_value')
+  .eq('reporting_month', reportingMonth)
+  .in('key_result_id', krIds)
+
+const { data: previousUpdates } = await supabase
+  .from('key_result_updates')
+  .select('key_result_id, current_value')
+  .eq('reporting_month', previousMonth)
+  .in('key_result_id', krIds)
+  const nextMirroredState = {
+  mirrored_np_this: {
+    previous: 0,
+    target: 0,
+    current: 0,
+    score: '—'
+  },
+  mirrored_np_next: {
+    previous: 0,
+    target: 0,
+    current: 0,
+    score: '—'
+  }
+}
+
+for (const kr of mirroredKRs) {
+  const currentUpdate = currentUpdates?.find(
+    (u) => u.key_result_id === kr.id
   )
 
-  const objectives: Objective[] = [
-    {
-      id: 'obj1',
-      title: 'Top of New Patient Funnel',
-      rows: [
-        { id: '1', label: '# New Patients Scheduled This Month', previous: '0', target: '0', current: '0', score: '0%', mirrored: true },
-        { id: '2', label: '# New Patients Scheduled Next Month', previous: '0', target: '0', current: '0', score: '0%', mirrored: true },
-      ],
-    },
-    {
-      id: 'obj2',
-      title: 'Understanding Referral Mix',
-      rows: [
-        { id: '3', label: 'MKT Dentist Referrals', previous: '0', target: '0', current: '0', score: '—' },
-        { id: '4', label: 'MKT Referring Dentists', previous: '0', target: '15', current: '0', score: '0%' },
-        { id: '5', label: 'MKT Patient Referrals', previous: '0', target: '15', current: '0', score: '0%' },
-        { id: '6', label: 'MKT Digital Marketing', previous: '0', target: '25', current: '0', score: '0%' },
-        { id: '7', label: 'MKT Community', previous: '0', target: '0', current: '0', score: '—' },
-      ],
-    },
-    {
-      id: 'obj3',
-      title: 'Community',
-      rows: [
-        { id: '8', label: 'MKT Sponsorships', previous: '0', target: '0', current: '0', score: '—' },
-        { id: '9', label: 'MKT Sponsorship Dollars', previous: '$0', target: '$10,000', current: '$0', score: '0%' },
-        { id: '10', label: 'MKT Community Events', previous: '0', target: '1', current: '0', score: '0%' },
-        { id: '11', label: 'MKT NP Community Referrals', previous: '0', target: '0', current: '0', score: '—' },
-        { id: '12', label: 'MKT GP Deliveries', previous: '0', target: '0', current: '0', score: '—' },
-      ],
-    },
-  ]
+  const previousUpdate = previousUpdates?.find(
+    (u) => u.key_result_id === kr.id
+  )
 
-  if (showLegacyDigital(selectedMonth)) {
-    objectives.push({
-      id: 'obj4',
-      title: 'Digital Marketing',
-      rows: [
-        { id: '13', label: 'MKT Social Posts', previous: '0', target: '8', current: '0', score: '0%' },
-        { id: '14', label: 'MKT Google Reviews', previous: '0', target: '10', current: '0', score: '0%' },
-        { id: '15', label: 'MKT Bright Referral', previous: '0', target: '0', current: '0', score: '—' },
-      ],
-    })
+  const currentValue = Number(currentUpdate?.current_value || 0)
+  const previousValue = Number(previousUpdate?.current_value || 0)
+  const targetValue = Number(kr.target_value || 0)
+
+  const key =
+    kr.key_result_template_id === MIRRORED_TEMPLATE_IDS.mirrored_np_this
+      ? 'mirrored_np_this'
+      : 'mirrored_np_next'
+
+  nextMirroredState[key] = {
+    previous: previousValue,
+    target: targetValue,
+    current: currentValue,
+    score: targetValue > 0
+      ? `${Math.round((currentValue / targetValue) * 100)}%`
+      : '—'
+  }
+}
+
+setMirroredRows(nextMirroredState)
   }
 
-  return (
-    <div style={styles.container}>
-      <TopNav />
-      <div style={styles.content}>
-        <div style={styles.stickyHeader}>
-          <div style={styles.topSection}>
-            <div>
-              <h1 style={styles.title}>Marketing</h1>
-              <p style={styles.description}>{MARKETING_DESCRIPTION}</p>
-              <div style={styles.metaRow}>
-                <span>% Into Period: {percentIntoPeriod}%</span>
-                <span>Date Updated: --</span>
-              </div>
+  init()
+}, [router, selectedMonth])
+
+const percentIntoPeriod = getPercentIntoPeriod(selectedMonth)
+
+return (
+  <div style={container}>
+    <TopNav />
+
+    <div style={content}>
+      <div style={stickyHeader}>
+        <div style={topSection}>
+          <div>
+            <div style={title}>Marketing</div>
+            <div style={description}>
+              Marketing performance tracking and OKR visibility across referral
+              growth, community engagement, and digital performance.
             </div>
 
-            <div style={styles.buttonRow}>
-              <button style={styles.backButton} onClick={() => router.push('/')}>
-                Back to Main
-              </button>
-              <button style={styles.editButton} onClick={() => setIsEditing(!isEditing)}>
-                {isEditing ? 'Save' : 'Edit'}
-              </button>
+            <div style={leftMeta}>
+              <div style={metaItem}>
+                <div style={label}>% Into Period</div>
+                <input
+                  value={`${percentIntoPeriod}%`}
+                  readOnly
+                  style={inputSmall}
+                />
+              </div>
             </div>
           </div>
 
-          <div style={styles.monthSelector}>
+          <div style={rightMeta}>
+            <div style={monthSelector}>
+              <button
+                style={arrowButton}
+                onClick={() =>
+                  setSelectedMonth(changeMonth(selectedMonth, -1))
+                }
+              >
+                ←
+              </button>
+
+              <div style={monthText}>
+                {formatMonth(selectedMonth)}
+              </div>
+
+              <button
+                style={arrowButton}
+                disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
+                onClick={() =>
+                  setSelectedMonth(changeMonth(selectedMonth, 1))
+                }
+              >
+                →
+              </button>
+            </div>
+
             <button
-              style={styles.arrowButton}
-              onClick={() => setSelectedMonth(changeMonth(selectedMonth, -1))}
+              style={editButton}
+              onClick={() => setEditing(!editing)}
             >
-              ←
+              {editing ? 'Save' : 'Edit'}
             </button>
-            <div>{formatMonth(selectedMonth)}</div>
+
             <button
-              style={styles.arrowButton}
-              disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
-              onClick={() => setSelectedMonth(changeMonth(selectedMonth, 1))}
+              style={backButton}
+              onClick={() => router.push('/')}
             >
-              →
+              Back to Main
             </button>
           </div>
         </div>
+      </div>
+            <div style={objective}>
+        <div style={objectiveTitle}>
+          Top of New Patient Funnel
+        </div>
 
-        {objectives.map((obj) => (
-          <div key={obj.id} style={styles.objective}>
-            <div style={styles.objectiveTitle}>{obj.title}</div>
-            <div style={styles.headerRow}>
-              <div>Key Results</div>
-              <div>Last Month</div>
-              <div>Target</div>
-              <div>This Month</div>
-              <div>Score</div>
-            </div>
-            {obj.rows.map((row) => {
-              const locked = row.mirrored || row.displayOnly
+        <div style={headerRow}>
+          <div>Key Result</div>
+          <div>Previous</div>
+          <div>Target</div>
+          <div>Current</div>
+          <div>Score</div>
+          <div>Actions</div>
+        </div>
 
-              return (
-                <div key={row.id} style={styles.krRow}>
-                  <div style={{ fontWeight: 500 }}>{row.label}</div>
-                  <div style={styles.valueCell}>{row.previous}</div>
-                  <div style={styles.targetCell}>{row.target}</div>
-                  <div>
-                    <input
-                      value={row.current}
-                      readOnly={!isEditing || locked}
-                      style={{
-                        ...styles.inputCell,
-                        backgroundColor:
-                          !isEditing || locked ? '#f8fafc' : '#ffffff',
-                        color: !isEditing || locked ? '#64748b' : '#0f172a',
-                      }}
-                    />
-                  </div>
-                  <ScoreBadge score={row.score} />
-                </div>
-              )
-            })}
-          </div>
-        ))}
+        <div style={row}>
+          <div># New Patients Scheduled This Month</div>
+
+          <div style={prevCell}>0</div>
+
+          <div style={targetCell}>0</div>
+
+          <input
+            value={0}
+            readOnly
+            style={currentCell}
+          />
+
+          <div style={cell}>—</div>
+
+          <button style={button}>
+            Mirrored
+          </button>
+        </div>
+
+        <div style={row}>
+          <div># New Patients Scheduled Next Month</div>
+
+          <div style={prevCell}>0</div>
+
+          <div style={targetCell}>0</div>
+
+          <input
+            value={0}
+            readOnly
+            style={currentCell}
+          />
+
+          <div style={cell}>—</div>
+
+          <button style={button}>
+            Mirrored
+          </button>
+        </div>
       </div>
     </div>
-  )
+  </div>
+)
+}
+// =========
+// STYLES
+// =========
+
+const container: React.CSSProperties = {
+  backgroundColor: COLORS.grayAppBackground,
+  minHeight: '100vh',
+  color: COLORS.navy
+}
+
+const stickyHeader: React.CSSProperties = {
+  position: 'sticky',
+  top: 60,
+  zIndex: 10,
+  background: `linear-gradient(90deg, ${COLORS.orangePrimary} 0%, ${COLORS.orangeSoft} 100%)`,
+  padding: 24,
+  borderBottom: `1px solid ${COLORS.orangeSoft}`,
+  borderRadius: 20,
+  margin: 16,
+  boxShadow: COLORS.shadowMedium
+}
+
+const content: React.CSSProperties = {
+  padding: 20,
+  overflowX: 'auto'
+}
+
+const title: React.CSSProperties = {
+  fontSize: 38,
+  fontWeight: 700,
+  color: COLORS.white,
+  marginBottom: 8
+}
+
+const description: React.CSSProperties = {
+  fontSize: 16,
+  color: COLORS.white,
+  marginBottom: 24,
+  maxWidth: 900,
+  lineHeight: 1.5
+}
+
+const topSection: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: 24,
+  alignItems: 'flex-start'
+}
+
+const leftMeta: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  gap: 16,
+  flexWrap: 'wrap',
+  alignItems: 'flex-end'
+}
+
+const rightMeta: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 14,
+  alignItems: 'stretch',
+  minWidth: 220
+}
+
+const metaItem: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  minWidth: 220
+}
+
+const label: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 600,
+  color: COLORS.white,
+  marginBottom: 6
+}
+
+const inputSmall: React.CSSProperties = {
+  height: 44,
+  padding: '10px 14px',
+  borderRadius: 10,
+  border: `1px solid ${COLORS.orangeSoft}`,
+  backgroundColor: COLORS.white,
+  color: COLORS.navy,
+  fontSize: 15,
+  fontWeight: 500
+}
+
+const monthSelector: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  padding: 8,
+  borderRadius: 12,
+  backgroundColor: COLORS.orangeAccent
+}
+
+const arrowButton: React.CSSProperties = {
+  backgroundColor: COLORS.navy,
+  border: 'none',
+  padding: '10px 14px',
+  borderRadius: 10,
+  color: COLORS.white,
+  cursor: 'pointer',
+  fontWeight: 600
+}
+
+const editButton: React.CSSProperties = {
+  backgroundColor: COLORS.navy,
+  border: 'none',
+  padding: '12px 20px',
+  borderRadius: 10,
+  color: COLORS.white,
+  fontWeight: 600,
+  cursor: 'pointer',
+  fontSize: 15,
+  width: '100%',
+  height: 52
+}
+
+const backButton: React.CSSProperties = {
+  backgroundColor: COLORS.navy,
+  border: 'none',
+  padding: '12px 20px',
+  borderRadius: 10,
+  color: COLORS.white,
+  cursor: 'pointer',
+  fontWeight: 600,
+  fontSize: 15,
+  width: '100%',
+  height: 52
+}
+
+const monthText: React.CSSProperties = {
+  fontSize: 18,
+  fontWeight: 700,
+  color: COLORS.navy,
+  minWidth: 120,
+  textAlign: 'center'
+}
+
+const objective: React.CSSProperties = {
+  marginBottom: 32,
+  backgroundColor: COLORS.grayPanel,
+  border: `1px solid ${COLORS.orangeSoft}`,
+  borderRadius: 20,
+  padding: 24,
+  boxShadow: COLORS.shadowSoft,
+  overflow: 'hidden'
+}
+
+const objectiveTitle: React.CSSProperties = {
+  color: COLORS.navy,
+  fontSize: 30,
+  fontWeight: 800,
+  marginBottom: 18,
+  paddingBottom: 12,
+  borderBottom: `2px solid ${COLORS.orangeSoft}`
+}
+
+const headerRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
+  gap: 10,
+  marginBottom: 14,
+  padding: '0 6px',
+  fontWeight: 600,
+  color: COLORS.textHeaderMuted,
+  fontSize: 14
+}
+
+const row: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr',
+  gap: 10,
+  marginBottom: 10,
+  padding: 12,
+  backgroundColor: COLORS.white,
+  border: `1px solid ${COLORS.orangeSoft}`,
+  borderRadius: 14,
+  alignItems: 'center'
+}
+
+const cell: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 12px',
+  backgroundColor: COLORS.white,
+  border: `1px solid ${COLORS.orangeSoft}`,
+  borderRadius: 10,
+  color: COLORS.textPrimary,
+  fontSize: 14,
+  fontWeight: 500,
+  textAlign: 'center',
+  outline: 'none'
+}
+
+const prevCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: COLORS.grayMuted
+}
+
+const targetCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: COLORS.inputBlue
+}
+
+const currentCell: React.CSSProperties = {
+  ...cell,
+  backgroundColor: COLORS.white
+}
+
+const button: React.CSSProperties = {
+  backgroundColor: COLORS.orangePrimary,
+  border: 'none',
+  borderRadius: 10,
+  padding: '10px 14px',
+  cursor: 'pointer',
+  color: COLORS.white,
+  fontWeight: 600,
+  fontSize: 13
+}
+
+const initiativeRow: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr 1fr',
+  gap: 10,
+  marginTop: 10,
+  padding: 12,
+  backgroundColor: COLORS.orangeTint,
+  borderRadius: 12,
+  border: `1px solid ${COLORS.orangeSoft}`
 }
