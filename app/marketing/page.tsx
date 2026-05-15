@@ -171,18 +171,18 @@ useEffect(() => {
   label="# of New Patients Scheduled This Month"
   selectedMonth={selectedMonth}
   isEditing={false}
-  sourceUser="Ashley"
+  sourceUser="Kelle"
   sourceLabel="FD NP Scheduled (GF)"
-  note="Pulls from Ashley"
+  note="Pulls from Kelle"
 />
 
 <KeyResult
   label="# of New Patients Scheduled Next Month"
   selectedMonth={selectedMonth}
   isEditing={false}
-  sourceUser="Ashley"
+  sourceUser="Kelle"
   sourceLabel="FD NP Scheduled Next Month"
-  note="Pulls from Ashley"
+  note="Pulls from Kelle"
 />
         </Objective>
 
