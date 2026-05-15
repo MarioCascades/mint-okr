@@ -270,9 +270,160 @@ return (
 
     <div style={content}>
           
-    
+    <div style={stickyHeader}>
+  <h1 style={title}>Marketing</h1>
+
+  <p style={description}>
+    Marketing performance tracking and OKR visibility across referral growth,
+    community engagement, and digital performance.
+  </p>
+
+  <div style={topSection}>
+    <div style={leftMeta}>
+      <div style={metaItem}>
+        <label style={label}>Date Updated</label>
+        <input
+          value={lastUpdated || '—'}
+          readOnly
+          style={inputSmall}
+        />
+      </div>
+
+      <div style={metaItem}>
+        <label style={label}>10 State</label>
+        <input
+          value=""
+          readOnly
+          style={inputSmall}
+        />
+      </div>
+
+      <div style={metaItem}>
+        <label style={label}>% Into Period</label>
+        <input
+          value={(percentIntoPeriod || 0).toFixed(2) + '%'}
+          readOnly
+          style={inputSmall}
+        />
+      </div>
+
+      <div style={metaItem}>
+        <label style={label}>OKR Time Frame</label>
+
+        <div style={monthSelector}>
+          <button
+            style={arrowButton}
+            onClick={() => setSelectedMonth(changeMonth(selectedMonth, -1))}
+          >
+            ←
+          </button>
+
+          <span style={monthText}>
+            {formatMonth(selectedMonth)}
+          </span>
+
+          <button
+            style={{
+              ...arrowButton,
+              opacity: isFutureMonth(changeMonth(selectedMonth, 1)) ? 0.3 : 1
+            }}
+            disabled={isFutureMonth(changeMonth(selectedMonth, 1))}
+            onClick={() =>
+              setSelectedMonth(changeMonth(selectedMonth, 1))
+            }
+          >
+            →
+          </button>
+        </div>
       </div>
     </div>
+    <div style={rightMeta}>
+      <button
+        style={backButton}
+        onClick={() => router.push('/')}
+      >
+        ← Back to Main
+      </button>
+
+      <button
+        style={editButton}
+        onClick={() => setEditing(!editing)}
+      >
+        {editing ? 'Save' : 'Edit'}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div style={objective}>
+  <div style={objectiveTitle}>
+    Top of New Patient Funnel
+  </div>
+
+  <div style={headerRow}>
+    <div>Key Result</div>
+    <div>Previous</div>
+    <div>Target</div>
+    <div>Current</div>
+    <div>Score</div>
+    <div>Actions</div>
+  </div>
+
+  <div style={row}>
+    <div># New Patients Scheduled This Month</div>
+
+    <div style={prevCell}>
+      {mirroredRows.mirrored_np_this.previous}
+    </div>
+
+    <div style={targetCell}>
+      {mirroredRows.mirrored_np_this.target}
+    </div>
+
+    <input
+      value={String(mirroredRows.mirrored_np_this.current)}
+      readOnly
+      style={currentCell}
+    />
+
+    <div style={cell}>
+      {mirroredRows.mirrored_np_this.score}
+    </div>
+
+    <button style={button}>
+      Mirrored
+    </button>
+  </div>
+
+  <div style={row}>
+    <div># New Patients Scheduled Next Month</div>
+
+    <div style={prevCell}>
+      {mirroredRows.mirrored_np_next.previous}
+    </div>
+
+    <div style={targetCell}>
+      {mirroredRows.mirrored_np_next.target}
+    </div>
+
+    <input
+      value={String(mirroredRows.mirrored_np_next.current)}
+      readOnly
+      style={currentCell}
+    />
+
+    <div style={cell}>
+      {mirroredRows.mirrored_np_next.score}
+    </div>
+
+    <button style={button}>
+      Mirrored
+    </button>
+  </div>
+</div>
+
+    </div>
+  </div>
     
   )
   }
