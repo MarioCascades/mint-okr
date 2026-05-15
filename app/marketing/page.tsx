@@ -13,6 +13,23 @@ import {
   canEditSelectedMonth
 } from '@/lib/auth'
 
+const MARKETING_LABEL_MAP: Record<string, string> = {
+  '# of Dentist Referrals': 'MKT Dentist Referrals',
+  '# of Referring Dentists': 'MKT Referring Dentists',
+  '# of Patient Referrals': 'MKT Patient Referrals',
+  'Digital Marketing': 'MKT Digital Marketing',
+  'Community': 'MKT Community',
+
+  '# of Sponsorships': 'MKT Sponsorships',
+  '$ of Sponsorships': 'MKT Sponsorship Dollars',
+  '# of Community Events': 'MKT Community Events',
+  '# of NPs from Community Referrals': 'MKT NP Community Referrals',
+  'GP Deliveries': 'MKT GP Deliveries',
+
+  '# of Social Posts': 'MKT Social Posts',
+  'Google Reviews': 'MKT Google Reviews',
+  'Bright Referral': 'MKT Bright Referral',
+}
 
 
 export default function Page() {
@@ -284,7 +301,10 @@ const KeyResult = ({
       .from('dashboard_okr_data')
       .select('*')
       .eq('user_name', sourceUser || 'Marketing')
-      .eq('key_result_title', sourceLabel || label)
+      .eq(
+  'key_result_title',
+  sourceLabel || MARKETING_LABEL_MAP[label] || label
+)
       .maybeSingle()
 
       if (!base) return
