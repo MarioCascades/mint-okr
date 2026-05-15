@@ -76,6 +76,8 @@ useEffect(() => {
     const now = new Date()
     return selectedMonth > new Date(now.getFullYear(), now.getMonth(), 1)
   }
+  const showDigitalMarketing =
+  selectedMonth < new Date(2026, 4, 1)
 
   return (
     <div style={container}>
@@ -199,13 +201,15 @@ useEffect(() => {
           <KeyResult label="# of NPs from Community Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="GP Deliveries" selectedMonth={selectedMonth} isEditing={isEditing} />
           
-          <Objective title="Objective 4: Digital Marketing">
+          {showDigitalMarketing && (
+        <Objective title="Objective 4: Digital Marketing">
           <KeyResult label="# of Social Posts" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Google Reviews" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
                     
     
-        </Objective>
+          </Objective>
+)}
       </div>
     </div>
     
@@ -423,7 +427,7 @@ setTarget(prev => {
          const currentValue =
   currentRow && currentRow.value !== null
     ? currentRow.value
-    : ''
+    : base.current_value ?? ''
 
 setValue(prev => {
   if (prev === '') {
