@@ -13,6 +13,12 @@ import {
   canEditSelectedMonth
 } from '@/lib/auth'
 
+
+// =========================
+// LABEL MAP
+// =========================
+
+
 const MARKETING_LABEL_MAP: Record<string, string> = {
   mirrored_np_this: '# New Patients Scheduled This Month',
   mirrored_np_next: '# New Patients Scheduled Next Month',
@@ -283,7 +289,11 @@ return (
     <div style={leftMeta}>
       <div style={metaItem}>
         <label style={label}>Date Updated</label>
-        <div style={inputSmall}>{lastUpdated || '—'}</div>
+        <input
+  value={lastUpdated || '—'}
+  readOnly
+  style={inputSmall}
+/>
         <input
           type="text"
           placeholder="10 State"
@@ -475,7 +485,7 @@ const description: React.CSSProperties = {
   fontSize: 16,
   color: COLORS.white,
   marginBottom: 24,
-  maxWidth: 900,
+  maxWidth: 620,
   lineHeight: 1.5
 }
 
