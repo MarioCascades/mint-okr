@@ -438,12 +438,18 @@ if (!currentRow && resolvedTarget !== '') {
 // SET TARGET
 setTarget(resolvedTarget?.toString() ?? '')
 
-         const currentValue =
+         const isCurrentSelectedMonth =
+  selectedMonth.getFullYear() === new Date().getFullYear() &&
+  selectedMonth.getMonth() === new Date().getMonth()
+
+const currentValue =
   currentRow && currentRow.value !== null
     ? currentRow.value
     : sourceUser
       ? base.current_value ?? ''
-      : ''
+      : isCurrentSelectedMonth
+        ? ''
+        : base.current_value ?? ''
 
 setValue(prev => {
   if (isDirty) return prev
