@@ -478,12 +478,14 @@ const title: React.CSSProperties = {
   fontSize: 38,
   fontWeight: 700,
   color: COLORS.white,
+  marginTop: 0,
   marginBottom: 8
 }
 
 const description: React.CSSProperties = {
   fontSize: 16,
   color: COLORS.white,
+  marginTop: 0,
   marginBottom: 16,
   maxWidth: 620,
   lineHeight: 1.5
