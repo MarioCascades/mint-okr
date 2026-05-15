@@ -451,15 +451,9 @@ const currentValue =
         ? ''
         : base.current_value ?? ''
 
-setValue(prev => {
-  if (isDirty) return prev
-  return currentValue?.toString() ?? ''
-})
+setValue(currentValue?.toString() ?? '')
 
-     setTarget(prev => {
-  if (isDirty) return prev
-  return resolvedTarget?.toString() ?? ''
-})
+     setTarget(resolvedTarget?.toString() ?? '')
 
      const c = Number(currentValue || 0)
     const t = Number(resolvedTarget || 0)
