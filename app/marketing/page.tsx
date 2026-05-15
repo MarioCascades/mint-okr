@@ -440,6 +440,7 @@ return (
 // STYLES
 // =========
 
+
 const container: React.CSSProperties = {
   backgroundColor: COLORS.grayAppBackground,
   minHeight: '100vh',
@@ -481,14 +482,16 @@ const description: React.CSSProperties = {
 const topSection: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: 24
+  gap: 24,
+  alignItems: 'flex-start'
 }
 
 const leftMeta: React.CSSProperties = {
   display: 'flex',
+  flexDirection: 'row',
   gap: 16,
-  alignItems: 'flex-start'
+  flexWrap: 'wrap',
+  alignItems: 'flex-end'
 }
 
 const rightMeta: React.CSSProperties = {
@@ -502,7 +505,7 @@ const rightMeta: React.CSSProperties = {
 const metaItem: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  minWidth: 140
+  minWidth: 220
 }
 
 const label: React.CSSProperties = {
@@ -527,10 +530,9 @@ const monthSelector: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 12,
-  padding: 6,
-  borderRadius: 10,
-  backgroundColor: COLORS.orangeAccent,
-  width: 170
+  padding: 8,
+  borderRadius: 12,
+  backgroundColor: COLORS.orangeAccent
 }
 
 const arrowButton: React.CSSProperties = {
