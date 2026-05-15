@@ -24,7 +24,7 @@ export default function Page() {
     return new Date(now.getFullYear(), now.getMonth(), 1)
   })
 
-  const [lastUpdated, setLastUpdated] = useState('')
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [percentIntoPeriod, setPercentIntoPeriod] = useState('')
   const [isEditing, setIsEditing] = useState(false)
   
@@ -195,15 +195,15 @@ useEffect(() => {
         </Objective>
 
         <Objective title="Objective 3: Community">
-  <KeyResult label="# of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
-  <KeyResult label="$ of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
-  <KeyResult label="# of Community Events" selectedMonth={selectedMonth} isEditing={isEditing} />
-  <KeyResult label="# of NPs from Community Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
-  <KeyResult label="GP Deliveries" selectedMonth={selectedMonth} isEditing={isEditing} />
-</Objective>
+          <KeyResult label="# of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="$ of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of Community Events" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of NPs from Community Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="GP Deliveries" selectedMonth={selectedMonth} isEditing={isEditing} />
+        </Objective>
           
           {showDigitalMarketing && (
-        <Objective title="Objective 4: Digital Marketing">
+          <Objective title="Objective 4: Digital Marketing">
           <KeyResult label="# of Social Posts" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Google Reviews" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -290,7 +290,7 @@ const KeyResult = ({
 
       console.log('SOURCE USER:', sourceUser)
 console.log('SOURCE LABEL:', sourceLabel)
-console.log('BASE RESULT:', base)
+console.log('BASE RESULT FULL:', JSON.stringify(base, null, 2))
 
       setKeyResultId(base.key_result_id)
 
@@ -415,26 +415,14 @@ if (!currentRow && resolvedTarget !== '') {
 }
 
 // SET TARGET
-setTarget(prev => {
-  // only set if empty (prevents overwrite)
-  if (prev === '') {
-    return resolvedTarget.toString()
-  }
-  return prev
-})
+setTarget(resolvedTarget?.toString() ?? '')
 
          const currentValue =
   currentRow && currentRow.value !== null
     ? currentRow.value
     : base.current_value ?? ''
 
-setValue(prev => {
-  if (prev === '') {
-    return currentValue.toString()
-  }
-  return prev
-})
-
+setValue(currentValue?.toString() ?? '')
 
       setLastMonth(prevData?.value ?? '')
 
