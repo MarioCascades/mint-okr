@@ -452,6 +452,10 @@ setScore(`${percent}%`)
   }, [label, selectedMonth])
 
   const handleSave = async () => {
+  console.log('HANDLE SAVE FIRED')
+  console.log('keyResultId:', keyResultId)
+  console.log('value:', value)
+  console.log('target:', target)
 
     if (!keyResultId) return
 
