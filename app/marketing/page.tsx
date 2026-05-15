@@ -82,10 +82,10 @@ useEffect(() => {
       <TopNav />
 
       <div style={stickyHeader}>
-        <h1 style={title}>Mari - Clinical Operations Manager</h1>
+        <h1 style={title}>Marketing</h1>
 
         <p style={description}>
-          The clinical team’s primary support and resource, providing guidance, training, and oversight to drive consistency, accountability, and exceptional patient outcomes. In addition, efficiently manage digital workflows and clinical supply/inventory.
+          Ensure brand reputatation and experience consistency (across all sources and channels), Marketing strategy incorporates brand awareness and lead generation. New Patient inquiry targets are set and appropriate for hitting TC starts target (based on 70% completed consult to start conversion rate) 
         </p>
 
        <div style={topSection}>
@@ -163,35 +163,54 @@ useEffect(() => {
       </div>
 
       <div style={content}>
-        <Objective title="Objective 1: Ensure Patient Flow and Completion">
-          <KeyResult label="# of Patients OVER ECD – LightForce" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="# of Patients OVER ECD – Aligners" selectedMonth={selectedMonth} isEditing={isEditing} />
-        </Objective>
-
-        <Objective title="Objective 2: Mentoring and Training the Clinical Team">
-          <KeyResult label="Monthly 1:1 with Team" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="# of Patients Waited 10+ Minutes" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="# of TLC Appts Scheduled" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="# of Same Day Call Outs" selectedMonth={selectedMonth} isEditing={isEditing} />
-        </Objective>
-
-        <Objective title="Objective 3: Ensure Complete and On Time Case/Appliance Ordering and Delivery">
-          <KeyResult label="# of Submissions Missed (OrthoFi Audit)" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult
-  label="# of Submissions Missed (Scan Report)"
+        <Objective title="Objective 1: Top of New Patient Funnel">
+        
+ <KeyResult
+  label="# of New Patients Scheduled This Month"
   selectedMonth={selectedMonth}
   isEditing={false}
-  sourceUser="Ashlynn"
-  sourceLabel="CO Orders Missing from Scan Report"
-  note="Pulls from Ashlynn"
+  sourceUser="Ashley"
+  sourceLabel="FD NP Scheduled (GF)"
+  note="Pulls from Ashley"
 />
-          <KeyResult label="# of Patients Rescheduled due to delayed case" selectedMonth={selectedMonth} isEditing={isEditing} />
+
+<KeyResult
+  label="# of New Patients Scheduled Next Month"
+  selectedMonth={selectedMonth}
+  isEditing={false}
+  sourceUser="Ashley"
+  sourceLabel="FD NP Scheduled Next Month"
+  note="Pulls from Ashley"
+/>
+        </Objective>
+
+        <Objective title="Objective 2: Understanding Referral Mix">
+          <KeyResult label="# of Dentist Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of Referring Dentists" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of Patient Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Digital Marketing" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Community" selectedMonth={selectedMonth} isEditing={isEditing} />
+        </Objective>
+
+        <Objective title="Objective 3: Community"/>
+          <KeyResult label="# of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="$ of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of Community Events" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="# of NPs from Community Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="GP Deliveries" selectedMonth={selectedMonth} isEditing={isEditing} />
+          
+          <Objective title="Objective 3: Digital Marketing">
+          <KeyResult label="# of Social Posts" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Google Reviews" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
+                    
+    
         </Objective>
       </div>
     </div>
+    
   )
 }
-
 // =========================
 // OBJECTIVE
 // =========================
