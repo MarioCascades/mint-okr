@@ -458,6 +458,11 @@ const currentValue =
         : base.current_value ?? ''
 
 setValue(currentValue?.toString() ?? '')
+setLastMonth(
+  prevData?.value !== null && prevData?.value !== undefined
+    ? prevData.value.toString()
+    : ''
+)
 
      setTarget(resolvedTarget?.toString() ?? '')
 
