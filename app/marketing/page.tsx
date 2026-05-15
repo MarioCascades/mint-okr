@@ -466,8 +466,17 @@ setLastMonth(
 
      setTarget(resolvedTarget?.toString() ?? '')
 
-     const c = Number(currentValue || 0)
-    const t = Number(resolvedTarget || 0)
+    if (
+  currentValue === '' ||
+  currentValue === null ||
+  currentValue === undefined
+) {
+  setScore('')
+  return
+}
+
+const c = Number(currentValue)
+const t = Number(resolvedTarget || 0)
 
 if (t <= 0) {
   setScore('')
@@ -544,6 +553,19 @@ const isLowerBetter = (label: string) => {
   )
 }
 const getScoreBackground = () => {
+
+  const isCurrencyField = label === '$ of Sponsorships'
+
+const formatCurrency = (val: string) => {
+  if (!val || isNaN(Number(val))) return ''
+
+  return Number(val).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
+}
   const num = Number(score.replace('%', ''))
 
   if (!num && num !== 0) {
@@ -572,6 +594,19 @@ const getScoreBackground = () => {
 
   return '#f3b8b8d8' // red
 }
+
+const isCurrencyField = label === '$ of Sponsorships'
+
+const formatCurrency = (val: string) => {
+  if (!val || isNaN(Number(val))) return ''
+
+  return Number(val).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
+}
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={row}>
@@ -596,7 +631,11 @@ const getScoreBackground = () => {
 
         <input
   style={targetCell}
-  value={target}
+value={
+  isCurrencyField && !isEditing
+    ? formatCurrency(target)
+    : target
+}
           disabled={!isEditing}
           onBlur={handleSave}
           onChange={(e) => {
@@ -609,17 +648,23 @@ const getScoreBackground = () => {
 
        <input
   style={currentCell}
-  value={value}
-          disabled={!isEditing}
-          onChange={(e) => {
-  const val = e.target.value.replace(/[^0-9]/g, '')
-  setValue(val)
-  setIsDirty(true)
-}}
-          onBlur={handleSave}
-          onKeyDown={handleEnter}
-        />
+  value={
+    isCurrencyField && !isEditing
+      ? formatCurrency(value)
+      : value
+  }
+  disabled={!isEditing}
+  onChange={(e) => {
+    const val = isCurrencyField
+      ? e.target.value.replace(/[^0-9.]/g, '')
+      : e.target.value.replace(/[^0-9]/g, '')
 
+    setValue(val)
+    setIsDirty(true)
+  }}
+  onBlur={handleSave}
+  onKeyDown={handleEnter}
+/>
         <input
   style={{
     ...cell,
