@@ -194,20 +194,19 @@ useEffect(() => {
           <KeyResult label="Community" selectedMonth={selectedMonth} isEditing={isEditing} />
         </Objective>
 
-        <Objective title="Objective 3: Community"/>
-          <KeyResult label="# of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="$ of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="# of Community Events" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="# of NPs from Community Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="GP Deliveries" selectedMonth={selectedMonth} isEditing={isEditing} />
+        <Objective title="Objective 3: Community">
+  <KeyResult label="# of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="$ of Sponsorships" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="# of Community Events" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="# of NPs from Community Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
+  <KeyResult label="GP Deliveries" selectedMonth={selectedMonth} isEditing={isEditing} />
+</Objective>
           
           {showDigitalMarketing && (
         <Objective title="Objective 4: Digital Marketing">
           <KeyResult label="# of Social Posts" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Google Reviews" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
-                    
-    
           </Objective>
 )}
       </div>
