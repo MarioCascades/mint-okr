@@ -627,7 +627,15 @@ const formatCurrency = (val: string) => {
   )}
 </span>
 
-        <input style={prevCell} value={lastMonth} readOnly />
+        <input
+  style={prevCell}
+  value={
+    isCurrencyField
+      ? formatCurrency(lastMonth)
+      : lastMonth
+  }
+  readOnly
+/>
 
         <input
   style={targetCell}
