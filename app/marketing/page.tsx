@@ -199,7 +199,7 @@ useEffect(() => {
           <KeyResult label="# of NPs from Community Referrals" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="GP Deliveries" selectedMonth={selectedMonth} isEditing={isEditing} />
           
-          <Objective title="Objective 3: Digital Marketing">
+          <Objective title="Objective 4: Digital Marketing">
           <KeyResult label="# of Social Posts" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Google Reviews" selectedMonth={selectedMonth} isEditing={isEditing} />
           <KeyResult label="Bright Referral" selectedMonth={selectedMonth} isEditing={isEditing} />
@@ -279,7 +279,7 @@ const KeyResult = ({
       const { data: base } = await supabase
       .from('dashboard_okr_data')
       .select('*')
-      .eq('user_name', sourceUser || 'Mari')
+      .eq('user_name', sourceUser || 'Marketing')
       .eq('key_result_title', sourceLabel || label)
       .maybeSingle()
 
