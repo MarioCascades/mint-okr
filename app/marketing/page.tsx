@@ -277,7 +277,7 @@ return (
     <div style={content}>
           
     <div style={stickyHeader}>
- <div style={title}>Marketing</div>
+  <h1 style={title}>Marketing</h1>
 
   <p style={description}>
     Marketing performance tracking and OKR visibility across referral growth,
@@ -484,7 +484,7 @@ const title: React.CSSProperties = {
 const description: React.CSSProperties = {
   fontSize: 16,
   color: COLORS.white,
-  marginBottom: 24,
+  marginBottom: 16,
   maxWidth: 620,
   lineHeight: 1.5
 }
