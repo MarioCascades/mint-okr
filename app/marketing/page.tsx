@@ -164,6 +164,7 @@ useEffect(() => {
         </div>
       </div>
 
+
       <div style={content}>
         <Objective title="Objective 1: Top of New Patient Funnel">
         
@@ -422,9 +423,15 @@ setTarget(resolvedTarget?.toString() ?? '')
     ? currentRow.value
     : base.current_value ?? ''
 
-setValue(currentValue?.toString() ?? '')
+setValue(prev => {
+  if (isDirty) return prev
+  return currentValue?.toString() ?? ''
+})
 
-      setLastMonth(prevData?.value ?? '')
+     setTarget(prev => {
+  if (isDirty) return prev
+  return resolvedTarget?.toString() ?? ''
+})
 
      const c = Number(currentValue || 0)
     const t = Number(resolvedTarget || 0)
@@ -554,6 +561,7 @@ const getScoreBackground = () => {
   style={targetCell}
   value={target}
           disabled={!isEditing}
+          onBlur={handleSave}
           onChange={(e) => {
   const val = e.target.value.replace(/[^0-9.]/g, '')
   setTarget(val)
