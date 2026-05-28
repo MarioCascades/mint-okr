@@ -793,10 +793,20 @@ useEffect(() => {
     return
   }
 
-  if (percentageMetrics.includes(label)) {
-    setScore(value ? value + '%' : '—')
-    return
-  }
+ if (percentageMetrics.includes(label)) {
+
+  const numericValue = Number(value || 0)
+  const numericTarget = Number(target || 0)
+
+  setScore(
+    calculateScore(
+      numericValue,
+      numericTarget
+    )
+  )
+
+  return
+}
 
   const numericValue = Number(value || 0)
   const numericTarget = Number(target || 0)
