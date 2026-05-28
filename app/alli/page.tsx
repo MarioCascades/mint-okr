@@ -166,8 +166,19 @@ export default function Page() {
         </Objective>
 
         <Objective title="Objective 3: Patient Engagement">
-          <KeyResult label="FD Total Active Patients" selectedMonth={selectedMonth} isEditing={isEditing} />
-          <KeyResult label="FD Total Active Patients Needing Appointment" selectedMonth={selectedMonth} isEditing={isEditing} />
+          <KeyResult
+  key="fd-total-active-patients"
+  label="FD Total Active Patients"
+  selectedMonth={selectedMonth}
+  isEditing={isEditing}
+/>
+
+<KeyResult
+  key="fd-total-active-patients-needing-appt"
+  label="FD Total Active Patients Needing Appointment"
+  selectedMonth={selectedMonth}
+  isEditing={isEditing}
+/>
         </Objective>
 
        <Objective title="Objective 4: Office Efficiency">
@@ -320,15 +331,17 @@ const getScoreStyle = () => {
 
     const fetchData = async () => {
 
-      const { data: base } = await supabase
-        .from('dashboard_okr_data')
-        .select('*')
-        .eq('user_name', sourceUser || 'Alli')  
-       .ilike(
-  'key_result_title',
-  `%${label.includes('Call') || label.includes('Missed') ? 'FD ' + label : label}%`
-)
-        .maybeSingle()
+    const lookupLabel =
+  label.includes('Call') || label.includes('Missed')
+    ? 'FD ' + label
+    : label
+
+const { data: base } = await supabase
+  .from('dashboard_okr_data')
+  .select('*')
+  .eq('user_name', sourceUser || 'Alli')
+  .eq('key_result_title', lookupLabel)
+  .maybeSingle()
 
       if (!base) return
 
@@ -534,7 +547,13 @@ const { data: prevData } = await supabase
 
     fetchData()
 
-  }, [label, selectedMonth])
+  }, [
+  label,
+  selectedMonth,
+  sourceUser,
+  isCurrency,
+  isPercent
+])
 
   const handleSave = async () => {
 
