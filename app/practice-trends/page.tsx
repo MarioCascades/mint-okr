@@ -343,6 +343,7 @@ if (row.metric_type === 'Insurance Collections') {
     </table>
   </div>
 </div>
+</div>
 
 
 <div style={topRowGrid}>
@@ -458,7 +459,7 @@ if (row.metric_type === 'Insurance Collections') {
     </div>
 </div>
 </div>
-</div>
+
 
  <div style={insuranceWrapper}>
   <div style={sectionBlock}>
