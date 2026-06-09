@@ -670,6 +670,6 @@ const topRowGrid: React.CSSProperties = {
 }
 
 const insuranceWrapper: React.CSSProperties = {
-  maxWidth: '900px',
+  width: 'calc(50% - 12px)',
   margin: '0 auto 32px auto'
 }
