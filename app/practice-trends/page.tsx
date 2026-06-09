@@ -399,9 +399,122 @@ if (row.metric_type === 'Insurance Collections') {
   </div>
 </div>
     </div>
+    <div style={startsWrapper}>
+  <div style={sectionBlock}>
+    <div style={sectionTitle}>
+      Patient Collections
+    </div>
+
+    <div style={tableWrapper}>
+      <table style={table}>
+        <thead>
+          <tr>
+            <th style={th}>Month</th>
+
+            {years.map((year) => (
+              <th key={year} style={th}>
+                {year}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {months.map((month) => (
+            <tr key={month}>
+              <td style={monthCell}>{month}</td>
+
+              {years.map((year) => (
+                <td key={year} style={td}>
+                  <input
+                    style={input}
+                    placeholder="$0.00"
+                    readOnly={!isEditing}
+                    value={patientCollectionsData[`${month}-${year}`] || ''}
+                    onChange={(e) => {
+                      setPatientCollectionsData({
+                        ...patientCollectionsData,
+                        [`${month}-${year}`]: e.target.value
+                      })
+                    }}
+                    onBlur={(e) => {
+                      const formatted = formatCurrency(e.target.value)
+
+                      setPatientCollectionsData({
+                        ...patientCollectionsData,
+                        [`${month}-${year}`]: formatted
+                      })
+                    }}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div style={startsWrapper}>
+  <div style={sectionBlock}>
+    <div style={sectionTitle}>
+      Insurance Collections
+    </div>
+
+    <div style={tableWrapper}>
+      <table style={table}>
+        <thead>
+          <tr>
+            <th style={th}>Month</th>
+
+            {years.map((year) => (
+              <th key={year} style={th}>
+                {year}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {months.map((month) => (
+            <tr key={month}>
+              <td style={monthCell}>{month}</td>
+
+              {years.map((year) => (
+                <td key={year} style={td}>
+                  <input
+                    style={input}
+                    placeholder="$0.00"
+                    readOnly={!isEditing}
+                    value={insuranceCollectionsData[`${month}-${year}`] || ''}
+                    onChange={(e) => {
+                      setInsuranceCollectionsData({
+                        ...insuranceCollectionsData,
+                        [`${month}-${year}`]: e.target.value
+                      })
+                    }}
+                    onBlur={(e) => {
+                      const formatted = formatCurrency(e.target.value)
+
+                      setInsuranceCollectionsData({
+                        ...insuranceCollectionsData,
+                        [`${month}-${year}`]: formatted
+                      })
+                    }}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
     </div>
   )
 }
+
 
 
 const container: React.CSSProperties = {
