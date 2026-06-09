@@ -459,9 +459,10 @@ if (row.metric_type === 'Insurance Collections') {
 </div>
 </div>
 
-  <div style={insuranceWrapper}>
+ <div style={insuranceWrapper}>
   <div style={sectionBlock}>
-    Insurance Collections
+    <div style={sectionTitle}>
+      Insurance Collections
     </div>
 
     <div style={tableWrapper}>
@@ -515,6 +516,8 @@ if (row.metric_type === 'Insurance Collections') {
     </div>
     </div>
     </div>
+    </div>
+    
   )
 }
 
@@ -648,13 +651,6 @@ const sectionTableCard: React.CSSProperties = {
   borderRadius: 16,
   padding: 20,
   boxShadow: COLORS.shadowSoft
-}
-
-const chartsGrid: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1fr',
-  gap: 24,
-  margin: '0 20px 32px 20px'
 }
 
 const sectionBlock: React.CSSProperties = {
