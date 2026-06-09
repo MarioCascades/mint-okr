@@ -207,7 +207,7 @@ if (row.metric_type === 'Insurance Collections') {
   </h1>
 
   <p style={headerSubtitle}>
-    Historical Production, Collections, and Starts
+    Historical Production, Collections, Starts, Patient Collections, Insurance Collections
   </p>
 
 <div style={actionRow}>
@@ -228,7 +228,8 @@ if (row.metric_type === 'Insurance Collections') {
 </div>
 
 </div>
-<div style={topRowGrid}>
+<div style={chartsGrid}>
+
 <div style={sectionBlock}>
   <div style={sectionTitle}>
     Production
@@ -283,7 +284,8 @@ if (row.metric_type === 'Insurance Collections') {
           </tbody>
         </table>
         </div>
-      </div>
+        </div>
+        
 
       <div style={sectionBlock}>
   <div style={sectionTitle}>
@@ -340,10 +342,8 @@ if (row.metric_type === 'Insurance Collections') {
     </table>
   </div>
 </div>
-</div>
 
-<div style={topRowGrid}>
-<div style={secondRowGrid}>
+
 <div style={sectionBlock}>
   <div style={sectionTitle}>
     Starts
@@ -399,10 +399,7 @@ if (row.metric_type === 'Insurance Collections') {
     </table>
   </div>
 </div>
-    </div>
-</div>
 
-<div style={secondRowGrid}>
 
 <div style={sectionBlock}>
   <div style={sectionTitle}>
@@ -457,11 +454,8 @@ if (row.metric_type === 'Insurance Collections') {
         </tbody>
       </table>
     </div>
-  </div>
 </div>
 
-
-<div style={startsWrapper}>
   <div style={sectionBlock}>
     <div style={sectionTitle}>
       Insurance Collections
@@ -515,11 +509,12 @@ if (row.metric_type === 'Insurance Collections') {
         </tbody>
       </table>
     </div>
-  </div>
-</div>
+    </div>
+    </div>
     </div>
   )
 }
+
 
 
 
@@ -652,20 +647,11 @@ const sectionTableCard: React.CSSProperties = {
   boxShadow: COLORS.shadowSoft
 }
 
-const topRowGrid: React.CSSProperties = {
+const chartsGrid: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
+  gridTemplateColumns: '1fr',
   gap: 24,
-  margin: '0 20px 32px 20px',
-  alignItems: 'start'
-}
-
-const secondRowGrid: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 24,
-  margin: '0 20px 32px 20px',
-  alignItems: 'start'
+  margin: '0 20px 32px 20px'
 }
 
 const sectionBlock: React.CSSProperties = {
@@ -674,17 +660,4 @@ const sectionBlock: React.CSSProperties = {
   borderRadius: 16,
   padding: 20,
   boxShadow: COLORS.shadowSoft
-}
-
-const startsWrapper: React.CSSProperties = {
-  width: '100%',
-  margin: '0 20px 40px 20px'
-}
-
-const middleRowGrid: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: 24,
-  margin: '0 20px 32px 20px',
-  alignItems: 'start'
 }
