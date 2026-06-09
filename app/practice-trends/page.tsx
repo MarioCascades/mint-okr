@@ -11,6 +11,8 @@ export default function PracticeTrendsPage() {
   const [productionData, setProductionData] = useState<Record<string, string>>({})
   const [collectionsData, setCollectionsData] = useState<Record<string, string>>({})
   const [startsData, setStartsData] = useState<Record<string, string>>({})
+  const [patientCollectionsData, setPatientCollectionsData] = useState<Record<string, string>>({})
+  const [insuranceCollectionsData, setInsuranceCollectionsData] = useState<Record<string, string>>({})
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -78,10 +80,42 @@ const handleSave = async () => {
   }
 })
 
+const patientCollectionsRows = Object.entries(patientCollectionsData).map(([key, value]) => {
+  const [month, year] = key.split('-')
+
+  return {
+    metric_type: 'Patient Collections',
+    month_name: month,
+    year_value: Number(year),
+    metric_value: Number(
+      value
+        .replace(/\$/g, '')
+        .replace(/,/g, '')
+    ) || 0
+  }
+})
+
+const insuranceCollectionsRows = Object.entries(insuranceCollectionsData).map(([key, value]) => {
+  const [month, year] = key.split('-')
+
+  return {
+    metric_type: 'Insurance Collections',
+    month_name: month,
+    year_value: Number(year),
+    metric_value: Number(
+      value
+        .replace(/\$/g, '')
+        .replace(/,/g, '')
+    ) || 0
+  }
+})
+
 const allRows = [
   ...productionRows,
   ...collectionsRows,
-  ...startsRows
+  ...startsRows,
+  ...patientCollectionsRows,
+  ...insuranceCollectionsRows
 ]
 
   const { error } = await supabase
@@ -112,6 +146,8 @@ useEffect(() => {
     const productionFormatted: Record<string, string> = {}
     const collectionsFormatted: Record<string, string> = {}
     const startsFormatted: Record<string, string> = {}
+    const patientCollectionsFormatted: Record<string, string> = {}
+    const insuranceCollectionsFormatted: Record<string, string> = {}
 
     data.forEach((row) => {
       const key = `${row.month_name}-${row.year_value}`
@@ -133,11 +169,28 @@ useEffect(() => {
       if (row.metric_type === 'Starts') {
         startsFormatted[key] = Number(row.metric_value).toLocaleString()
       }
+      if (row.metric_type === 'Patient Collections') {
+  patientCollectionsFormatted[key] =
+    `$${Number(row.metric_value).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`
+}
+
+if (row.metric_type === 'Insurance Collections') {
+  insuranceCollectionsFormatted[key] =
+    `$${Number(row.metric_value).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`
+}
     })
 
     setProductionData(productionFormatted)
     setCollectionsData(collectionsFormatted)
     setStartsData(startsFormatted)
+    setPatientCollectionsData(patientCollectionsFormatted)
+    setInsuranceCollectionsData(insuranceCollectionsFormatted)
   }
 
   fetchData()
