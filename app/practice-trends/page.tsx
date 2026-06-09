@@ -458,6 +458,7 @@ if (row.metric_type === 'Insurance Collections') {
     </div>
 </div>
 </div>
+</div>
 
  <div style={insuranceWrapper}>
   <div style={sectionBlock}>
@@ -516,7 +517,7 @@ if (row.metric_type === 'Insurance Collections') {
     </div>
     </div>
     </div>
-    </div>
+    
     
   )
 }
