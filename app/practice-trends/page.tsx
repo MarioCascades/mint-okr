@@ -228,7 +228,7 @@ if (row.metric_type === 'Insurance Collections') {
 </div>
 
 </div>
-<div style={chartsGrid}>
+<div style={topRowGrid}>
 
 <div style={sectionBlock}>
   <div style={sectionTitle}>
@@ -285,6 +285,7 @@ if (row.metric_type === 'Insurance Collections') {
         </table>
         </div>
         </div>
+        
         
 
       <div style={sectionBlock}>
@@ -344,6 +345,7 @@ if (row.metric_type === 'Insurance Collections') {
 </div>
 
 
+<div style={topRowGrid}>
 <div style={sectionBlock}>
   <div style={sectionTitle}>
     Starts
@@ -455,10 +457,11 @@ if (row.metric_type === 'Insurance Collections') {
       </table>
     </div>
 </div>
+</div>
 
+  <div style={insuranceWrapper}>
   <div style={sectionBlock}>
-    <div style={sectionTitle}>
-      Insurance Collections
+    Insurance Collections
     </div>
 
     <div style={tableWrapper}>
@@ -660,4 +663,16 @@ const sectionBlock: React.CSSProperties = {
   borderRadius: 16,
   padding: 20,
   boxShadow: COLORS.shadowSoft
+}
+const topRowGrid: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: 24,
+  margin: '0 20px 24px 20px',
+  alignItems: 'start'
+}
+
+const insuranceWrapper: React.CSSProperties = {
+  maxWidth: '900px',
+  margin: '0 auto 32px auto'
 }
