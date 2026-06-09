@@ -18,6 +18,8 @@ export default function PracticeTrendsCharts() {
   const [productionData, setProductionData] = useState<any[]>([])
   const [collectionsData, setCollectionsData] = useState<any[]>([])
   const [startsData, setStartsData] = useState<any[]>([])
+  const [patientCollectionsData, setPatientCollectionsData] = useState<any[]>([])
+  const [insuranceCollectionsData, setInsuranceCollectionsData] = useState<any[]>([])
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -33,6 +35,8 @@ export default function PracticeTrendsCharts() {
       const productionMap: any = {}
       const collectionsMap: any = {}
       const startsMap: any = {}
+      const patientCollectionsMap: any = {}
+      const insuranceCollectionsMap: any = {}
 
       data.forEach((row) => {
         const month = row.month_name
@@ -70,6 +74,28 @@ export default function PracticeTrendsCharts() {
               ? null
               : Number(row.metric_value)
         }
+
+        if (row.metric_type === 'Patient Collections') {
+          if (!patientCollectionsMap[month]) {
+            patientCollectionsMap[month] = { month }
+          }
+
+          patientCollectionsMap[month][yearKey] =
+            Number(row.metric_value) === 0
+              ? null
+              : Number(row.metric_value)
+        }
+
+        if (row.metric_type === 'Insurance Collections') {
+         if (!insuranceCollectionsMap[month]) {
+            insuranceCollectionsMap[month] = { month }
+          }
+
+          insuranceCollectionsMap[month][yearKey] =
+            Number(row.metric_value) === 0
+             ? null
+              : Number(row.metric_value)
+        }
       })
 
       setProductionData(
@@ -82,6 +108,17 @@ setCollectionsData(
 
 setStartsData(
   sortByMonth(Object.values(startsMap))
+)
+setPatientCollectionsData(
+  sortByMonth(
+    Object.values(patientCollectionsMap)
+  )
+)
+
+setInsuranceCollectionsData(
+  sortByMonth(
+    Object.values(insuranceCollectionsMap)
+  )
 )
     }
     const monthOrder = [
@@ -117,7 +154,7 @@ const sortByMonth = (arr: any[]) =>
         </h1>
 
         <p style={headerSubtitle}>
-          Visual performance tracking for Production, Collections, and Starts
+          Visual performance tracking for Production, Collections, Starts, Patient Collections and Insurance Collections
         </p>
       </div>
 
@@ -133,12 +170,24 @@ const sortByMonth = (arr: any[]) =>
         />
       </div>
 
-      <div style={startsWrapper}>
-        <ChartCard
-          title="Starts"
-          data={startsData}
-        />
-      </div>
+     <div style={topRowGrid}>
+  <ChartCard
+    title="Starts"
+    data={startsData}
+  />
+
+  <ChartCard
+    title="Patient Collections"
+    data={patientCollectionsData}
+  />
+</div>
+
+<div style={insuranceWrapper}>
+  <ChartCard
+    title="Insurance Collections"
+    data={insuranceCollectionsData}
+  />
+</div>
     </>
   )
 }
@@ -231,11 +280,9 @@ const topRowGrid: React.CSSProperties = {
   alignItems: 'start'
 }
 
-const startsWrapper: React.CSSProperties = {
+const insuranceWrapper: React.CSSProperties = {
   width: '72%',
-  margin: '36px auto 48px auto',
-  display: 'flex',
-  justifyContent: 'center'
+  margin: '36px auto 48px auto'
 }
 
 const chartCard: React.CSSProperties = {
